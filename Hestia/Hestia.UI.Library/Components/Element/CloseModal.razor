@@ -1,0 +1,26 @@
+﻿@code {
+    [Parameter]
+    public bool CloseMainModal { get; set; } = true;
+    [Parameter]
+    public bool CloseRefreshEncryptionKeyModal { get; set; } = true;
+}
+
+@if(CloseMainModal)
+{
+    <div
+        id="modal-container"
+        class="modal"
+        hx-swap-oob="true">
+    </div>
+}
+
+@if(CloseRefreshEncryptionKeyModal)
+{
+    <div
+        id="refresh-encryption-key-modal-container"
+        class="modal"
+        hx-swap-oob="true">
+    </div>
+}
+
+

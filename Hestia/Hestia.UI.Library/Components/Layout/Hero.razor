@@ -1,0 +1,30 @@
+@using System.Text
+@using Hestia.UI.Library.Models
+@code {
+    [Parameter, EditorRequired]
+    public required string Title { get; set; }
+
+    [Parameter]
+    public string? Subtitle { get; set; }
+
+    [Parameter]
+    public Color Color { get; set; }
+    [Parameter]
+    public HeroSize Size { get; set; }
+
+    private string _class = default!;
+    protected override void OnInitialized()
+    {
+        _class = $"hero {Color.Class()} {Size.Class()}";
+    }
+}
+
+<section class="@_class">
+    <div class="hero-body">
+        <p class="title">@Title</p>
+        @if (!string.IsNullOrEmpty(Subtitle))
+        {
+            <p class="subtitle">@Subtitle</p>
+        }
+    </div>
+</section>

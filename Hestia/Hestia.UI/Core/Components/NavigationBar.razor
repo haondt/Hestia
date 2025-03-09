@@ -1,0 +1,48 @@
+<nav class="navbar is-white" id="navbar"
+    _="on OnNavigate 
+        for anchor in .navbar-item in (the first .navbar-start in me)
+            if anchor's innerHTML == the event's detail.value
+                add .is-active to anchor
+            else
+                remove .is-active from anchor
+    ">
+    <style>
+        @@scope{
+            :scope {
+                --bulma-link: #000000;
+                .navbar-item.is-tab.is-active {
+                    font-weight: 500;
+                }
+            }
+        }
+    </style>
+    <div class="navbar-brand">
+        <div class="navbar-item">
+            <p class="subtitle is-3 has-text-black">HESTIA</p>
+        </div>
+
+        <a class="navbar-burger">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </a>
+    </div>
+
+    <div class="navbar-menu">
+        <div class="navbar-start">
+            <a
+                href="/ingredients"
+                hx-boost="true"
+                hx-target="#page-container"
+                class="navbar-item is-tab">Ingredients</a>
+        </div>
+        <div class="navbar-end">
+            <a
+                href="/settings"
+                hx-boost="true"
+                hx-target="#page-container"
+                class="navbar-item is-tab">settings</a>
+        </div>
+    </div>
+</nav>

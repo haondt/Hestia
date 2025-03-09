@@ -1,0 +1,61 @@
+﻿
+@code {
+    [Parameter]
+    public RenderFragment? BodyContent { get; set; } 
+    [Parameter]
+    public RenderFragment? FooterContent { get; set; } 
+    [Parameter, EditorRequired]
+    public required string Title { get; set; } 
+}
+
+
+<div 
+    id="modal-container"
+    class="modal is-active is-justify-content-flex-start pt-6"
+    hx-swap-oob="true">
+    <div 
+        class="modal-background"
+        _="
+            on click
+                remove .is-active from #modal-container
+                set #modal-container's innerHTML to ''
+            end
+            on keydown(key) from elsewhere
+                if the key is 'Escape'
+                    send click to me
+                end
+            end
+        "></div>
+    <div class="card">
+        <style>
+            @@scope {
+                :scope {
+                    max-height: calc(100% - var(--bulma-modal-card-spacing));
+                    display: flex;
+                    flex-direction: column;
+                    width: 80rem;
+                }
+
+                .card-content {
+                    overflow: auto;
+                    /* overflow-y: scroll; */
+                }
+
+                .modal-card-head {
+                    box-shadow:none;
+                    border-bottom: 1px solid var(--bulma-border-weak);
+                }
+            }
+        </style>
+        <header class="modal-card-head card-header">
+            <p class="modal-card-title">@Title</p>
+            <button class="delete" _="on click send click to the previous .modal-background"></button>
+        </header>
+        <section class="card-content">
+            @BodyContent
+        </section>
+        <footer class="modal-card-foot">
+            @FooterContent
+        </footer>
+    </div>
+</div>

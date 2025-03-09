@@ -1,0 +1,28 @@
+@using Haondt.Web.BulmaCSS.Services
+@using Hestia.UI.Library.Components.Element
+@code {
+    [Parameter, EditorRequired]
+    public required IComponent Content { get; set; }
+}
+
+<div>
+    <div id="toast-relay"></div>
+    <div id="modal-container" class="modal"></div>
+    <div 
+        hx-trigger="toastRelay"
+        hx-get="/fragments/toast"
+        id="toast-relay"
+        hx-vals='js:{"message": event.detail.message, "severity": event.detail.severity || "@ToastSeverity.Info"}'
+    ></div>
+    <ToastContainer />
+    <div id="navigation-container">
+        @if (Content.GetType().GetCustomAttributes(typeof(BareLayoutAttribute), false).Length == 0)
+        {
+            <NavigationBar />
+        }
+    </div>
+    <div id="page-container">
+        <ObjectComponent Component="@Content"/>
+    </div>
+    <div id="refresh-encryption-key-modal-container"style="z-index:1000;"></div>
+</div> 

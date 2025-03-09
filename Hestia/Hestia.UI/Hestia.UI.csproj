@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Haondt.Core" Version="0.2.5" />
+    <PackageReference Include="Haondt.Web" Version="0.2.5" />
+    <PackageReference Include="Haondt.Web.BulmaCSS" Version="0.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hestia.UI.Library\Hestia.UI.Library.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Ingredients\Components\" />
+  </ItemGroup>
+
+
+</Project>

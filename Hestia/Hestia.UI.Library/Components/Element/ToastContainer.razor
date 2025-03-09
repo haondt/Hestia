@@ -1,0 +1,27 @@
+<div id="toast-container" 
+    class="is-flex is-flex-direction-column is-justify-content-flex-start is-align-items-flex-end mr-5 mt-5">
+    <style>
+        @@scope {
+            :scope {
+                overflow-y: auto;
+                position: fixed;
+                z-index: 1000;
+                bottom: 0;
+            }
+
+            .toast {
+                opacity: 0;
+                transition: opacity 0.5s ease;
+                z-index: 1000;
+            }
+
+            .toast.notification {
+                margin-bottom: 10px;
+            }
+
+            .toast.created {
+                opacity: 1;
+            }
+        }
+    </style>
+</div>

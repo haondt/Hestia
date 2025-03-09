@@ -1,0 +1,34 @@
+@using Haondt.Web.Core.Http
+@using Hestia.UI.Library.Components.Layout
+@using Hestia.UI.Library.Models
+@attribute [RenderPage]
+@attribute [BareLayout]
+
+@code {
+    [Parameter, EditorRequired]
+    public required int StatusCode { get; set; }
+    [Parameter, EditorRequired]
+    public required string Message { get; set; }
+    [Parameter]
+    public Optional<string> Details { get; set; }
+
+    [CascadingParameter]
+    public IResponseData Response { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        Response.Status(StatusCode);
+    }
+}
+
+<div id="page-container" hx-swap-oob="true">
+    <Hero Title="@(StatusCode.ToString())" Subtitle="@Message" Color="Color.Danger" Size="HeroSize.Medium"/>
+</div>
+@if (Details.HasValue)
+{
+    <section class="section">
+        <article class="message">
+            <div class="message-body is-family-monospace" style="white-space:pre-wrap;">@Details.Value</div>
+        </article>
+    </section>
+}
