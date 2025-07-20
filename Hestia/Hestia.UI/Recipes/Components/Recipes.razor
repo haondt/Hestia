@@ -1,0 +1,108 @@
+@using Hestia.UI.Library.Components.Components
+@using Hestia.UI.Library.Components.Element
+@attribute [RenderPage]
+<div _="on load send OnNavigate(value:'Recipes') to #navbar then remove me"></div>
+
+<div class="content-container mt-5">
+    <form hx-get="/secrets/search" hx-swap="none">
+        <div class="field is-grouped">
+            <div class="control is-expanded">
+                <p class="control has-icons-left">
+                    <input
+                        _="
+                            on input debounced at 200ms
+                            send submit to the closest <form />
+                        "
+                        class="input is-fullwidth is-rounded" name="search" placeholder="search" type="search">
+                    <span class="icon is-small is-left"><i class="fas fa-search" aria-hidden="true"></i></span>
+                </p>
+            </div>
+            <div class="control buttons">
+                <div class="dropdown is-right">
+                    <div class="dropdown-trigger">
+                        <button class="button is-primary">
+                            New recipe
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <div class="mt-5 masonry-container"
+        _="on load[event.target==me]
+            js(me)
+                const mm = new MiniMasonry({
+                    container: me,
+                    surroundingGutter: false,
+                    gutter: 15,
+                    ultimateGutter: 15,
+                    baseWidth: 300
+                });
+                mm.layout();
+                return mm;
+            end
+            set :mm to it
+        end
+        
+        on htmx:beforeCleanupElement[event.target==me]
+            set mm to :mm
+            js(mm)
+                mm.destroy();
+            end
+        end
+
+        on htmx:afterSwap
+            set mm to :mm
+            js(mm)
+                mm.layout();
+            end
+        end
+    ">
+        @for(int i =0;i<15;i++){
+
+                var localId = i;
+        <div class="masonry-child" >
+            <Tag Text="10 min" IsStatic="true" ColorClasses="recipe-card-tag" IsMonospace="false"></Tag>
+            <a href="google.com">
+
+                <Card>
+                    <Image>
+                        @if(localId % 3 == 0){
+
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFaksC-wuUxI6PkfrTLIO06xLsSiZGYyWYPA&s" alt="Recipe Image"/>
+                        }
+                        else {
+                            <div class="has-width-full has-height-full is-flex is-justify-content-center
+ is-align-items-center">
+                                  <img src="/static/wwwroot.fire-pan.svg" style="height:6em;position:initial;" />
+                            </div>
+
+                        }
+                    </Image>
+                    <Content>
+                        @if(localId % 2 == 0){
+
+                        <p class="subtitle is-5">
+                            Paleo Avocado
+                        </p>
+                        }
+                        else {
+                        <p class="subtitle is-5">
+                            Paleo Avocado Tuna Salad (Tuna in Oil)
+                            Paleo Avocado Tuna Salad (Tuna in Oil)
+                            Paleo Avocado Tuna Salad (Tuna in Oil)
+                            Paleo Avocado Tuna Salad (Tuna in Oil)
+                        </p>
+
+                        }
+                    </Content>
+                </Card>
+            </a>
+        </div>
+        }
+    </div>
+
+</div>
+

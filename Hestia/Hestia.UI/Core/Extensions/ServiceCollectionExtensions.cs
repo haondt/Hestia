@@ -1,5 +1,4 @@
-﻿using Haondt.Web.Assets;
-using Haondt.Web.BulmaCSS.Extensions;
+﻿using Haondt.Web.BulmaCSS.Extensions;
 using Haondt.Web.Core.Services;
 using Haondt.Web.Services;
 using Hestia.UI.Core.Middlewares;
@@ -32,9 +31,20 @@ namespace Hestia.UI.Core.Extensions
             var assembly = typeof(ServiceCollectionExtensions).Assembly;
             var assemblyPrefix = assembly.GetName().Name;
 
-            services.AddSingleton<IAssetSource>(sp => new ManifestAssetSource(assembly));
-
-
+            services.AddScoped<IHeadEntryDescriptor>(sp => new LinkDescriptor
+            {
+                Uri = "/static/wwwroot.logo.svg",
+                Relationship = "icon",
+                Type = "image/svg+xml"
+            });
+            services.AddScoped<IHeadEntryDescriptor>(_ => new StyleSheetDescriptor
+            {
+                Uri = "/static/wwwroot.style.css",
+            });
+            services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
+            {
+                Uri = "https://cdn.jsdelivr.net/npm/minimasonry@1.3.2/build/minimasonry.min.js",
+            });
             services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
             {
                 Uri = "https://kit.fontawesome.com/afd44816da.js",
@@ -42,7 +52,7 @@ namespace Hestia.UI.Core.Extensions
             });
             services.AddScoped<IHeadEntryDescriptor>(_ => new TitleDescriptor
             {
-                Title = "hestia",
+                Title = "Hestia",
             });
             services.AddScoped<IHeadEntryDescriptor>(_ => new MetaDescriptor
             {
@@ -51,7 +61,8 @@ namespace Hestia.UI.Core.Extensions
                     ""responseHandling"": [
                         { ""code"": ""204"", ""swap"": false },
                         { ""code"": "".*"", ""swap"": true }
-                    ]
+                    ],
+                    ""scrollIntoViewOnBoost"": false
                 }",
             });
             return services;

@@ -1,0 +1,56 @@
+@using Haondt.Core.Models
+@using Hestia.UI.Library.Components.Element
+@code {
+    [Parameter]
+    public RenderFragment? Header { get; set; } = default;
+
+    [Parameter]
+    public RenderFragment? Image { get; set; } = default;
+
+    [Parameter]
+    public RenderFragment? Content { get; set; } = default;
+
+    /// <summary>
+    /// Each item in here should have the "card-footer-item" class."
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Footer { get; set; } = default;
+}
+<div class="card">
+    @if(Header is not null) 
+    {
+        <header class="card-header">
+            <p class="card-header-title">@Header</p>
+            <!--
+                <button class="card-header-icon" aria-label="more options">
+                <span class="icon">
+                    <i class="fas fa-angle-down"></i>
+                </span>
+            -->
+        </header>
+    }
+
+    @if (Image is not null)
+    {
+        <div class="card-image">
+            <figure class="image is-3by2">
+                @Image
+            </figure>
+        </div>
+    }
+
+    @if (Content is not null)
+    {
+        <div class="card-content">
+            @Content
+        </div>
+    }
+
+    @if (Footer is not null)
+    {
+        <footer class="card-footer">
+            @Footer
+        </footer>
+    }
+
+</div>

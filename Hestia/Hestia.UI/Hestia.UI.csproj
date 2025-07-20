@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -6,6 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\fire-pan.svg" />
+    <Content Remove="wwwroot\logo.svg" />
+    <Content Remove="wwwroot\style.css" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Haondt.Core" Version="0.2.5" />
@@ -19,6 +25,12 @@
 
   <ItemGroup>
     <Folder Include="Ingredients\Components\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\fire-pan.svg" />
+    <EmbeddedResource Include="wwwroot\logo.svg" />
+    <EmbeddedResource Include="wwwroot\style.css" />
   </ItemGroup>
 
 

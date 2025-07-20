@@ -2,6 +2,52 @@
 
 <div _="on load send OnNavigate(value:'Ingredients') to #navbar then remove me"></div>
 
-<div>
-    Welcome to ingredients page!
-</div>
+<form hx-get="/secrets/search" hx-swap="none">
+    <div class="field is-grouped">
+        <div class="control is-expanded">
+            <p class="control has-icons-left">
+                <input
+                    _="
+                        on input debounced at 200ms
+                        send submit to the closest <form />
+                    "
+                    class="input is-fullwidth is-rounded" name="search" placeholder="search" type="search">
+                <span class="icon is-small is-left"><i class="fas fa-search" aria-hidden="true"></i></span>
+            </p>
+        </div>
+        <div class="control buttons">
+            <div class="dropdown is-right">
+                <div class="dropdown-trigger">
+                    <button class="button is-info is-dark" 
+                        _="
+                            set :dd to the closest .dropdown
+                            on click
+                                toggle .is-active on :dd then halt the event
+                            on click from elsewhere
+                                if the event's target is not in :dd
+                                    remove .is-active from :dd
+                    ">
+                        <span class="icon is-small"><i class="fas fa-tag" aria-hidden="true"></i></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>IDs</th>
+            <th>Name</th>
+            <th>Calories</th>
+            <th>Protein</th>
+            <th>Carbs</th>
+            <th>Fat</th>
+            <th>Cost</th>
+            <th>Unit</th>
+        </tr>
+    </thead>
+
+</table>

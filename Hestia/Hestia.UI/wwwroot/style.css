@@ -1,0 +1,111 @@
+:root {
+    --hestia-content-width: 1300px;
+    --bulma-card-content-padding: 1rem;
+
+  --bulma-hr-margin: 1rem 0;
+        color-scheme: dark;
+    --bulma-primary-h: 15deg;
+    --bulma-primary-s: 74%;
+    --bulma-primary-l: 55%;
+
+    --bulma-link-h: 31deg;
+    --bulma-link-s: 92%;
+    --bulma-link-l: 54%;
+
+      --bulma-scheme-h: 14;
+  --bulma-scheme-s: 5%;
+
+
+
+}
+.navbar {
+    --bulma-navbar-h: var(--bulma-link-h);
+    --bulma-navbar-s: var(--bulma-link-s);
+    --bulma-navbar-l: var(--bulma-link-l);
+}
+
+.navbar-item.is-tab {
+    border-bottom: initial;
+}
+
+.navbar-item.is-tab.is-active {
+    border-bottom: initial;
+    padding-bottom: calc(.5rem - 1px); /* taken from .navbar-item.is-tab */
+}
+
+
+.button {
+  --bulma-button-weight: var(--bulma-weight-normal);
+}
+
+.content-container {
+    max-width: var(--hestia-content-width);
+    margin: auto;
+    width: calc(100% - 40px);
+}
+
+.recipe-card-tag {
+    position: absolute;
+    z-index: 100;
+    top: 0.5rem;
+    left: 0.5rem;
+}
+
+.card {
+    box-shadow: initial;
+    border-width: 1px;
+    border-style: solid;
+    border-color: hsl(var(--bulma-scheme-h),var(--bulma-scheme-s),calc(var(--bulma-border-l)));
+    transition: border-color 0.3s ease;
+}
+
+.card:hover {
+    border: 1px solid var(--bulma-link-text);
+
+}
+
+.card-content {
+    --bulma-card-content-padding: 1rem;
+}
+
+.icon.is-8x {
+        height: 9em;
+        width: 9em;
+}
+.icon.is-7x {
+        height: 8em;
+        width: 8em;
+}
+.icon.is-6x {
+        height: 7em;
+        width: 7em;
+}
+
+.has-width-full {
+    width: 100%;
+}
+.has-height-full {
+    height: 100%;
+}
+
+
+.gap-0 { gap: 0; }
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-5 { gap: 1.25rem; }
+.gap-6 { gap: 1.5rem; }
+.gap-7 { gap: 1.75rem; }
+.gap-8 { gap: 2rem; }
+
+.content {
+    --bulma-content-heading-weight: var(--bulma-weight-semibold);
+}
+
+  .masonry-container {
+      position: relative;
+  }
+  .masonry-child {
+      position: absolute;
+  }

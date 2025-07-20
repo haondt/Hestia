@@ -33,4 +33,6 @@ app.UseMiddleware<UnmappedRouteHandlerMiddleware>();
 
 //app.Services.PerformDatabaseMigrations();
 
+app.UseHestiaUI();
+
 app.Run();
