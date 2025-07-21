@@ -1,4 +1,113 @@
+@using Haondt.Core.Extensions
+@using RecipeModel = Hestia.Core.Models.Recipe;
+
+@attribute [RenderPage]
+<div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
+
 @code {
     [Parameter]
-    public Recipe? Recipe { get; set; }
+    public Optional<RecipeModel> Recipe { get; set; }
+
+    private string _target = default!;
+
+    protected override void OnInitialized()
+    {
+        _target = Recipe.As(r => $"/recipes/edit/{r.Id}").Or("/recipes/new");
+        base.OnInitialized();
+    }
+
 }
+
+<div class="content-container mt-5">
+    <form id="edit-recipe-form" class="control" hx-swap="none" hx-post="@_target">
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Title</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <input class="input" name="title" type="text" value="@Recipe.As(q => q.Title).Or("")" />
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Description</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <textarea class="textarea" name="description" type="text" value="@Recipe.As(q => q.Description).Or("")" />
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Photo</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFaksC-wuUxI6PkfrTLIO06xLsSiZGYyWYPA&s" alt="Recipe Image"/>
+                </div>
+            </div>
+        </div>
+        <div class="field is-horizontal">
+            <div class="field-label is-normal"></div>
+            <div class="field-body">
+                <div class="field">
+                    <div class="buttons">
+                        <button class="button is-ghost has-text-danger">Delete</button>
+                        <button class="button is-ghost has-text-link">Upload</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Ingredients</label>
+            </div>
+            <div class="field-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>TODO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TODO</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Instructions</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div 
+                        _="
+                            on load[event.target==me]
+                                js(me)
+                                   return new Quill(me, {
+                                        theme: 'snow',
+                                    });
+                                end
+                                set :q to it
+                            end
+                        "
+                    ></div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+

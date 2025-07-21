@@ -4,30 +4,35 @@
 <div _="on load send OnNavigate(value:'Recipes') to #navbar then remove me"></div>
 
 <div class="content-container mt-5">
-    <form hx-get="/secrets/search" hx-swap="none">
         <div class="field is-grouped">
             <div class="control is-expanded">
-                <p class="control has-icons-left">
-                    <input
-                        _="
-                            on input debounced at 200ms
-                            send submit to the closest <form />
-                        "
-                        class="input is-fullwidth is-rounded" name="search" placeholder="search" type="search">
-                    <span class="icon is-small is-left"><i class="fas fa-search" aria-hidden="true"></i></span>
-                </p>
+                <form hx-get="/secrets/search" hx-swap="none">
+                    <p class="control has-icons-left">
+                        <input
+                            _="
+                                on input debounced at 200ms
+                                send submit to the closest <form />
+                            "
+                            class="input is-fullwidth is-rounded" name="search" placeholder="search" type="search">
+                        <span class="icon is-small is-left"><i class="fas fa-search" aria-hidden="true"></i></span>
+                    </p>
+                </form>
             </div>
             <div class="control buttons">
                 <div class="dropdown is-right">
                     <div class="dropdown-trigger">
-                        <button class="button is-primary">
+                        <a 
+                            href="/recipes/new"
+                            class="button is-primary"
+                            hx-boost="true"
+                            hx-target="#page-container"
+                        >
                             New recipe
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-    </form>
 
 
     <div class="mt-5 masonry-container"

@@ -12,6 +12,11 @@
     --bulma-link-s: 92%;
     --bulma-link-l: 54%;
 
+    --bulma-danger-h: 0deg;
+    --bulma-danger-s: 68%;
+    --bulma-danger-l: 49%;
+
+
       --bulma-scheme-h: 14;
   --bulma-scheme-s: 5%;
 
@@ -109,3 +114,7 @@
   .masonry-child {
       position: absolute;
   }
+
+.label {
+    font-weight: inherit;
+}

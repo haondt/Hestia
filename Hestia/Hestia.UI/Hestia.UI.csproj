@@ -10,6 +10,7 @@
   <ItemGroup>
     <Content Remove="wwwroot\fire-pan.svg" />
     <Content Remove="wwwroot\logo.svg" />
+    <Content Remove="wwwroot\quill.css" />
     <Content Remove="wwwroot\style.css" />
   </ItemGroup>
 
@@ -20,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Hestia.Core\Hestia.Core.csproj" />
     <ProjectReference Include="..\Hestia.UI.Library\Hestia.UI.Library.csproj" />
   </ItemGroup>
 
@@ -30,6 +32,7 @@
   <ItemGroup>
     <EmbeddedResource Include="wwwroot\fire-pan.svg" />
     <EmbeddedResource Include="wwwroot\logo.svg" />
+    <EmbeddedResource Include="wwwroot\quill.css" />
     <EmbeddedResource Include="wwwroot\style.css" />
   </ItemGroup>
 

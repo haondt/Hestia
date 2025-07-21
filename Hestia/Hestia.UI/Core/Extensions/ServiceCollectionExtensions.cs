@@ -47,6 +47,18 @@ namespace Hestia.UI.Core.Extensions
             });
             services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
             {
+                Uri = "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js",
+            });
+            services.AddScoped<IHeadEntryDescriptor>(sp => new StyleSheetDescriptor
+            {
+                Uri = "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css",
+            });
+            services.AddScoped<IHeadEntryDescriptor>(_ => new StyleSheetDescriptor
+            {
+                Uri = "/static/wwwroot.quill.css",
+            });
+            services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
+            {
                 Uri = "https://kit.fontawesome.com/afd44816da.js",
                 CrossOrigin = "anonymous"
             });
