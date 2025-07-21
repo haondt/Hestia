@@ -131,3 +131,19 @@ span.fat {
 span.carbs {
     color: #e8dc8a;
 }
+
+.page-header {
+    margin-bottom: var(--bulma-block-spacing);
+    border-bottom: 1px solid var(--bulma-link-text);
+}
+
+.page-header p {
+    color: var(--bulma-link-text);
+    padding: 0.5em 1em;
+    display: flex;
+    font-size: var(--bulma-size-normal);
+}
+
+.unit-input {
+    width: 5em;
+}

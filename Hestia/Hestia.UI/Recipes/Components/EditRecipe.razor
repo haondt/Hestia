@@ -19,6 +19,9 @@
 }
 
 <div class="content-container mt-5">
+    <div class="page-header">
+        <p>@Recipe.As(_ => "Edit").Or("New") recipe</p>
+    </div>
     <form id="edit-recipe-form" class="control" hx-swap="none" hx-post="@_target">
         <div class="field is-horizontal">
             <div class="field-label is-normal">

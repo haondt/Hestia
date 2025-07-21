@@ -15,5 +15,11 @@ namespace Hestia.UI.Ingredients.Controllers
             return componentFactory.RenderComponentAsync<Ingredients.Components.Ingredients>();
 
         }
+
+        [HttpGet("new")]
+        public Task<IResult> GetCreateIngredient()
+        {
+            return componentFactory.RenderComponentAsync<Ingredients.Components.EditIngredient>();
+        }
     }
 }

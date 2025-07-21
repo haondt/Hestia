@@ -1,0 +1,167 @@
+@using Haondt.Core.Extensions
+@using IngredientModel = Hestia.Core.Models.Ingredient;
+
+@attribute [RenderPage]
+<div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
+
+@code {
+    [Parameter]
+    public Optional<IngredientModel> Ingredient { get; set; }
+
+    [Parameter]
+    public bool IsReadOnly { get; set; } = true;
+
+    private string _target = default!;
+
+    protected override void OnInitialized()
+    {
+        _target = Ingredient.As(r => $"/ingredients/edit/{r.Id}").Or("/ingredients/new");
+        base.OnInitialized();
+    }
+
+}
+
+<div class="content-container mt-5">
+    <div class="page-header">
+        <p>@Ingredient.As(_ => "Edit").Or("New") ingredient</p>
+    </div>
+    <form id="edit-recipe-form" class="control" hx-swap="none" hx-post="@_target">
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Name</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <input class="input" name="name" type="text" placeholder="3.25% Homogenized Milk" value="@Ingredient.As(q => q.Name).Or("")" required/>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Brand</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <input class="input" name="brand" type="text" placeholder="Beatrice" value="@Ingredient.As(q => q.Brand).Or("")" />
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Vendor</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <input class="input" name="vendor" type="text" placeholder="Superstore" value="@Ingredient.As(q => q.Vendor).Or("")" />
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Serving size</label>
+            </div>
+            <div class="field-body">
+                <div class="field has-addons">
+                    <div class="control"><input class="input" type="number" placeholder="250"></div>
+                    <div class="control"><input class="input unit-input" type="text" placeholder="mL"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Fat</label>
+            </div>
+            <div class="field-body">
+                <div class="field has-addons">
+                    <div class="control"><input class="input" type="number" placeholder="8"></div>
+                    <div class="control"><p class="button is-static">g</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Carbs</label>
+            </div>
+            <div class="field-body">
+                <div class="field has-addons">
+                    <div class="control"><input class="input" type="number" placeholder="12"></div>
+                    <div class="control"><p class="button is-static">g</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Protein</label>
+            </div>
+            <div class="field-body">
+                <div class="field has-addons">
+                    <div class="control"><input class="input" type="number" placeholder="9"></div>
+                    <div class="control"><p class="button is-static">g</p></div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Package size</label>
+            </div>
+            <div class="field-body">
+                <div class="field has-addons">
+                    <div class="control"><input class="input" type="number" placeholder="4"></div>
+                    <div class="control"><input class="input unit-input" type="text" placeholder="L"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Package price</label>
+            </div>
+            <div class="field-body">
+                <div class="field has-addons">
+                    <div class="control"><input class="input" type="number" placeholder="5.25"></div>
+                    <div class="control"><p class="button is-static">$</p></div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Notes</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <textarea class="textarea" name="name" type="text" value="@Ingredient.As(q => q.Notes).Or("")" required/>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal mt-2">
+            <div class="field-label is-normal"></div>
+            <div class="field-body">
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </form>
+
+</div>
