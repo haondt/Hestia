@@ -17,7 +17,7 @@
     --bulma-danger-l: 49%;
 
 
-      --bulma-scheme-h: 14;
+  --bulma-scheme-h: 14;
   --bulma-scheme-s: 5%;
 
 
@@ -61,11 +61,12 @@
     border-width: 1px;
     border-style: solid;
     border-color: hsl(var(--bulma-scheme-h),var(--bulma-scheme-s),calc(var(--bulma-border-l)));
-    transition: border-color 0.3s ease;
+    transition: border-color 1s ease;
 }
 
 .card:hover {
     border: 1px solid var(--bulma-link-text);
+    transition-duration: initial;
 
 }
 
@@ -117,4 +118,16 @@
 
 .label {
     font-weight: inherit;
+}
+
+span.protein {
+  color: #b63032;
+}
+
+span.fat {
+    color: #d1bb08;
+}
+
+span.carbs {
+    color: #e8dc8a;
 }

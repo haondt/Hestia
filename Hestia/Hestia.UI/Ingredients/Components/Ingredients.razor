@@ -1,53 +1,68 @@
+@using Hestia.UI.Library.Components.Components
 @attribute [RenderPage]
 
 <div _="on load send OnNavigate(value:'Ingredients') to #navbar then remove me"></div>
 
-<form hx-get="/secrets/search" hx-swap="none">
-    <div class="field is-grouped">
-        <div class="control is-expanded">
-            <p class="control has-icons-left">
-                <input
-                    _="
-                        on input debounced at 200ms
-                        send submit to the closest <form />
-                    "
-                    class="input is-fullwidth is-rounded" name="search" placeholder="search" type="search">
-                <span class="icon is-small is-left"><i class="fas fa-search" aria-hidden="true"></i></span>
-            </p>
-        </div>
-        <div class="control buttons">
-            <div class="dropdown is-right">
-                <div class="dropdown-trigger">
-                    <button class="button is-info is-dark" 
+<div class="content-container mt-5">
+    <form hx-get="/secrets/search" hx-swap="none">
+        <div class="field is-grouped">
+            <div class="control is-expanded">
+                <p class="control has-icons-left">
+                    <input
                         _="
-                            set :dd to the closest .dropdown
-                            on click
-                                toggle .is-active on :dd then halt the event
-                            on click from elsewhere
-                                if the event's target is not in :dd
-                                    remove .is-active from :dd
-                    ">
-                        <span class="icon is-small"><i class="fas fa-tag" aria-hidden="true"></i></span>
-                    </button>
+                            on input debounced at 200ms
+                            send submit to the closest <form />
+                        "
+                        class="input is-fullwidth is-rounded" name="search" placeholder="search" type="search">
+                    <span class="icon is-small is-left"><i class="fas fa-search" aria-hidden="true"></i></span>
+                </p>
+            </div>
+            <div class="control buttons">
+                <div class="dropdown is-right">
+                    <div class="dropdown-trigger">
+                        <button class="button is-info is-dark" 
+                            _="
+                                set :dd to the closest .dropdown
+                                on click
+                                    toggle .is-active on :dd then halt the event
+                                on click from elsewhere
+                                    if the event's target is not in :dd
+                                        remove .is-active from :dd
+                        ">
+                            <span class="icon is-small"><i class="fas fa-tag" aria-hidden="true"></i></span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
+    </form>
+
+    <div class="grid is-col-min-10 mt-5">
+        @for(int i =0;i<50;i++)
+        {
+        <div class="cell is-clickable">
+            <Card>
+                <Content>
+
+            <div class="is-flex">
+                <div class="is-flex is-flex-direction-column" style="width:15rem;">
+                    <div class="is-flex is-justify-content-space-between">
+                        <strong>Eggs</strong>
+                        <p>170 Calories</p>
+                    </div>
+                    <div class="is-flex is-justify-content-space-between">
+                        <p>7 / - / 9</p>
+                        <p>30 / 50 / 900</p>
+                    </div>
+                </div>
+            </div>
+                </Content>
+            </Card>
+        </div>
+        }
     </div>
-</form>
+                    <p>$3.50/12 eggs</p>
 
+                    <p>(i) notes </p>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>IDs</th>
-            <th>Name</th>
-            <th>Calories</th>
-            <th>Protein</th>
-            <th>Carbs</th>
-            <th>Fat</th>
-            <th>Cost</th>
-            <th>Unit</th>
-        </tr>
-    </thead>
-
-</table>
+</div>
