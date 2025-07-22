@@ -12,22 +12,34 @@
     {
         SeverityString = Severity switch
         {
-            ToastSeverity.Warning => "is-warning",
-            ToastSeverity.Error => "is-danger",
-            ToastSeverity.Success => "is-success",
-            ToastSeverity.Info => "is-info",
+            ToastSeverity.Warning => "warning",
+            ToastSeverity.Error => "danger",
+            ToastSeverity.Success => "success",
+            ToastSeverity.Info => "info",
             _ => throw new ArgumentException(Severity.ToString())
         };
     }
 }
 
 <div hx-swap-oob="afterbegin:#toast-container">
-    <div style="width:400px;z-index:1000;"
-        class="notification toast @SeverityString is-light"
+    <div style="max-width:400px;z-index:1000;"
+        class="toast"
         _="
             on load
                 add .created to me
-                then wait 2s
+                then wait 5s
+                then if :me
+                    repeat forever
+                        if :m
+                            wait for mouseleave
+                        end
+                        set :me to false
+                        wait 2s
+                        if not :me
+                            break
+                        end
+                    end
+                end
                 then remove .created from me
                 then wait for transitionend
                 then send deleted to me
@@ -35,9 +47,22 @@
             on deleted
                 remove me
             end
+
+            on mouseenter
+                set :me to true
+                set :m to true
+            end
+            on mouseleave
+                set :m to false
+            end
             ">
-        <button class="delete" _="on click send deleted to the closest <div.toast />"></button>
-        <p style="white-space:pre-wrap;">@Message</p>
+        <div class="toast-header">
+            <p class="has-text-@SeverityString">@Severity</p>
+            <button class="delete" _="on click send deleted to the closest <div.toast />"></button>
+        </div>
+        <div class="toast-body">
+            <p style="white-space:pre-wrap;">@Message</p>
+        </div>
     </div>
 </div>
 

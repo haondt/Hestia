@@ -1,18 +1,41 @@
 <div id="toast-container" 
-    class="is-flex is-flex-direction-column is-justify-content-flex-start is-align-items-flex-end mr-5 mt-5">
+    class="is-flex is-flex-direction-column is-justify-content-flex-start is-align-items-flex-end ml-5 mr-5 mb-3 mt-3">
     <style>
         @@scope {
             :scope {
                 overflow-y: auto;
                 position: fixed;
                 z-index: 1000;
-                bottom: 0;
+                right: 0;
+                top: 0;
             }
 
             .toast {
                 opacity: 0;
                 transition: opacity 0.5s ease;
                 z-index: 1000;
+                background-color: var(--bulma-body-background-color);
+                border: 1px solid;
+                border-color: hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-border-l));
+                border-radius: var(--bulma-radius);
+            }
+
+            .toast-header {
+                border-bottom: 1px solid;
+                border-color: hsl(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-border-l));
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
+                align-items: center;
+                font-weight: var(--bulma-weight-semibold);
+            }
+
+            .toast-body {
+                padding: 0.5rem;
             }
 
             .toast.notification {
@@ -21,6 +44,10 @@
 
             .toast.created {
                 opacity: 1;
+            }
+
+            .toast + .toast {
+                margin-top: 1rem;
             }
         }
     </style>

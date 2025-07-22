@@ -50,6 +50,7 @@
     border-color: var(--ql-border-color);
     color: var(--ql-text-color);
     box-shadow: none;
+    border-radius: var(--bulma-input-radius);
 }
 
 .ql-snow a {

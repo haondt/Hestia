@@ -13,7 +13,7 @@
     --bulma-link-l: 54%;
 
     --bulma-danger-h: 0deg;
-    --bulma-danger-s: 68%;
+    --bulma-danger-s: 60%;
     --bulma-danger-l: 49%;
 
 
@@ -23,6 +23,12 @@
 
 
 }
+.delete {
+  --bulma-delete-background-alpha: initial;
+  --bulma-delete-color: var(--bulma-danger);
+  background-color: initial;
+}
+
 .navbar {
     --bulma-navbar-h: var(--bulma-link-h);
     --bulma-navbar-s: var(--bulma-link-s);
