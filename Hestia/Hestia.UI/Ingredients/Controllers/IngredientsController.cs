@@ -1,20 +1,44 @@
-﻿using Haondt.Web.Core.Extensions;
+﻿using Haondt.Web.BulmaCSS.Services;
+using Haondt.Web.Components;
+using Haondt.Web.Core.Extensions;
 using Haondt.Web.Core.Services;
+using Hestia.Domain.Models;
+using Hestia.Domain.Services;
+using Hestia.UI.Core.Components;
 using Hestia.UI.Core.Controllers;
+using Hestia.UI.Ingredients.Components;
 using Hestia.UI.Library.Components.Element;
+using Hestia.UI.Library.Components.Htmx;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hestia.UI.Ingredients.Controllers
 {
     [Route("ingredients")]
-    public class IngredientsController(IComponentFactory componentFactory) : UIController
+    public class IngredientsController(IComponentFactory componentFactory,
+        IIngredientsService ingredientsService) : UIController
     {
         [HttpGet]
         public Task<IResult> Get()
         {
             return componentFactory.RenderComponentAsync<Ingredients.Components.Ingredients>();
+        }
 
+        [HttpGet("view/{id}")]
+        public async Task<IResult> ViewIngredient(int id)
+        {
+            var result = await ingredientsService.GetIngredientAsync(id);
+            if (!result.TryGetValue(out var model))
+                return await componentFactory.RenderComponentAsync(new Error
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                });
+
+            return await componentFactory.RenderComponentAsync(new ViewIngredient
+            {
+                Ingredient = model,
+                IngredientId = id
+            });
         }
 
         [HttpGet("new")]
@@ -24,15 +48,49 @@ namespace Hestia.UI.Ingredients.Controllers
         }
 
         [HttpPost("new")]
-        public async Task<IResult> CreateIngredient()
+        public async Task<IResult> CreateIngredient([FromForm] IngredientModel ingredient, [FromForm] bool createAnother)
         {
+            var (id, model) = await ingredientsService.CreateIngredientAsync(ingredient);
 
-            var model = new Toast { Message = $"FooException: something really really really really really really really really really bad happened", Severity = Haondt.Web.BulmaCSS.Services.ToastSeverity.Error };
-            var errorComponent = await componentFactory.RenderComponentAsync(model);
-            HttpContext.Response.AsResponseData()
-                .Status(500)
-                .HxReswap("none");
-            return errorComponent;
+            if (createAnother)
+                return await componentFactory.RenderComponentAsync(new AppendComponentLayout
+                {
+                    Components = new()
+                    {
+                        new HxSwapOob
+                        {
+                            Content =  new EditIngredient(),
+                            Target = "#page-container"
+                        },
+                        new Toast
+                        {
+                            Message = $"Created ingredient \"{model.Name}\"",
+                            Severity = ToastSeverity.Success
+                        }
+                    }
+                });
+
+            Response.AsResponseData().HxPushUrl($"view/{id}");
+            return await componentFactory.RenderComponentAsync(new AppendComponentLayout
+            {
+                Components = new()
+                {
+                    new HxSwapOob
+                    {
+                        Content =  new ViewIngredient
+                        {
+                            Ingredient = model,
+                            IngredientId = id
+                        },
+                        Target = "#page-container"
+                    },
+                    new Toast
+                    {
+                        Message = $"Created ingredient \"{model.Name}\"",
+                        Severity = ToastSeverity.Success
+                    }
+                }
+            });
         }
     }
 }

@@ -1,5 +1,8 @@
 using Haondt.Web.Core.Middleware;
 using Haondt.Web.Extensions;
+using Hestia.Domain.Extensions;
+using Hestia.ModelBinders;
+using Hestia.Persistence.Extensions;
 using Hestia.UI.Core.Extensions;
 using Hestia.UI.Core.Middlewares;
 
@@ -12,12 +15,15 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services
     .AddHaondtWebServices(builder.Configuration)
-    //.AddHestiaPersistenceServices(builder.Configuration)
-    //.AddHestiaServices(builder.Configuration)
+    .AddHestiaPersistenceServices(builder.Configuration)
+    .AddHestiaDomainServices(builder.Configuration)
     .AddHestiaUI(builder.Configuration);
 //.AddHestiaApi(builder.Configuration);
 
-builder.Services.AddMvc();
+builder.Services.AddMvc(options =>
+{
+    options.ModelBinderProviders.Insert(0, new OptionalModelBinderProvider());
+});
 builder.Services.AddServerSideBlazor();
 
 
@@ -31,7 +37,7 @@ app.MapControllers();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseMiddleware<UnmappedRouteHandlerMiddleware>();
 
-//app.Services.PerformDatabaseMigrations();
+app.Services.PerformDatabaseMigrations();
 
 app.UseHestiaUI();
 

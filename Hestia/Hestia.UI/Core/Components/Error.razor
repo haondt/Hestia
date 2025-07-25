@@ -7,8 +7,8 @@
 @code {
     [Parameter, EditorRequired]
     public required int StatusCode { get; set; }
-    [Parameter, EditorRequired]
-    public required string Message { get; set; }
+    [Parameter]
+    public string? Message { get; set; }
     [Parameter]
     public Optional<string> Details { get; set; }
 

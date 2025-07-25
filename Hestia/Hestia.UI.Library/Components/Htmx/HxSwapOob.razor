@@ -1,0 +1,18 @@
+@code{
+    [Parameter, EditorRequired]
+    public required string Target { get; set; }
+    [Parameter]
+    public string Strategy { get; set; } = "innerHTML";
+
+
+    [Parameter, EditorRequired]
+    public required IComponent Content { get; set; }
+
+
+
+}
+<div 
+    hx-swap-oob="@Strategy:@Target">
+    <div _="on load go to the top of #body-content then remove me"></div>
+    <Haondt.Web.Components.ObjectComponent Component="Content" />
+</div>
