@@ -1,0 +1,8 @@
+@code {
+    [Parameter, EditorRequired]
+    public required double Percentage { get; set; }
+
+}
+<div class="hestia-progress-container">
+    <div class="hestia-progress-bar" style="width:@(Percentage * 100)%;"></div>
+</div>

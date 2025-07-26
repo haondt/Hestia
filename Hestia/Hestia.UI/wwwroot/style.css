@@ -19,6 +19,7 @@
 
   --bulma-scheme-h: 14;
   --bulma-scheme-s: 5%;
+  --color-protein: #b63032;
 
 
 }
@@ -143,15 +144,12 @@
     font-weight: inherit;
 }
 
-span.protein {
-  color: #b63032;
-}
 
-span.fat {
+.color-fat {
     color: #d1bb08;
 }
 
-span.carbs {
+.color-carbs {
     color: #e8dc8a;
 }
 
@@ -170,3 +168,17 @@ span.carbs {
 .unit-input {
     width: 5em;
 }
+.hestia-progress-container {
+    border: 1px solid var(--bulma-border-weak);
+    border-radius: 9999px;
+    height: 0.75rem;
+    width: 100%;
+    display: flex;
+}
+
+.hestia-progress-bar {
+    background-color: var(--bulma-border-weak);
+    border-radius: 9999px;
+    margin: 1px;
+}
+
