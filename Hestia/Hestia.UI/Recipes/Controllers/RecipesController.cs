@@ -15,7 +15,7 @@ namespace Hestia.UI.Recipes.Controllers
             throw new NotImplementedException();
         }
 
-        [HttpGet()]
+        [HttpGet]
         public Task<IResult> GetRecipes()
         {
             return componentFactory.RenderComponentAsync<Recipes.Components.Recipes>();

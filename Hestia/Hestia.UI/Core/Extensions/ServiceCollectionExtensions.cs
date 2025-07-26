@@ -14,7 +14,6 @@ namespace Hestia.UI.Core.Extensions
         public static IServiceCollection AddHestiaUI(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<ILayoutComponentFactory, LayoutComponentFactory>();
-            services.AddBulmaCSSHeadEntries();
             services.AddBulmaCSSAssetSources();
             services.AddHestiaHeadEntries();
             services.AddSingleton<IComponentFactory, ComponentFactory>();
@@ -27,40 +26,39 @@ namespace Hestia.UI.Core.Extensions
 
         public static IServiceCollection AddHestiaHeadEntries(this IServiceCollection services)
         {
+            services.AddScoped<IHeadEntryDescriptor>(_ => new StyleSheetDescriptor
+            {
+                Uri = "/static/shared/vendored/bulma/css/bulma.min.css"
+            });
 
             var assembly = typeof(ServiceCollectionExtensions).Assembly;
             var assemblyPrefix = assembly.GetName().Name;
 
             services.AddScoped<IHeadEntryDescriptor>(sp => new LinkDescriptor
             {
-                Uri = "/static/wwwroot.logo.svg",
+                Uri = "/static/shared/logo.svg",
                 Relationship = "icon",
                 Type = "image/svg+xml"
             });
             services.AddScoped<IHeadEntryDescriptor>(_ => new StyleSheetDescriptor
             {
-                Uri = "/static/wwwroot.style.css",
+                Uri = "/static/shared/style.css",
             });
             services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
             {
-                Uri = "https://cdn.jsdelivr.net/npm/minimasonry@1.3.2/build/minimasonry.min.js",
+                Uri = "/static/shared/vendored/minimasonry/build/minimasonry.min.js",
             });
             services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
             {
-                Uri = "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js",
+                Uri = "/static/shared/vendored/quill/dist/quill.js"
             });
             services.AddScoped<IHeadEntryDescriptor>(sp => new StyleSheetDescriptor
             {
-                Uri = "https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css",
+                Uri = "/static/shared/vendored/quill/dist/quill.snow.css"
             });
             services.AddScoped<IHeadEntryDescriptor>(_ => new StyleSheetDescriptor
             {
-                Uri = "/static/wwwroot.quill.css",
-            });
-            services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
-            {
-                Uri = "https://kit.fontawesome.com/afd44816da.js",
-                CrossOrigin = "anonymous"
+                Uri = "/static/shared/quill.css",
             });
             services.AddScoped<IHeadEntryDescriptor>(_ => new TitleDescriptor
             {

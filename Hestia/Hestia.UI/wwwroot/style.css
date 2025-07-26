@@ -21,8 +21,23 @@
   --bulma-scheme-s: 5%;
 
 
-
 }
+
+@media(prefers-color-scheme: dark) {
+    html {
+        color-scheme: dark;
+    }
+}
+
+.toast {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.toast.created {
+    opacity: 1;
+}
+
 .delete {
   --bulma-delete-background-alpha: initial;
   --bulma-delete-color: var(--bulma-danger);
@@ -40,9 +55,11 @@
 }
 
 .navbar-item.is-tab.is-active {
+    color: var(--bulma-link-text);
     border-bottom: initial;
     padding-bottom: calc(.5rem - 1px); /* taken from .navbar-item.is-tab */
 }
+
 
 
 .button {

@@ -14,7 +14,11 @@ builder.Services.AddControllers();
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services
-    .AddHaondtWebServices(builder.Configuration)
+    .AddHaondtWebServices(builder.Configuration, options =>
+    {
+        options.HtmxScriptUri = "/static/shared/vendored/htmx.org/dist/htmx.min.js";
+        options.HyperscriptScriptUri = "/static/shared/vendored/hyperscript.org/dist/_hyperscript.min.js";
+    })
     .AddHestiaPersistenceServices(builder.Configuration)
     .AddHestiaDomainServices(builder.Configuration)
     .AddHestiaUI(builder.Configuration);
@@ -32,7 +36,6 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseAuthorization();
-app.UseStaticFiles();
 app.MapControllers();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseMiddleware<UnmappedRouteHandlerMiddleware>();

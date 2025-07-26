@@ -12,7 +12,7 @@
 
     protected override void OnInitialized()
     {
-        _target = Recipe.As(r => $"/recipes/edit/{r.Id}").Or("/recipes/new");
+        _target = Recipe.Map(r => $"/recipes/edit/{r.Id}").Or("/recipes/new");
         base.OnInitialized();
     }
 
@@ -20,7 +20,7 @@
 
 <div class="content-container mt-5">
     <div class="page-header">
-        <p>@Recipe.As(_ => "Edit").Or("New") recipe</p>
+        <p>@Recipe.Map(_ => "Edit").Or("New") recipe</p>
     </div>
     <form id="edit-recipe-form" class="control" hx-swap="none" hx-post="@_target">
         <div class="field is-horizontal">
@@ -29,7 +29,7 @@
             </div>
             <div class="field-body">
                 <div class="field">
-                    <input class="input" name="title" type="text" value="@Recipe.As(q => q.Title).Or("")" />
+                    <input class="input" name="title" type="text" value="@Recipe.Map(q => q.Title).Or("")" />
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@
             </div>
             <div class="field-body">
                 <div class="field">
-                    <textarea class="textarea" name="description" type="text" value="@Recipe.As(q => q.Description).Or("")" />
+                    <textarea class="textarea" name="description" type="text" value="@Recipe.Map(q => q.Description).Or("")" />
                 </div>
             </div>
         </div>

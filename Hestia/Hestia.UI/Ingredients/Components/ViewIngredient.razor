@@ -13,134 +13,169 @@
 
 
 <div class="content-container mt-5">
-    <div class="page-header">
-        <p>@Ingredient.Name</p>
+    <div class="is-flex is-flex-direction-row is-fullwidth gap-4">
+        <div class="tabs is-flex-grow-1">
+            <ul>
+                <li class="is-active">
+                    <a>Ingredient</a>
+                </li>
+                <li>
+                    <a>Insights</a>
+                </li>
+            </ul>
+        </div>
+        <div >
+            <button
+                hx-get="/ingredients/edit/@IngredientId"
+                hx-push-url="/ingredients/edit/@IngredientId"
+                hx-swap="innerHTML"
+                hx-target="#page-container"
+                class="button is-primary"
+            >
+                Edit
+            </button>
+        </div>
     </div>
-    <form id="edit-recipe-form" class="control" >
+        <div id="ingredient-tab-body">
+            <form id="view-recipe-form" class="control" >
 
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Brand</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <input class="input" name="@nameof(IngredientModel.Brand)" type="text" placeholder="Beatrice" value="@Ingredient.Brand.Unwrap()" />
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Name</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <input class="input" name="@nameof(IngredientModel.Name)" type="text" value="@Ingredient.Name" readonly/>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Vendor</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <input class="input" name="@nameof(IngredientModel.Vendor)" type="text" placeholder="Superstore" value="@Ingredient.Vendor.Unwrap()" />
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Brand</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <input class="input" name="@nameof(IngredientModel.Brand)" type="text" value="@Ingredient.Brand.Unwrap()" readonly />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <hr />
-
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Serving size</label>
-            </div>
-            <div class="field-body">
-                <div class="field has-addons">
-                    <div class="control"><input class="input" name="@nameof(IngredientModel.ServingSizeQuantity)" type="number" placeholder="250" value="@Ingredient.ServingSizeQuantity.Unwrap()"></div>
-                    <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.ServingSizeUnit)" type="text" placeholder="mL" value="@Ingredient.ServingSizeUnit.Unwrap()"></div>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Vendor</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <input class="input" name="@nameof(IngredientModel.Vendor)" type="text" value="@Ingredient.Vendor.Unwrap()" readonly />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Calories</label>
-            </div>
-            <div class="field-body">
-                <div class="field has-addons">
-                    <div class="control"><input class="input" name="@nameof(IngredientModel.Calories)" type="number" placeholder="160" value="@Ingredient.Calories.Unwrap()"></div>
+            <hr />
+
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Serving size</label>
+                </div>
+                <div class="field-body">
+                    <div class="field has-addons">
+                        <div class="control"><input class="input" name="@nameof(IngredientModel.ServingSizeQuantity)" type="number" value="@Ingredient.ServingSizeQuantity.Unwrap()" readonly></div>
+                        <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.ServingSizeUnit)" type="text" value="@Ingredient.ServingSizeUnit.Unwrap()" readonly></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Fat</label>
-            </div>
-            <div class="field-body">
-                <div class="field has-addons">
-                    <div class="control"><input class="input" name="@nameof(IngredientModel.FatGrams)" type="number" placeholder="8" value="@Ingredient.FatGrams.Unwrap()"></div>
-                    <div class="control"><p class="button is-static">g</p></div>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Calories</label>
+                </div>
+                <div class="field-body">
+                    <div class="field has-addons">
+                        <div class="control"><input class="input" name="@nameof(IngredientModel.Calories)" type="number" value="@Ingredient.Calories.Unwrap()" readonly></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Carbs</label>
-            </div>
-            <div class="field-body">
-                <div class="field has-addons">
-                    <div class="control"><input class="input" name="@nameof(IngredientModel.CarbGrams)" type="number" placeholder="12" value="@Ingredient.CarbGrams.Unwrap()"></div>
-                    <div class="control"><p class="button is-static">g</p></div>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Fat</label>
+                </div>
+                <div class="field-body">
+                    <div class="field has-addons">
+                        <div class="control"><input class="input" name="@nameof(IngredientModel.FatGrams)" type="number" value="@Ingredient.FatGrams.Unwrap()" readonly></div>
+                        <div class="control"><p class="button is-static">g</p></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Protein</label>
-            </div>
-            <div class="field-body">
-                <div class="field has-addons">
-                    <div class="control"><input class="input" name="@nameof(IngredientModel.ProteinGrams)" type="number" placeholder="9" value="@Ingredient.ProteinGrams.Unwrap()"></div>
-                    <div class="control"><p class="button is-static">g</p></div>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Carbs</label>
+                </div>
+                <div class="field-body">
+                    <div class="field has-addons">
+                        <div class="control"><input class="input" name="@nameof(IngredientModel.CarbGrams)" type="number" value="@Ingredient.CarbGrams.Unwrap()" readonly></div>
+                        <div class="control"><p class="button is-static">g</p></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <hr />
-
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Package size</label>
-            </div>
-            <div class="field-body">
-                <div class="field has-addons">
-                    <div class="control"><input class="input" name="@nameof(IngredientModel.PackageSizeQuantity)" type="number" placeholder="4" value="@Ingredient.PackageSizeQuantity.Unwrap()"></div>
-                    <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.PackageSizeUnit)" type="text" placeholder="L" value="@Ingredient.PackageSizeUnit.Unwrap()"></div>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Protein</label>
+                </div>
+                <div class="field-body">
+                    <div class="field has-addons">
+                        <div class="control"><input class="input" name="@nameof(IngredientModel.ProteinGrams)" type="number" value="@Ingredient.ProteinGrams.Unwrap()" readonly></div>
+                        <div class="control"><p class="button is-static">g</p></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Package price</label>
-            </div>
-            <div class="field-body">
-                <div class="field has-addons">
-                    <div class="control"><input class="input" name="@nameof(IngredientModel.PackageCostDollars)" type="number" placeholder="5.25" value="@Ingredient.PackageCostDollars.Unwrap()"></div>
-                    <div class="control"><p class="button is-static">$</p></div>
+            <hr />
+
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Package size</label>
+                </div>
+                <div class="field-body">
+                    <div class="field has-addons">
+                        <div class="control"><input class="input" name="@nameof(IngredientModel.PackageSizeQuantity)" type="number" value="@Ingredient.PackageSizeQuantity.Unwrap()" readonly></div>
+                        <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.PackageSizeUnit)" type="text" value="@Ingredient.PackageSizeUnit.Unwrap()" readonly></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <hr />
-
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Notes</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <textarea class="textarea" name="@nameof(IngredientModel.Notes)" type="text" value="@Ingredient.Notes" />
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Package price</label>
+                </div>
+                <div class="field-body">
+                    <div class="field has-addons">
+                        <div class="control"><input class="input" name="@nameof(IngredientModel.PackageCostDollars)" type="number" value="@Ingredient.PackageCostDollars.Unwrap()" readonly></div>
+                        <div class="control"><p class="button is-static">$</p></div>
+                    </div>
                 </div>
             </div>
+
+            <hr />
+
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Notes</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <textarea class="textarea" name="@nameof(IngredientModel.Notes)" type="text" value="@Ingredient.Notes" readonly />
+                    </div>
+                </div>
+            </div>
+
+
+        </form>
         </div>
+        <div id="insights-tab-body" class="is-hidden">
 
-
-    </form>
-
+        </div>
 </div>

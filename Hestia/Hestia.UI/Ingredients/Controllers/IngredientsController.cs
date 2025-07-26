@@ -41,6 +41,51 @@ namespace Hestia.UI.Ingredients.Controllers
             });
         }
 
+        [HttpGet("edit/{id}")]
+        public async Task<IResult> EditIngredient(int id)
+        {
+            var result = await ingredientsService.GetIngredientAsync(id);
+            if (!result.TryGetValue(out var model))
+                return await componentFactory.RenderComponentAsync(new Error
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                });
+
+            return await componentFactory.RenderComponentAsync(new EditIngredient
+            {
+                Ingredient = model,
+                IngredientId = id
+            });
+        }
+
+        [HttpPut("edit/{id}")]
+        public async Task<IResult> UpdateIngredient(int id, [FromForm] IngredientModel ingredient)
+        {
+            var model = await ingredientsService.UpdateIngredientAsync(id, ingredient);
+
+            Response.AsResponseData().HxPushUrl($"/ingredients/view/{id}");
+            return await componentFactory.RenderComponentAsync(new AppendComponentLayout
+            {
+                Components = new()
+                {
+                    new HxSwapOob
+                    {
+                        Content =  new ViewIngredient
+                        {
+                            Ingredient = model,
+                            IngredientId = id
+                        },
+                        Target = "#page-container"
+                    },
+                    new Toast
+                    {
+                        Message = $"Updated ingredient \"{model.Name}\"",
+                        Severity = ToastSeverity.Success
+                    }
+                }
+            });
+        }
+
         [HttpGet("new")]
         public Task<IResult> GetCreateIngredient()
         {
@@ -70,7 +115,7 @@ namespace Hestia.UI.Ingredients.Controllers
                     }
                 });
 
-            Response.AsResponseData().HxPushUrl($"view/{id}");
+            Response.AsResponseData().HxPushUrl($"/ingredients/view/{id}");
             return await componentFactory.RenderComponentAsync(new AppendComponentLayout
             {
                 Components = new()
