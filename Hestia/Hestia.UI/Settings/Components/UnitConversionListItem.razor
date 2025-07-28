@@ -1,0 +1,60 @@
+@using Hestia.Domain.Models
+
+@code {
+    [Parameter, EditorRequired]
+    public required UnitConversionModel Conversion { get; set; }
+
+    private readonly string _id = $"c{Guid.NewGuid():N}";
+}
+<div class="is-flex is-flex-direction-row is-flex-wrap-wrap is-column-gap-2 is-row-gap-0.5 is-align-items-center is-justify-content-flex-start">
+    <div class="is-flex is-flex-wrap-wrap is-align-items-center">
+        <div id="@_id" class="is-flex is-flex-direction-row is-flex-wrap-wrap is-column-gap-2 is-row-gap-0.5 is-align-items-center" style="min-width:0;">
+            <div class="field has-addons mb-0">
+                <div class="control"><p class="button is-static">1</p></div>
+                <div class="control"><input class="input unit-input" name="FromUnit" type="text" placeholder="L" value="@Conversion.FromUnit" readonly></div>
+            </div>
+            <p>is</p>
+            <div class="field has-addons mb-0">
+                <div class="control"><input class="input unit-input" name="" type="text" placeholder="L" value="@Conversion.Multiplier" readonly></div>
+                <div class="control"><input class="input unit-input" name="ToUnit" type="text" placeholder="L" value="@Conversion.ToUnit" readonly></div>
+            </div>
+        </div>
+    </div>
+    <div class="is-flex is-flex-direction-row is-gap-2">
+        <p 
+            class="is-clickable has-text-danger is-ghost unit-conversion-list-delete-button"
+            _="on click
+                toggle .is-hidden on me
+                toggle .is-hidden on the first .unit-conversion-list-cancel-button in my parentElement
+                toggle .is-hidden on the first .unit-conversion-list-confirm-button in my parentElement
+            "
+        >
+            Delete
+        </p>
+        <p 
+            class="is-clickable has-text-danger is-ghost unit-conversion-list-cancel-button is-hidden"
+            _="on click
+                toggle .is-hidden on me
+                toggle .is-hidden on the first .unit-conversion-list-delete-button in my parentElement
+                toggle .is-hidden on the first .unit-conversion-list-confirm-button in my parentElement
+            "
+        >
+            Cancel
+        </p>
+        <p 
+            class="is-clickable has-text-danger is-ghost unit-conversion-list-confirm-button is-hidden"
+            hx-delete="/settings/unit-conversions"
+            hx-swap="none"
+            hx-include="#@_id"
+            hx-target="#unit-conversion-list"
+            _="on htmx:afterOnLoad
+                if the event's detail.xhr.status is 200
+                    remove my parentElement's parentElement
+                end
+            "
+        >
+            Confirm
+        </p>
+    </div>
+</div>
+

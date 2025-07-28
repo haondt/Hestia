@@ -41,6 +41,7 @@ app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseMiddleware<UnmappedRouteHandlerMiddleware>();
 
 app.Services.PerformDatabaseMigrations();
+await app.Services.SeedDbAsync();
 
 app.UseHestiaUI();
 

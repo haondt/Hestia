@@ -16,12 +16,14 @@ namespace Hestia.UI.Ingredients.Controllers
 {
     [Route("ingredients")]
     public class IngredientsController(IComponentFactory componentFactory,
-        IIngredientsService ingredientsService) : UIController
+        IIngredientsService ingredientsService) : UIController(componentFactory)
     {
+        private readonly IComponentFactory _componentFactory = componentFactory;
+
         [HttpGet]
         public Task<IResult> Get()
         {
-            return componentFactory.RenderComponentAsync<Ingredients.Components.Ingredients>();
+            return _componentFactory.RenderComponentAsync<Ingredients.Components.Ingredients>();
         }
 
         [HttpGet("view/{id}")]
@@ -29,12 +31,12 @@ namespace Hestia.UI.Ingredients.Controllers
         {
             var result = await ingredientsService.GetIngredientAsync(id);
             if (!result.TryGetValue(out var model))
-                return await componentFactory.RenderComponentAsync(new Error
+                return await _componentFactory.RenderComponentAsync(new Error
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                 });
 
-            return await componentFactory.RenderComponentAsync(new ViewIngredient
+            return await _componentFactory.RenderComponentAsync(new ViewIngredient
             {
                 Ingredient = model,
                 IngredientId = id
@@ -46,12 +48,12 @@ namespace Hestia.UI.Ingredients.Controllers
         {
             var result = await ingredientsService.GetIngredientAsync(id);
             if (!result.TryGetValue(out var model))
-                return await componentFactory.RenderComponentAsync(new Error
+                return await _componentFactory.RenderComponentAsync(new Error
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                 });
 
-            return await componentFactory.RenderComponentAsync(new EditIngredient
+            return await _componentFactory.RenderComponentAsync(new EditIngredient
             {
                 Ingredient = model,
                 IngredientId = id
@@ -64,7 +66,7 @@ namespace Hestia.UI.Ingredients.Controllers
             var model = await ingredientsService.UpdateIngredientAsync(id, ingredient);
 
             Response.AsResponseData().HxPushUrl($"/ingredients/view/{id}");
-            return await componentFactory.RenderComponentAsync(new AppendComponentLayout
+            return await _componentFactory.RenderComponentAsync(new AppendComponentLayout
             {
                 Components = new()
                 {
@@ -89,7 +91,7 @@ namespace Hestia.UI.Ingredients.Controllers
         [HttpGet("new")]
         public Task<IResult> GetCreateIngredient()
         {
-            return componentFactory.RenderComponentAsync<Ingredients.Components.EditIngredient>();
+            return _componentFactory.RenderComponentAsync<Ingredients.Components.EditIngredient>();
         }
 
         [HttpPost("new")]
@@ -98,7 +100,7 @@ namespace Hestia.UI.Ingredients.Controllers
             var (id, model) = await ingredientsService.CreateIngredientAsync(ingredient);
 
             if (createAnother)
-                return await componentFactory.RenderComponentAsync(new AppendComponentLayout
+                return await _componentFactory.RenderComponentAsync(new AppendComponentLayout
                 {
                     Components = new()
                     {
@@ -116,7 +118,7 @@ namespace Hestia.UI.Ingredients.Controllers
                 });
 
             Response.AsResponseData().HxPushUrl($"/ingredients/view/{id}");
-            return await componentFactory.RenderComponentAsync(new AppendComponentLayout
+            return await _componentFactory.RenderComponentAsync(new AppendComponentLayout
             {
                 Components = new()
                 {

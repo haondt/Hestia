@@ -1,4 +1,11 @@
+@using Hestia.Domain.Models
 @attribute [RenderPage]
+
+@code {
+    [Parameter, EditorRequired]
+    public required UnitConversionList UnitConversionList { get; set; }
+}
+
 <div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
 
 <div class="content-container mt-5">
@@ -9,7 +16,14 @@
             </li>
         </ul>
     </div>
-    <form id="settings-form" class="control" >
-        <p>This is the settings page. More content will be added here.</p>
-    </form>
+    <div id="settings-form" class="control">
+        <div class="mt-5">
+            <ObjectComponentT Component="@UnitConversionList"/>
+        </div>
+    </div>
 </div>
+
+@code {
+    [Parameter]
+    public IEnumerable<UnitConversionModel> Conversions { get; set; } = new List<UnitConversionModel>();
+}

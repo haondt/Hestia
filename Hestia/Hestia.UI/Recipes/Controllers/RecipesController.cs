@@ -1,14 +1,16 @@
-﻿using Haondt.Web.Core.Controllers;
-using Haondt.Web.Core.Extensions;
+﻿using Haondt.Web.Core.Extensions;
 using Haondt.Web.Core.Services;
+using Hestia.UI.Core.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hestia.UI.Recipes.Controllers
 {
     [Route("recipes")]
-    public class RecipesController(IComponentFactory componentFactory) : UIController
+    public class RecipesController(IComponentFactory componentFactory) : UIController(componentFactory)
     {
+        private readonly IComponentFactory _componentFactory = componentFactory;
+
         [HttpGet("view/{recipeId}")]
         public Task<IResult> GetRecipe(int recipeId)
         {
@@ -18,13 +20,13 @@ namespace Hestia.UI.Recipes.Controllers
         [HttpGet]
         public Task<IResult> GetRecipes()
         {
-            return componentFactory.RenderComponentAsync<Recipes.Components.Recipes>();
+            return _componentFactory.RenderComponentAsync<Recipes.Components.Recipes>();
         }
 
         [HttpGet("new")]
         public Task<IResult> GetCreateRecipe()
         {
-            return componentFactory.RenderComponentAsync<Recipes.Components.EditRecipe>();
+            return _componentFactory.RenderComponentAsync<Recipes.Components.EditRecipe>();
         }
     }
 }

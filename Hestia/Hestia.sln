@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hestia.Core", "Hestia.Core\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hestia.Domain", "Hestia.Domain\Hestia.Domain.csproj", "{866A28A0-5B6B-4197-9238-E39A43686B1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hestia.Tests", "Hestia.Tests\Hestia.Tests.csproj", "{7EE4F6BD-385E-4414-AEAE-26C99102A7B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{866A28A0-5B6B-4197-9238-E39A43686B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{866A28A0-5B6B-4197-9238-E39A43686B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{866A28A0-5B6B-4197-9238-E39A43686B1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EE4F6BD-385E-4414-AEAE-26C99102A7B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EE4F6BD-385E-4414-AEAE-26C99102A7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EE4F6BD-385E-4414-AEAE-26C99102A7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EE4F6BD-385E-4414-AEAE-26C99102A7B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,6 +9,8 @@ namespace Hestia.Domain.Extensions
         public static IServiceCollection AddHestiaDomainServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IIngredientsService, IngredientsService>();
+            services.AddScoped<IUnitConversionsService, UnitConversionsService>();
+            services.AddScoped<IDbSeeder, DbSeeder>();
 
             return services;
         }

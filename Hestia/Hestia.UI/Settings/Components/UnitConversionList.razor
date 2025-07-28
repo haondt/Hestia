@@ -1,0 +1,66 @@
+@using Hestia.Domain.Models
+@using System.Text.Json
+@code {
+    [Parameter]
+    public IEnumerable<UnitConversionModel> Conversions { get; set; } = new List<UnitConversionModel>();
+}
+
+<div id="settings-section-unit-conversions">
+    <div class="block">
+        <p class="section-label">Unit Conversions</p>
+        <p>Manage the list of compatible units and how to convert between them.</p>
+    </div>
+
+    <div class="block">
+        <div  class=" has-border-left-weak pl-4">
+
+            <div style="max-height: 15rem; overflow-y: auto;">
+                <div id="unit-conversion-list" class="is-flex is-flex-direction-column is-gap-2">
+                @foreach(var conversion in Conversions)
+                {
+                    <UnitConversionListItem Conversion="@conversion" />
+                }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="block">
+        <form 
+            hx-post="/settings/unit-conversions"
+            hx-target="#unit-conversion-list" 
+            hx-swap="beforeend"
+            _="on htmx:afterRequest
+                if the event's detail.xhr.status is 200
+                    for input in <input/> in me
+                        set input's value to ''
+                    end
+                end
+                on htmx:afterOnLoad
+                    if the event's detail.xhr.status is 200
+                        go to the bottom of #unit-conversion-list
+                    end
+                end
+            "
+        >
+            <div class="is-flex is-flex-direction-row is-flex-wrap-wrap is-column-gap-2 is-row-gap-0.5 is-align-items-center is-justify-content-flex-start">
+                <div class="is-flex is-flex-direction-column is-gap-0.5">
+                    <div class="is-flex is-flex-direction-row is-flex-wrap-wrap is-column-gap-2 is-row-gap-0.5 is-align-items-center is-justify-content-center">
+                        <div class="field has-addons mb-0">
+                            <div class="control"><p class="button is-static">1</p></div>
+                            <div class="control"><input class="input unit-input" name="@nameof(UnitConversionModel.FromUnit)" type="text" placeholder="kg"></div>
+                        </div>
+                        <p>is</p>
+                        <div class="field has-addons mb-0">
+                            <div class="control"><input class="input unit-input" name="@nameof(UnitConversionModel.Multiplier)" type="number" placeholder="2.20"></div>
+                            <div class="control"><input class="input unit-input" name="@nameof(UnitConversionModel.ToUnit)" type="text" placeholder="lbs"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="button mt-4 is-primary">
+                Add Conversion
+            </button>
+        </form>
+    </div>
+</div>

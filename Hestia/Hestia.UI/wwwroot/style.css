@@ -16,6 +16,12 @@
     --bulma-danger-s: 60%;
     --bulma-danger-l: 49%;
 
+      --bulma-warning-h: 275deg;
+  --bulma-warning-s: 30%;
+  --bulma-warning-l: 63%;
+
+
+
 
   --bulma-scheme-h: 14;
   --bulma-scheme-s: 5%;
@@ -144,6 +150,13 @@
     font-weight: inherit;
 }
 
+.section-label {
+    font-weight: var(--bulma-label-weight);
+    font-size: var(--bulma-size-normal);
+    color: var(--bulma-text-strong);
+    display: block;
+}
+
 
 .color-fat {
     color: #d1bb08;
@@ -182,3 +195,80 @@
     margin: 1px;
 }
 
+.grid.divide-x {
+    column-gap: 0;
+    row-gap: 1px;
+    background-color: var(--bulma-border);
+
+    > .cell {
+        background-color: var(--bulma-scheme-main);
+        padding: 0.5rem;
+    }
+}
+.grid > .cell {
+    display: flex;
+    align-items: center;
+}
+
+.is-bordered {
+    border: 1px solid var(--bulma-border);
+}
+.is-bordered-weak {
+    border: 1px solid var(--bulma-border-weak);
+}
+
+.has-border-top {
+    border-top: 1px solid var(--bulma-border);
+}
+.has-border-bottom {
+    border-bottom: 1px solid var(--bulma-border);
+}
+.has-border-left {
+    border-left: 1px solid var(--bulma-border);
+}
+.has-border-right {
+    border-right: 1px solid var(--bulma-border);
+}
+
+.has-border-top-weak {
+    border-top: 1px solid var(--bulma-border-weak);
+}
+.has-border-bottom-weak {
+    border-bottom: 1px solid var(--bulma-border-weak);
+}
+.has-border-left-weak {
+    border-left: 1px solid var(--bulma-border-weak);
+}
+.has-border-right-weak {
+    border-right: 1px solid var(--bulma-border-weak);
+}
+
+
+.has-border-x {
+    border-left: 1px solid var(--bulma-border);
+    border-right: 1px solid var(--bulma-border);
+}
+.has-border-y {
+    border-top: 1px solid var(--bulma-border);
+    border-bottom: 1px solid var(--bulma-border);
+}
+
+.has-border-x-weak {
+    border-left: 1px solid var(--bulma-border-weak);
+    border-right: 1px solid var(--bulma-border-weak);
+}
+.has-border-y-weak {
+    border-top: 1px solid var(--bulma-border-weak);
+    border-bottom: 1px solid var(--bulma-border-weak);
+}
+
+tr.border-bottom-none > td {
+    border-bottom: none;
+}
+
+.unit-conversion-list-fields .input:not([readonly]) {
+    --bulma-input-border-color: var(--bulma-warning);
+}
+.unit-conversion-list-fields p.button.dirty {
+    border-color: var(--bulma-warning);
+}
