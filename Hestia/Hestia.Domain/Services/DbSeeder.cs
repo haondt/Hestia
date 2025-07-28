@@ -38,5 +38,9 @@ public class DbSeeder(ApplicationDbContext dbContext, IUnitConversionsService un
         var result = await unitConversionsService.AddAsync(conversions);
         if (!result.IsSuccessful)
             throw new InvalidOperationException($"Failed to seed unit conversions: {result.Reason}");
+
+        state = await dbContext.HestiaStates.FirstOrDefaultAsync(q => q.Id == HestiaConstants.HestiaStateId) ?? new();
+        state.HasSeededUnitConversions = true;
+        await dbContext.SaveChangesAsync();
     }
 }

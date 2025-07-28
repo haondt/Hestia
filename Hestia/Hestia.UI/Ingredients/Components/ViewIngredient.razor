@@ -111,6 +111,18 @@
 
         <div class="field is-horizontal">
             <div class="field-label is-normal">
+                <label class="label">Alternate Serving size</label>
+            </div>
+            <div class="field-body">
+                <div class="field has-addons">
+                    <div class="control"><input class="input" name="@nameof(IngredientModel.AlternateServingSizeQuantity)" type="number" value="@Ingredient.AlternateServingSizeQuantity.Unwrap()" readonly></div>
+                    <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.AlternateServingSizeUnit)" type="text" value="@Ingredient.AlternateServingSizeUnit.Unwrap()" readonly></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
                 <label class="label">Calories</label>
             </div>
             <div class="field-body">

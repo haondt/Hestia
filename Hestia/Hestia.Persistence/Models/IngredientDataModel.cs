@@ -10,6 +10,8 @@
 
         public required decimal? ServingSizeQuantity { get; set; }
         public required string? ServingSizeUnit { get; set; }
+        public required decimal? AlternateServingSizeQuantity { get; set; }
+        public required string? AlternateServingSizeUnit { get; set; }
         public required decimal? Calories { get; set; }
         public required decimal? FatGrams { get; set; }
         public required decimal? CarbGrams { get; set; }

@@ -14,6 +14,8 @@ namespace Hestia.Domain.Models
 
         public required Optional<decimal> ServingSizeQuantity { get; set; }
         public required Optional<string> ServingSizeUnit { get; set; }
+        public required Optional<decimal> AlternateServingSizeQuantity { get; set; }
+        public required Optional<string> AlternateServingSizeUnit { get; set; }
         public required Optional<decimal> Calories { get; set; }
         public required Optional<decimal> FatGrams { get; set; }
         public required Optional<decimal> CarbGrams { get; set; }
@@ -33,6 +35,8 @@ namespace Hestia.Domain.Models
             Vendor = model.Vendor.AsOptional(),
             ServingSizeQuantity = model.ServingSizeQuantity.AsOptional(),
             ServingSizeUnit = model.ServingSizeUnit.AsOptional(),
+            AlternateServingSizeQuantity = model.AlternateServingSizeQuantity.AsOptional(),
+            AlternateServingSizeUnit = model.AlternateServingSizeUnit.AsOptional(),
             Calories = model.Calories.AsOptional(),
             FatGrams = model.FatGrams.AsOptional(),
             CarbGrams = model.CarbGrams.AsOptional(),
@@ -50,6 +54,8 @@ namespace Hestia.Domain.Models
             Vendor = Vendor.Unwrap(),
             ServingSizeQuantity = ServingSizeQuantity.Unwrap(),
             ServingSizeUnit = ServingSizeUnit.Unwrap(),
+            AlternateServingSizeQuantity = AlternateServingSizeQuantity.Unwrap(),
+            AlternateServingSizeUnit = AlternateServingSizeUnit.Unwrap(),
             Calories = Calories.Unwrap(),
             FatGrams = FatGrams.Unwrap(),
             CarbGrams = CarbGrams.Unwrap(),

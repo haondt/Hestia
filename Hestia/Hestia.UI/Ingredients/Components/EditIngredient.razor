@@ -88,9 +88,21 @@
                 <label class="label">Serving size</label>
             </div>
             <div class="field-body">
-                <div class="field has-addons">
-                    <div class="control"><input class="input" name="@nameof(IngredientModel.ServingSizeQuantity)" type="number" placeholder="250" value="@Ingredient.Bind(q => q.ServingSizeQuantity).Unwrap()"></div>
-                    <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.ServingSizeUnit)" type="text" placeholder="mL" value="@Ingredient.Bind(q => q.ServingSizeUnit).Unwrap()"></div>
+                <div class="field has-addons is-flex-grow-0">
+                    <div class="control"><input class="input" name="@nameof(IngredientModel.ServingSizeQuantity)" type="number" placeholder="1" value="@Ingredient.Bind(q => q.ServingSizeQuantity).Unwrap()"></div>
+                    <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.ServingSizeUnit)" type="text" placeholder="cup" value="@Ingredient.Bind(q => q.ServingSizeUnit).Unwrap()"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Alternate serving size</label>
+            </div>
+            <div class="field-body">
+                <div class="field has-addons is-flex-grow-0">
+                    <div class="control"><input class="input" name="@nameof(IngredientModel.AlternateServingSizeQuantity)" type="number" placeholder="250" value="@Ingredient.Bind(q => q.AlternateServingSizeQuantity).Unwrap()"></div>
+                    <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.AlternateServingSizeUnit)" type="text" placeholder="mL" value="@Ingredient.Bind(q => q.AlternateServingSizeUnit).Unwrap()"></div>
                 </div>
             </div>
         </div>
