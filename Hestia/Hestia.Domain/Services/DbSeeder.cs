@@ -1,7 +1,6 @@
-using Hestia.Core.Constants;
 using Hestia.Domain.Models;
 using Hestia.Persistence;
-using Microsoft.EntityFrameworkCore;
+using Hestia.Persistence.Models;
 
 namespace Hestia.Domain.Services;
 
@@ -9,7 +8,7 @@ public class DbSeeder(ApplicationDbContext dbContext, IUnitConversionsService un
 {
     public async Task SeedAsync()
     {
-        var state = await dbContext.HestiaStates.FirstOrDefaultAsync(q => q.Id == HestiaConstants.HestiaStateId) ?? new();
+        var state = await HestiaStateDataModel.GetOrCreateAsync(dbContext);
         if (state.HasSeededUnitConversions)
             return;
 
@@ -39,7 +38,7 @@ public class DbSeeder(ApplicationDbContext dbContext, IUnitConversionsService un
         if (!result.IsSuccessful)
             throw new InvalidOperationException($"Failed to seed unit conversions: {result.Reason}");
 
-        state = await dbContext.HestiaStates.FirstOrDefaultAsync(q => q.Id == HestiaConstants.HestiaStateId) ?? new();
+        state = await HestiaStateDataModel.GetOrCreateAsync(dbContext);
         state.HasSeededUnitConversions = true;
         await dbContext.SaveChangesAsync();
     }

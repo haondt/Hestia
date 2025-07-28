@@ -1,6 +1,9 @@
 @using Hestia.Domain.Models
+@using Hestia.Domain.Services
 @using Hestia.UI.Library.Components.Element
 @attribute [RenderPage]
+
+@inject IUnitConversionsService UnitConversionsService
 <div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
 
 @code {
@@ -10,6 +13,12 @@
     [Parameter, EditorRequired]
     public required int IngredientId { get; set; }
 
+    private IngredientInsightsModel _insights = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _insights = await Ingredient.GetInsightsAsync(UnitConversionsService);
+    }
 }
 
 <div class="content-container mt-5">
@@ -210,61 +219,125 @@
 
     </form>
     </div>
+
     <div id="insights-tab-body" class="is-hidden">
-        <div class="columns is-multiline">
-            <!-- Macronutrient Breakdown Card -->
-            <div class="column is-one-third">
-                <div class="card">
-                    <header class="card-header">
-                        <p class="card-header-title">
-                            Macronutrient Breakdown
-                        </p>
-                    </header>
-                    <div class="card-content">
-                        <div class="content">
-                            <p>Protein 25%</p>
-                            <Progress Percentage="0.25"></Progress>
-                            <p>Carbohydrates 100%</p>
-                            <Progress Percentage="1"></Progress>
-                            <p>Fat 0%</p>
-                            <Progress Percentage="0"></Progress>
+        <div class="grid is-col-min-12 is-column-gap-4 is-row-gap-4">
+            <div class="cell">
+                <p class="section-label">Macro breakdown</p>
+                @if (_insights.MacroNutrientBreakdown.TryGetValue(out var macroNutrientBreakdown))
+                {
+                    <div class="is-flex is-flex-direction-column">
+                        <div class="fixed-grid has-3-cols">
+                            <div class="grid" style="grid-template-columns: max-content 1fr max-content;">
+                                @foreach(var (name, fill) in new List<(string, double)>
+                                {
+                                    ("Protein", macroNutrientBreakdown.ProportionProtein),
+                                    ("Fat", macroNutrientBreakdown.ProportionFat),
+                                    ("Carbs", macroNutrientBreakdown.ProportionCarbs)
+                                })
+                                {
+                                    <div class="cell">
+                                        <p>@name</p>
+                                    </div>
+                                    <div class="cell">
+                                         <Progress Percentage="@fill"></Progress>
+                                    </div>
+                                    <div class="cell">
+                                        <p>@fill.ToString("P0")</p>
+                                    </div>
+                                }
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    <p class="has-text-grey">Insufficient data for macro breakdown</p>
+                }
             </div>
+            
+            <div class="cell">
+                <p class="section-label">Macro efficiency</p>
+                @{
+                    var hasAnyMacroEfficiency = _insights.MacroEfficiency.ProteinPerDollar.HasValue 
+                        || _insights.MacroEfficiency.FatPerDollar.HasValue 
+                        || _insights.MacroEfficiency.CarbsPerDollar.HasValue
+                        || _insights.MacroEfficiency.ProteinPerCalorie.HasValue
+                        || _insights.MacroEfficiency.FatPerCalorie.HasValue
+                        || _insights.MacroEfficiency.CarbsPerCalorie.HasValue;
+                }
+                @if (hasAnyMacroEfficiency)
+                {
+                    <div class="is-grid is-fullwidth" style="grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem 1rem;">
+                        <div>Protein</div>
+                        <div>@(_insights.MacroEfficiency.ProteinPerDollar.TryGetValue(out var proteinPerDollar) ? $"{proteinPerDollar:F2} g/$" : "—")</div>
+                        <div>@(_insights.MacroEfficiency.ProteinPerCalorie.TryGetValue(out var proteinPerCalorie) ? $"{proteinPerCalorie * 1000:F0} mg/cal" : "—")</div>
 
-            <!-- Cost Analysis Card -->
-            <div class="column is-one-third">
-                <div class="card">
-                    <header class="card-header">
-                        <p class="card-header-title">
-                            Cost Analysis
-                        </p>
-                    </header>
-                    <div class="card-content">
-                        <div class="content">
-                            <p><strong>Calories per dollar:</strong> 1,234</p>
-                            <p><strong>Protein per dollar:</strong> 56g</p>
-                        </div>
+                        <div>Fat</div>
+                        <div>@(_insights.MacroEfficiency.FatPerDollar.TryGetValue(out var fatPerDollar) ? $"{fatPerDollar:F2} g/$" : "—")</div>
+                        <div>@(_insights.MacroEfficiency.FatPerCalorie.TryGetValue(out var fatPerCalorie) ? $"{fatPerCalorie * 1000:F0} mg/cal" : "—")</div>
+
+                        <div>Carbs</div>
+                        <div>@(_insights.MacroEfficiency.CarbsPerDollar.TryGetValue(out var carbsPerDollar) ? $"{carbsPerDollar:F2} g/$" : "—")</div>
+                        <div>@(_insights.MacroEfficiency.CarbsPerCalorie.TryGetValue(out var carbsPerCalorie) ? $"{carbsPerCalorie * 1000:F0} mg/cal" : "—")</div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    <p class="has-text-grey">Insufficient data for macro efficiency analysis</p>
+                }
             </div>
-
-            <!-- General Stats Card -->
-            <div class="column is-one-third">
-                <div class="card">
-                    <header class="card-header">
-                        <p class="card-header-title">
-                            General Stats
-                        </p>
-                    </header>
-                    <div class="card-content">
-                        <div class="content">
-                            <p><strong>Servings per package:</strong> 10</p>
-                            <p><strong>Cost per serving:</strong> $0.99</p>
-                        </div>
+            <div class="cell">
+                <p class="section-label">Cost analysis</p>
+                @{
+                    var hasAnyCostAnalysis = _insights.CostAnalysis.ServingsPerPackage.HasValue 
+                        || _insights.CostAnalysis.CostPerServing.HasValue 
+                        || _insights.CostAnalysis.CaloriesPerDollar.HasValue;
+                }
+                @if (hasAnyCostAnalysis)
+                {
+                    <div class="is-flex is-flex-direction-column gap-2">
+                        @if (_insights.CostAnalysis.ServingsPerPackage.TryGetValue(out var servingsPerPackage))
+                        {
+                            <div class="is-flex is-justify-content-space-between">
+                                <span>Servings per package:</span>
+                                <span class="has-text-weight-semibold">@servingsPerPackage.ToString("F1")</span>
+                            </div>
+                        }
+                        @if (_insights.CostAnalysis.CostPerServing.TryGetValue(out var costPerServing))
+                        {
+                            <div class="is-flex is-justify-content-space-between">
+                                <span>Cost per serving:</span>
+                                <span class="has-text-weight-semibold">$@costPerServing.ToString("F2")</span>
+                            </div>
+                        }
+                        @if (_insights.CostAnalysis.CaloriesPerDollar.TryGetValue(out var caloriesPerDollar))
+                        {
+                            <div class="is-flex is-justify-content-space-between">
+                                <span>Calories per dollar:</span>
+                                <span class="has-text-weight-semibold">@caloriesPerDollar.ToString("F0")</span>
+                            </div>
+                        }
                     </div>
-                </div>
+                }
+                else
+                {
+                    <p class="has-text-grey">Insufficient data for cost analysis</p>
+                }
+            </div>
+            <div class="cell">
+                <p class="section-label">Protein score</p>
+                @if (_insights.ProteinScore.TryGetValue(out var proteinScore))
+                {
+                    <div class="has-text-centered">
+                        <p class="title is-2 has-text-primary">@proteinScore.ToString("F2")</p>
+                        <p class="subtitle is-6">Protein efficiency rating</p>
+                    </div>
+                }
+                else
+                {
+                    <p class="has-text-grey">Insufficient data for protein score</p>
+                }
             </div>
         </div>
     </div>

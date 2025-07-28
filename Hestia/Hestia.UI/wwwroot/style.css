@@ -156,6 +156,9 @@
     color: var(--bulma-text-strong);
     display: block;
 }
+.section-label + :not(p) {
+    margin-top: 0.5rem;
+}
 
 
 .color-fat {
@@ -271,4 +274,14 @@ tr.border-bottom-none > td {
 }
 .unit-conversion-list-fields p.button.dirty {
     border-color: var(--bulma-warning);
+}
+
+
+#insights-tab-body > .grid > .cell {
+    display: block;
+}
+
+.table thead td, .table thead th {
+    font-weight: var(--bulma-body-weight);
+    color: var(--bulma-body-color);
 }
