@@ -1,12 +1,27 @@
+@using Hestia.Domain.Models
+@using Hestia.Domain.Services
 @using Hestia.UI.Library.Components.Components
+@using Hestia.UI.Core.Components
 @attribute [RenderPage]
+@inject IUnitConversionsService UnitConversionsService
+@inject IIngredientsService IngredientsService
+
+@code {
+    private List<(int Id, IngredientModel Ingredient)> _ingredients = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _ingredients = await IngredientsService.GetIngredientsAsync();
+    }
+}
+
 
 <div _="on load send OnNavigate(value:'Ingredients') to #navbar then remove me"></div>
 
 <div class="content-container mt-5">
     <div class="field is-grouped">
         <div class="control is-expanded">
-            <form hx-get="/secrets/search" hx-swap="none">
+            <form hx-get="/ingredients/search" hx-swap="none">
                 <p class="control has-icons-left">
                     <input
                         _="
@@ -35,31 +50,39 @@
     </div>
 
     <div class="grid is-col-min-10 mt-5">
-        @for(int i =0;i<50;i++)
+        @foreach (var (id, ingredient) in _ingredients)
         {
-        <div class="cell is-clickable">
-            <Card>
-                <Content>
-
-            <div class="is-flex">
-                <div class="is-flex is-flex-direction-column gap-3" style="width:15rem;">
-                    <div class="is-flex is-justify-content-space-between gap-6">
-                        <strong>Eggs</strong>
-                        <p>170 Calories</p>
-                    </div>
-                    <div class="is-flex is-justify-content-space-between gap-6">
-                        <p>7 / - / 9</p>
-                        <p>30 / 50 / 900</p>
-                    </div>
-                </div>
+            <div class="cell is-clickable" hx-get="/ingredients/view/@id" hx-target="#page-container" hx-push-url>
+                <Card>
+                    <Content>
+                        <div class="is-flex">
+                            <div class="is-flex is-flex-direction-column gap-3" style="width:15rem;">
+                                <div class="is-flex is-justify-content-space-between gap-6">
+                                    <strong>@ingredient.Name</strong>
+                                </div>
+                                <div class="is-flex is-flex-direction-row is-justify-content-space-between">
+                                    <span class="tag is-flex is-gap-1">
+                                        @foreach (var (value, icon) in new List<(Optional<decimal>, string)>
+                                        {
+                                            (ingredient.ProteinGrams, "beef"),
+                                            (ingredient.FatGrams, "droplet"),
+                                            (ingredient.CarbGrams, "wheat")
+                                        })
+                                        {
+                                            <div class="is-flex is-flex-direction-row is-align-items-center is-gap-0.5">
+                                                <LucideIcon Name="@icon" />
+                                                @value.Map(q => q.ToString("F0")).Or("-")
+                                            </div>
+                                        }
+                                    </span>
+                                    <p>@(ingredient.Calories.HasValue ? ingredient.Calories.Value.ToString("F0") + " Calories" : "-")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </Content>
+                </Card>
             </div>
-                </Content>
-            </Card>
-        </div>
         }
     </div>
-                    <p>$3.50/12 eggs</p>
-
-                    <p>(i) notes </p>
 
 </div>

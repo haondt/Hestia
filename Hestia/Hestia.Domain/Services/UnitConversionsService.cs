@@ -9,26 +9,18 @@ namespace Hestia.Domain.Services;
 
 public class UnitConversionsService(ApplicationDbContext dbContext) : IUnitConversionsService
 {
-    private Optional<UnitConversionGraph> _cachedGraph = new();
+    private static readonly MutexResource<UnitConversionGraph> _graphCache = new();
 
     public Task<List<UnitConversionDataModel>> GetAllDataModelsAsync() =>
         dbContext.UnitConversions.ToListAsync();
 
-    private ValueTask<UnitConversionGraph> GetCachedGraphAsync()
-    {
-        if (_cachedGraph.TryGetValue(out var graph))
-            return new ValueTask<UnitConversionGraph>(graph);
-
-        return new ValueTask<UnitConversionGraph>(LoadGraphAsync());
-
-        async Task<UnitConversionGraph> LoadGraphAsync()
+    private ValueTask<UnitConversionGraph> GetCachedGraphAsync() =>
+        _graphCache.GetOrCreateAsync(async () =>
         {
             var dataModels = await GetAllDataModelsAsync();
             var (graph, _) = UnitConversionGraph.FromConversions(dataModels);
-            _cachedGraph = new(graph);
             return graph;
-        }
-    }
+        });
 
     public async Task<List<UnitConversionModel>> GetAllAsync()
     {
@@ -61,7 +53,7 @@ public class UnitConversionsService(ApplicationDbContext dbContext) : IUnitConve
 
         await dbContext.UnitConversions.AddRangeAsync(newDataModels);
         await dbContext.SaveChangesAsync();
-        _cachedGraph = new();
+        _graphCache.Invalidate();
 
         return new(newDataModels.Select(UnitConversionModel.FromDataModel).ToList());
     }
@@ -86,7 +78,7 @@ public class UnitConversionsService(ApplicationDbContext dbContext) : IUnitConve
 
         dbContext.UnitConversions.Add(model);
         await dbContext.SaveChangesAsync();
-        _cachedGraph = new();
+        _graphCache.Invalidate();
         return new(UnitConversionModel.FromDataModel(model));
     }
 
@@ -98,7 +90,7 @@ public class UnitConversionsService(ApplicationDbContext dbContext) : IUnitConve
         {
             dbContext.UnitConversions.Remove(model);
             await dbContext.SaveChangesAsync();
-            _cachedGraph = new();
+            _graphCache.Invalidate();
         }
     }
 }

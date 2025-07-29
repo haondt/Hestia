@@ -6,6 +6,7 @@
     "bulma": "1.0.4",
     "htmx.org": "2.0.6",
     "hyperscript.org": "^0.9.14",
+    "lucide-static": "^0.533.0",
     "minimasonry": "^1.3.2",
     "quill": "^2.0.3"
   }

@@ -6,6 +6,7 @@
         "bulma": "1.0.4",
         "htmx.org": "2.0.6",
         "hyperscript.org": "^0.9.14",
+        "lucide-static": "^0.533.0",
         "minimasonry": "^1.3.2",
         "quill": "^2.0.3",
       },
@@ -56,6 +57,8 @@
     "lodash.clonedeep": ["lodash.clonedeep@4.5.0", "", {}, "sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ=="],
 
     "lodash.isequal": ["lodash.isequal@4.5.0", "", {}, "sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ=="],
+
+    "lucide-static": ["lucide-static@0.533.0", "", {}, "sha512-k3UlBd6LDsmOPd4X3G4+xbVwRIfBwzSJPkeO/bL5kLvEj2WJ0REDibUJPXB4PjWwYJ6N4/FfAHk7xhT/UUgPOA=="],
 
     "markdown-it-deflist": ["markdown-it-deflist@2.1.0", "", {}, "sha512-3OuqoRUlSxJiuQYu0cWTLHNhhq2xtoSFqsZK8plANg91+RJQU1ziQ6lA2LzmFAEes18uPBsHZpcX6We5l76Nzg=="],
 

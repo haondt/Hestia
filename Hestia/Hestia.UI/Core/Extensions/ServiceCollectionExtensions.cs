@@ -20,6 +20,7 @@ namespace Hestia.UI.Core.Extensions
 
             services.AddSingleton<IExceptionActionResultFactory, ToastExceptionActionResultFactory>();
             services.AddScoped<ModelStateValidationFilter>();
+            services.AddSingleton<ILucideIconService, LucideIconService>();
 
             return services;
         }

@@ -25,10 +25,11 @@ namespace Hestia.Domain.Services
             return IngredientModel.FromDataModel(dataModel.Entity);
         }
 
-        public async Task<List<IngredientModel>> GetIngredientsAsync()
+        public async Task<List<(int Id, IngredientModel Ingredient)>> GetIngredientsAsync()
         {
+
             var dataModels = await dbContext.Ingredients.ToListAsync();
-            return dataModels.Select(IngredientModel.FromDataModel).ToList();
+            return dataModels.Select(m => (m.Id, IngredientModel.FromDataModel(m))).ToList();
         }
 
         public async Task<Result<IngredientModel>> GetIngredientAsync(int id)

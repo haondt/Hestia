@@ -16,6 +16,11 @@
     "quill": [
       "dist/quill.js",
       "dist/quill.snow.css"
+    ],
+    "lucide-static": [
+      "icons/beef.svg",
+      "icons/droplet.svg",
+      "icons/wheat.svg"
     ]
   }
 }
