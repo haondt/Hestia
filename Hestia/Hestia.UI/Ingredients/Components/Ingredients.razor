@@ -21,15 +21,19 @@
 <div class="content-container mt-5">
     <div class="field is-grouped">
         <div class="control is-expanded">
-            <form hx-get="/ingredients/search" hx-swap="none">
+            <form hx-get="/ingredients/search" hx-target="#ingredients-grid" hx-swap="outerHTML">
                 <p class="control has-icons-left">
                     <input
                         _="
                             on input debounced at 200ms
                             send submit to the closest <form />
                         "
-                        class="input is-fullwidth is-rounded" name="search" placeholder="search" type="search" />
-                    <span class="icon is-small is-left"><i class="fas fa-search" aria-hidden="true"></i></span>
+                        class="input is-fullwidth is-rounded" 
+                        name="search" 
+                        placeholder="search" 
+                        type="search"
+                        value="" />
+                    <span class="icon is-small is-left"><LucideIcon Name="search" /></span>
                 </p>
             </form>
         </div>
@@ -49,42 +53,6 @@
         </div>
     </div>
 
-    <div class="grid is-col-min-10 mt-5">
-        @foreach (var (id, ingredient) in _ingredients)
-        {
-            <div class="cell">
-                <div class="is-clickable" hx-get="/ingredients/view/@id" hx-target="#page-container" hx-push-url="true">
-                    <Card>
-                        <Content>
-                            <div class="is-flex">
-                                <div class="is-flex is-flex-direction-column gap-3" style="width:15rem;">
-                                    <div class="is-flex is-justify-content-space-between gap-6">
-                                        <strong>@ingredient.Name</strong>
-                                    </div>
-                                    <div class="is-flex is-flex-direction-row is-justify-content-space-between">
-                                        <span class="tag is-flex is-gap-1">
-                                            @foreach (var (value, icon) in new List<(Optional<decimal>, string)>
-                                            {
-                                                (ingredient.ProteinGrams, "beef"),
-                                                (ingredient.FatGrams, "droplet"),
-                                                (ingredient.CarbGrams, "wheat")
-                                            })
-                                            {
-                                                <div class="is-flex is-flex-direction-row is-align-items-center is-gap-0.5">
-                                                    <LucideIcon Name="@icon" />
-                                                    @value.Map(q => q.ToString("F0")).Or("-")
-                                                </div>
-                                            }
-                                        </span>
-                                        <p>@(ingredient.Calories.HasValue ? ingredient.Calories.Value.ToString("F0") + " Calories" : "-")</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </Content>
-                    </Card>
-                </div>
-            </div>
-        }
-    </div>
+    <IngredientsGrid Ingredients="_ingredients" />
 
 </div>

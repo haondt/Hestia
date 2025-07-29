@@ -20,7 +20,8 @@
     "lucide-static": [
       "icons/beef.svg",
       "icons/droplet.svg",
-      "icons/wheat.svg"
+      "icons/wheat.svg",
+      "icons/search.svg"
     ]
   }
 }

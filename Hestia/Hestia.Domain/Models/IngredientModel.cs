@@ -1,5 +1,6 @@
 ﻿using Haondt.Core.Extensions;
 using Haondt.Core.Models;
+using Hestia.Core.Models;
 using Hestia.Domain.Services;
 using Hestia.Persistence.Models;
 using System.ComponentModel.DataAnnotations;
@@ -51,6 +52,7 @@ namespace Hestia.Domain.Models
         public IngredientDataModel AsDataModel() => new()
         {
             Name = Name,
+            NormalizedName = NormalizedString.Create(Name),
             Brand = Brand.Unwrap(),
             Vendor = Vendor.Unwrap(),
             ServingSizeQuantity = ServingSizeQuantity.Unwrap(),

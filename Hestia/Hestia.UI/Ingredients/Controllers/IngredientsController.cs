@@ -26,6 +26,19 @@ namespace Hestia.UI.Ingredients.Controllers
             return _componentFactory.RenderComponentAsync<Ingredients.Components.Ingredients>();
         }
 
+        [HttpGet("search")]
+        public async Task<IResult> Search([FromQuery] string? search)
+        {
+            var ingredients = string.IsNullOrWhiteSpace(search) 
+                ? await ingredientsService.GetIngredientsAsync()
+                : await ingredientsService.SearchIngredientsAsync(search);
+
+            return await _componentFactory.RenderComponentAsync(new IngredientsGrid
+            {
+                Ingredients = ingredients
+            });
+        }
+
         [HttpGet("view/{id}")]
         public async Task<IResult> ViewIngredient(int id)
         {
