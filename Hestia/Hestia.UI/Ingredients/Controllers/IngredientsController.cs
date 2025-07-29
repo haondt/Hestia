@@ -1,7 +1,10 @@
-﻿using Haondt.Web.BulmaCSS.Services;
+﻿using Haondt.Core.Extensions;
+using Haondt.Core.Models;
+using Haondt.Web.BulmaCSS.Services;
 using Haondt.Web.Components;
 using Haondt.Web.Core.Extensions;
 using Haondt.Web.Core.Services;
+using Hestia.Core.Constants;
 using Hestia.Domain.Models;
 using Hestia.Domain.Services;
 using Hestia.UI.Core.Components;
@@ -27,15 +30,19 @@ namespace Hestia.UI.Ingredients.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IResult> Search([FromQuery] string? search)
+        public async Task<IResult> Search([FromQuery] string? search, [FromQuery] int page = 0)
         {
-            var ingredients = string.IsNullOrWhiteSpace(search) 
-                ? await ingredientsService.GetIngredientsAsync()
-                : await ingredientsService.SearchIngredientsAsync(search);
+            var ingredients = string.IsNullOrWhiteSpace(search)
+                ? await ingredientsService.GetIngredientsAsync(page, HestiaConstants.PageSize)
+                : await ingredientsService.SearchIngredientsAsync(search, page, HestiaConstants.PageSize);
 
             return await _componentFactory.RenderComponentAsync(new IngredientsGrid
             {
-                Ingredients = ingredients
+                Ingredients = ingredients,
+                CurrentSearch = search.AsOptional(),
+                NextPage = ingredients.Count == HestiaConstants.PageSize
+                    ? page + 1
+                    : new Optional<int>()
             });
         }
 

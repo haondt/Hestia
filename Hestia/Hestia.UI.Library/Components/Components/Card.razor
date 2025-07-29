@@ -1,4 +1,5 @@
 @using Haondt.Core.Models
+@using Haondt.Core.Extensions
 @using Hestia.UI.Library.Components.Element
 @code {
     [Parameter]
@@ -9,6 +10,9 @@
 
     [Parameter]
     public RenderFragment? Content { get; set; } = default;
+
+    [Parameter]
+    public Optional<string> ContentClasses { get; set; } = default;
 
     /// <summary>
     /// Each item in here should have the "card-footer-item" class."
@@ -35,7 +39,7 @@
 
     @if (Content is not null)
     {
-        <div class="card-content">
+        <div class="card-content @ContentClasses.Unwrap()">
             @Content
         </div>
     }

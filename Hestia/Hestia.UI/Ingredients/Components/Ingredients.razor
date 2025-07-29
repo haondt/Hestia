@@ -1,3 +1,4 @@
+@using Hestia.Core.Constants
 @using Hestia.Domain.Models
 @using Hestia.Domain.Services
 @using Hestia.UI.Library.Components.Components
@@ -11,7 +12,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _ingredients = await IngredientsService.GetIngredientsAsync();
+        _ingredients = await IngredientsService.GetIngredientsAsync(pageSize: HestiaConstants.PageSize);
     }
 }
 
@@ -53,6 +54,8 @@
         </div>
     </div>
 
-    <IngredientsGrid Ingredients="_ingredients" />
+    <IngredientsGrid
+        NextPage="@(_ingredients.Count == HestiaConstants.PageSize ? 1 : new Optional<int>())"
+        Ingredients="_ingredients" />
 
 </div>

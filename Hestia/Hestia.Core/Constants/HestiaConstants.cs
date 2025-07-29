@@ -8,5 +8,7 @@
         /// 0-1
         /// </summary>
         public const decimal UnitConversionRelativeTolerance = 0.1m;
+
+        public const int PageSize = 20;
     }
 }

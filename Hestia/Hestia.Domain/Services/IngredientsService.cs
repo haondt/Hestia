@@ -26,10 +26,14 @@ namespace Hestia.Domain.Services
             return IngredientModel.FromDataModel(dataModel.Entity);
         }
 
-        public async Task<List<(int Id, IngredientModel Ingredient)>> GetIngredientsAsync()
+        public async Task<List<(int Id, IngredientModel Ingredient)>> GetIngredientsAsync(int page = 0, int pageSize = 20)
         {
-
-            var dataModels = await dbContext.Ingredients.ToListAsync();
+            var dataModels = await dbContext.Ingredients
+                .OrderBy(i => i.Id)
+                .Skip(page * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            
             return dataModels.Select(m => (m.Id, IngredientModel.FromDataModel(m))).ToList();
         }
 
@@ -39,13 +43,16 @@ namespace Hestia.Domain.Services
             return dataModel is null ? new() : new(IngredientModel.FromDataModel(dataModel));
         }
 
-        public async Task<List<(int Id, IngredientModel Ingredient)>> SearchIngredientsAsync(NormalizedString searchTerm)
+        public async Task<List<(int Id, IngredientModel Ingredient)>> SearchIngredientsAsync(NormalizedString searchTerm, int page = 0, int pageSize = 20)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
-                return await GetIngredientsAsync();
+                return await GetIngredientsAsync(page, pageSize);
 
             var dataModels = await dbContext.Ingredients
                 .Where(i => i.NormalizedName.Contains(searchTerm))
+                .OrderBy(i => i.Id)
+                .Skip(page * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             return dataModels.Select(m => (m.Id, IngredientModel.FromDataModel(m))).ToList();

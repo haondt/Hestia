@@ -8,8 +8,8 @@ namespace Hestia.Domain.Services
     {
         Task<(int Id, IngredientModel Ingredient)> CreateIngredientAsync(IngredientModel ingredient);
         Task<Result<IngredientModel>> GetIngredientAsync(int id);
-        Task<List<(int Id, IngredientModel Ingredient)>> GetIngredientsAsync();
-        Task<List<(int Id, IngredientModel Ingredient)>> SearchIngredientsAsync(NormalizedString searchTerm);
+        Task<List<(int Id, IngredientModel Ingredient)>> GetIngredientsAsync(int page = 0, int pageSize = 20);
+        Task<List<(int Id, IngredientModel Ingredient)>> SearchIngredientsAsync(NormalizedString searchTerm, int page = 0, int pageSize = 20);
         Task<IngredientModel> UpdateIngredientAsync(int id, IngredientModel ingredient);
     }
 }

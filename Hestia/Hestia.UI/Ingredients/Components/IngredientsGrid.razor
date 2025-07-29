@@ -4,42 +4,59 @@
 
 @code {
     [Parameter] public required List<(int Id, IngredientModel Ingredient)> Ingredients { get; set; } = new();
+    [Parameter] public Optional<int> NextPage { get; set; }
+    [Parameter] public Optional<string> CurrentSearch { get; set; }
 }
 
-<div id="ingredients-grid" class="grid is-col-min-10 mt-5">
-    @foreach (var (id, ingredient) in Ingredients)
-    {
-        <div class="cell">
-            <div class="has-width-full is-clickable" hx-get="/ingredients/view/@id" hx-target="#page-container" hx-push-url="true">
-                <Card>
-                    <Content>
-                        <div class="is-flex">
-                            <div class="is-flex is-flex-direction-column gap-3 is-flex-grow-1" style="width:15rem;">
-                                <div class="is-flex is-justify-content-space-between gap-6">
-                                    <strong>@ingredient.Name</strong>
-                                </div>
-                                <div class="is-flex is-flex-direction-row is-justify-content-space-between">
-                                    <span class="tag is-flex is-gap-1">
-                                        @foreach (var (value, icon) in new List<(Optional<decimal>, string)>
-                                        {
-                                            (ingredient.ProteinGrams, "beef"),
-                                            (ingredient.FatGrams, "droplet"),
-                                            (ingredient.CarbGrams, "wheat")
-                                        })
-                                        {
-                                            <div class="is-flex is-flex-direction-row is-align-items-center is-gap-0.5">
-                                                <LucideIcon Name="@icon" />
-                                                @value.Map(q => q.ToString("F0")).Or("-")
-                                            </div>
-                                        }
-                                    </span>
-                                    <p>@(ingredient.Calories.HasValue ? ingredient.Calories.Value.ToString("F0") + " Calories" : "-")</p>
+    <div id="ingredients-grid" class="grid is-col-min-10 mt-5">
+        @foreach (var (id, ingredient) in Ingredients)
+        {
+            <div class="cell is-align-items-stretch"> 
+                <div class="has-width-full is-clickable is-align-items-stretch is-flex" hx-get="/ingredients/view/@id" hx-target="#page-container" hx-push-url="true">
+                    <Card ContentClasses="@("has-height-full")" >
+                        <Content>
+                            <div class="is-flex has-height-full">
+                                <div class="is-flex is-flex-direction-column gap-3 is-flex-grow-1 is-justify-content-space-between" style="width:15rem;">
+                                    <div class="is-flex is-justify-content-space-between gap-6">
+                                        <strong>@ingredient.Name</strong>
+                                    </div>
+                                    <div class="is-flex is-flex-direction-row is-justify-content-space-between">
+                                        <span class="tag is-flex is-gap-1">
+                                            @foreach (var (value, icon) in new List<(Optional<decimal>, string)>
+                                            {
+                                                (ingredient.ProteinGrams, "beef"),
+                                                (ingredient.FatGrams, "droplet"),
+                                                (ingredient.CarbGrams, "wheat")
+                                            })
+                                            {
+                                                <div class="is-flex is-flex-direction-row is-align-items-center is-gap-0.5">
+                                                    <LucideIcon Name="@icon" />
+                                                    @value.Map(q => q.ToString("F0")).Or("-")
+                                                </div>
+                                            }
+                                        </span>
+                                        <p>@(ingredient.Calories.HasValue ? ingredient.Calories.Value.ToString("F0") + " Calories" : "-")</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </Content>
-                </Card>
+                        </Content>
+                    </Card>
+                </div>
             </div>
-        </div>
-    }
-</div>
+        }
+        
+        @if (NextPage.HasValue)
+        {
+            <div
+                 hx-get="/ingredients/search" 
+                 hx-trigger="intersect once"
+                 hx-select="#ingredients-grid > *"
+                 hx-swap="outerHTML"
+                 hx-vals='{
+                     "search": "@CurrentSearch.Unwrap()",
+                     "page": "@(NextPage.Value)"
+                 }'
+                 style="height: 1px;">
+            </div>
+        }
+    </div>
