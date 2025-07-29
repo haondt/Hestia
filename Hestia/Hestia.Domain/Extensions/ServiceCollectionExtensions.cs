@@ -11,6 +11,7 @@ namespace Hestia.Domain.Extensions
             services.AddScoped<IIngredientsService, IngredientsService>();
             services.AddScoped<IUnitConversionsService, UnitConversionsService>();
             services.AddScoped<IDbSeeder, DbSeeder>();
+            services.AddScoped<IDevDbSeeder, DevDbSeeder>();
 
             return services;
         }

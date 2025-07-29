@@ -10,11 +10,11 @@
     @foreach (var (id, ingredient) in Ingredients)
     {
         <div class="cell">
-            <div class="is-clickable" hx-get="/ingredients/view/@id" hx-target="#page-container" hx-push-url="true">
+            <div class="has-width-full is-clickable" hx-get="/ingredients/view/@id" hx-target="#page-container" hx-push-url="true">
                 <Card>
                     <Content>
                         <div class="is-flex">
-                            <div class="is-flex is-flex-direction-column gap-3" style="width:15rem;">
+                            <div class="is-flex is-flex-direction-column gap-3 is-flex-grow-1" style="width:15rem;">
                                 <div class="is-flex is-justify-content-space-between gap-6">
                                     <strong>@ingredient.Name</strong>
                                 </div>
