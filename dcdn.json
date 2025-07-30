@@ -21,7 +21,9 @@
       "icons/beef.svg",
       "icons/droplet.svg",
       "icons/wheat.svg",
-      "icons/search.svg"
+      "icons/search.svg",
+      "icons/book-open.svg",
+      "icons/cog.svg"
     ]
   }
 }

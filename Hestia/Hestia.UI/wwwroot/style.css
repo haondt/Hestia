@@ -286,3 +286,6 @@ tr.border-bottom-none > td {
     color: var(--bulma-body-color);
 }
 
+.navbar-brand > a.navbar-item {
+    background: none;
+}

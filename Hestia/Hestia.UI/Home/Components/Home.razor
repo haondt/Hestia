@@ -1,0 +1,50 @@
+@using Hestia.UI.Library.Components.Components
+@using Hestia.UI.Core.Components
+@attribute [RenderPage]
+
+@code {
+    private readonly List<(string Url, string Icon, string Title, string Description)> sections = new()
+    {
+        ("/ingredients", "wheat", "Ingredients", "Track nutrition info and perform cost analysis for all your ingredients."),
+        ("/recipes", "book-open", "Recipes", "Create and organize your favorite recipes with detailed instructions and nutrition."),
+        ("/settings", "cog", "Settings", "Customize your Hestia experience.")
+    };
+}
+
+<div class="container mt-6">
+    <div class="hero">
+        <div class="hero-body has-text-centered">
+            <div class="is-flex is-justify-content-center mb-5">
+                <img src="/static/shared/logo.svg" alt="Hestia Logo" style="height: 64px;" />
+            </div>
+            <h1 class="title is-1">Hestia</h1>
+            <p class="subtitle is-4">Your digital kitchen companion</p>
+            <p class="content is-size-5 mt-4">
+                Manage your ingredients, track nutrition, and organize your culinary adventures all in one place.
+            </p>
+        </div>
+    </div>
+
+    <div class="columns is-centered mt-6">
+        @foreach (var (url, icon, title, description) in sections)
+        {
+            <div class="column is-4">
+                <a href="@url" class="has-height-full is-flex is-flex-grow-1">
+                    <Card ContentClasses="@("has-height-full")" Classes="@("has-height-full is-flex-grow-1")">
+                        <Content>
+                            <div class="has-text-centered is-clickable is-flex is-flex-direction-column is-justify-content-flex-start has-height-full">
+                                    <div class="mb-4">
+                                        <LucideIcon Name="@icon" Size="48" />
+                                    </div>
+                                    <p class="section-label is-size-4">@title</p>
+                                    <p class="content mt-1 is-flex-grow-1 is-align-content-center">
+                                        @description
+                                    </p>
+                            </div>
+                        </Content>
+                    </Card>
+                </a>
+            </div>
+        }
+    </div>
+</div>

@@ -14,13 +14,16 @@
     [Parameter]
     public Optional<string> ContentClasses { get; set; } = default;
 
+    [Parameter]
+    public Optional<string> Classes { get; set; } = default;
+
     /// <summary>
     /// Each item in here should have the "card-footer-item" class."
     /// </summary>
     [Parameter]
     public RenderFragment? Footer { get; set; } = default;
 }
-<div class="card">
+<div class="card @Classes.Unwrap()">
     @if(Header is not null) 
     {
         <header class="card-header">
