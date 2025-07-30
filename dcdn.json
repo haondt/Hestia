@@ -23,7 +23,14 @@
       "icons/wheat.svg",
       "icons/search.svg",
       "icons/book-open.svg",
-      "icons/cog.svg"
+      "icons/cog.svg",
+      "icons/triangle-alert.svg"
+    ],
+    "@floating-ui/dom": [
+      "./dist/floating-ui.dom.umd.js"
+    ],
+    "@floating-ui/core": [
+      "./dist/floating-ui.core.umd.js"
     ]
   }
 }

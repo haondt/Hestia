@@ -3,6 +3,8 @@
     "@types/bun": "latest"
   },
   "dependencies": {
+    "@floating-ui/core": "1.7.2",
+    "@floating-ui/dom": "1.7.2",
     "bulma": "1.0.4",
     "htmx.org": "2.0.6",
     "hyperscript.org": "^0.9.14",

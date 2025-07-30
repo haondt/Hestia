@@ -1,0 +1,85 @@
+@code {
+    public enum TooltipPosition
+    {
+        Top,
+        TopStart,
+        TopEnd,
+        Right,
+        RightStart,
+        RightEnd,
+        Bottom,
+        BottomStart,
+        BottomEnd,
+        Left,
+        LeftStart,
+        LeftEnd
+    }
+
+    [Parameter] public RenderFragment? TriggerContent { get; set; }
+    [Parameter] public Optional<string> TriggerClasses { get; set; } 
+    [Parameter] public RenderFragment? ToolTipContent { get; set; }
+    [Parameter] public TooltipPosition Position { get; set; } = TooltipPosition.Top;
+    [Parameter] public int Offset { get; set; } = 10;
+
+    private string GetPositionString() => Position switch
+    {
+        TooltipPosition.Top => "top",
+        TooltipPosition.TopStart => "top-start",
+        TooltipPosition.TopEnd => "top-end",
+        TooltipPosition.Right => "right",
+        TooltipPosition.RightStart => "right-start",
+        TooltipPosition.RightEnd => "right-end",
+        TooltipPosition.Bottom => "bottom",
+        TooltipPosition.BottomStart => "bottom-start",
+        TooltipPosition.BottomEnd => "bottom-end",
+        TooltipPosition.Left => "left",
+        TooltipPosition.LeftStart => "left-start",
+        TooltipPosition.LeftEnd => "left-end",
+        _ => "top"
+    };
+}
+
+<span class="tooltip-trigger @TriggerClasses.Unwrap()" 
+    _="
+        on showTooltip
+            if not :cleanup
+                set tooltip to the next .tooltip-body
+                toggle .is-hidden on tooltip
+                js(me, tooltip)
+                    return HestiaUI.autoPositionTooltip({ 
+                        trigger: me, 
+                        tooltip: tooltip, 
+                        position: '@GetPositionString()', 
+                        offset: @Offset,
+                        padding: 15,
+                    });
+                end
+                set :cleanup to it
+            end
+        end
+        on hideTooltip
+            if :cleanup
+                set cleanup to :cleanup
+                js(cleanup)
+                    cleanup();
+                end
+                set tooltip to the next .tooltip-body
+                toggle .is-hidden on tooltip
+                set :cleanup to null
+            end
+        end
+
+        on htmx:beforeCleanupElement send hideTooltip to me end
+        on mouseleave send hideTooltip to me end
+        on blur send hideTooltip to me end
+
+        on mouseenter send showTooltip to me end
+        on focus send showTooltip to me end
+    "
+>
+    @TriggerContent
+</span>
+<div class="tooltip-body is-hidden">
+    @ToolTipContent
+</div>
+

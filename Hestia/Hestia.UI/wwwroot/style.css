@@ -289,3 +289,24 @@ tr.border-bottom-none > td {
 .navbar-brand > a.navbar-item {
     background: none;
 }
+
+.field.has-addons .control:not(:first-child):not(:last-child):has(+ .tooltip-trigger) .input  {
+    border-start-end-radius:var(--bulma-control-radius);
+    border-end-end-radius:var(--bulma-control-radius);
+}
+.field.has-addons .control:not(:first-child):not(:last-child):has(+ .tooltip-trigger) {
+    margin-right: 0.5rem;
+}
+
+/* Floating UI Tooltip styles */
+.tooltip-body {
+  width: max-content;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 900;
+}
+.tooltip-trigger {
+    display: inline-block;
+}
+

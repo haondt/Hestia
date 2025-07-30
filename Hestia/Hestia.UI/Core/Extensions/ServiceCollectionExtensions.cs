@@ -61,6 +61,18 @@ namespace Hestia.UI.Core.Extensions
             {
                 Uri = "/static/shared/quill.css",
             });
+            services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
+            {
+                Uri = "/static/shared/vendored/@floating-ui/core/dist/floating-ui.core.umd.js"
+            });
+            services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
+            {
+                Uri = "/static/shared/vendored/@floating-ui/dom/dist/floating-ui.dom.umd.js"
+            });
+            services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
+            {
+                Uri = "/static/shared/js/tooltip.js"
+            });
             services.AddScoped<IHeadEntryDescriptor>(_ => new TitleDescriptor
             {
                 Title = "Hestia",
