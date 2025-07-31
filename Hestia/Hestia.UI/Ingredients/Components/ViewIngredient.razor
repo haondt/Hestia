@@ -1,5 +1,7 @@
 @using Hestia.Domain.Models
 @using Hestia.Domain.Services
+@using Hestia.UI.Core.Components
+@using Hestia.UI.Core.Extensions
 @using Hestia.UI.Library.Components.Element
 @attribute [RenderPage]
 
@@ -13,11 +15,14 @@
     [Parameter, EditorRequired]
     public required int IngredientId { get; set; }
 
+    public const string UnitIncompatibilityMessage = EditIngredient.UnitIncompatibilityMessage;
     private IngredientInsightsModel _insights = default!;
+    private bool _areUnitsCompatible = true;
 
     protected override async Task OnInitializedAsync()
     {
         _insights = await Ingredient.GetInsightsAsync(UnitConversionsService);
+        _areUnitsCompatible = await UnitConversionsService.CheckIngredientUnitCompatibilityAsync(Ingredient, true);
     }
 }
 
@@ -111,9 +116,12 @@
                 <label class="label">Serving size</label>
             </div>
             <div class="field-body">
-                <div class="field has-addons">
+                <div class="field has-addons is-flex-grow-0">
                     <div class="control"><input class="input" name="@nameof(IngredientModel.ServingSizeQuantity)" type="number" value="@Ingredient.ServingSizeQuantity.Unwrap()" readonly></div>
                     <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.ServingSizeUnit)" type="text" value="@Ingredient.ServingSizeUnit.Unwrap()" readonly></div>
+                    <FieldWarningTooltip
+                        IsVisible="@(!_areUnitsCompatible)"
+                        Message="@UnitIncompatibilityMessage" />
                 </div>
             </div>
         </div>
@@ -123,9 +131,12 @@
                 <label class="label">Alternate Serving size</label>
             </div>
             <div class="field-body">
-                <div class="field has-addons">
+                <div class="field has-addons is-flex-grow-0">
                     <div class="control"><input class="input" name="@nameof(IngredientModel.AlternateServingSizeQuantity)" type="number" value="@Ingredient.AlternateServingSizeQuantity.Unwrap()" readonly></div>
                     <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.AlternateServingSizeUnit)" type="text" value="@Ingredient.AlternateServingSizeUnit.Unwrap()" readonly></div>
+                    <FieldWarningTooltip
+                        IsVisible="@(!_areUnitsCompatible)"
+                        Message="@UnitIncompatibilityMessage" />
                 </div>
             </div>
         </div>
@@ -187,6 +198,9 @@
                 <div class="field has-addons">
                     <div class="control"><input class="input" name="@nameof(IngredientModel.PackageSizeQuantity)" type="number" value="@Ingredient.PackageSizeQuantity.Unwrap()" readonly></div>
                     <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.PackageSizeUnit)" type="text" value="@Ingredient.PackageSizeUnit.Unwrap()" readonly></div>
+                    <FieldWarningTooltip
+                        IsVisible="@(!_areUnitsCompatible)"
+                        Message="@UnitIncompatibilityMessage" />
                 </div>
             </div>
         </div>
