@@ -184,6 +184,9 @@
 .unit-input {
     width: 5em;
 }
+.unit-input-short {
+    width: 2.5em;
+}
 .hestia-progress-container {
     border: 1px solid var(--bulma-border-weak);
     border-radius: 9999px;
