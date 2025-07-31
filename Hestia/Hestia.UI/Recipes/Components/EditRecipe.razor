@@ -1,5 +1,5 @@
 @using Haondt.Core.Extensions
-@using RecipeModel = Hestia.Core.Models.Recipe;
+@using Hestia.Domain.Models
 
 @attribute [RenderPage]
 <div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
@@ -8,11 +8,14 @@
     [Parameter]
     public Optional<RecipeModel> Recipe { get; set; }
 
+    [Parameter]
+    public Optional<int> RecipeId { get; set; }
+
     private string _target = default!;
 
     protected override void OnInitialized()
     {
-        _target = Recipe.Map(r => $"/recipes/edit/{r.Id}").Or("/recipes/new");
+        _target = RecipeId.Map(r => $"/recipes/edit/{r}").Or("/recipes/new");
         base.OnInitialized();
     }
 
@@ -29,7 +32,7 @@
             </div>
             <div class="field-body">
                 <div class="field">
-                    <input class="input" name="title" type="text" value="@Recipe.Map(q => q.Title).Or("")" />
+                    <input class="input" name="@nameof(RecipeModel.Title)" type="text" value="@Recipe.Map(q => q.Title).Unwrap()" required />
                 </div>
             </div>
         </div>
@@ -40,7 +43,7 @@
             </div>
             <div class="field-body">
                 <div class="field">
-                    <textarea class="textarea" name="description" type="text" value="@Recipe.Map(q => q.Description).Or("")" />
+                    <textarea class="textarea" name="@nameof(RecipeModel.Description)" type="text" value="@Recipe.Bind(q => q.Description).Unwrap()" />
                 </div>
             </div>
         </div>
@@ -62,6 +65,82 @@
                     <div class="buttons">
                         <button class="button is-ghost has-text-danger">Delete</button>
                         <button class="button is-ghost has-text-link">Upload</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Yield</label>
+            </div>
+            <div class="field-body">
+                <div class="field has-addons is-flex-grow-0">
+                    <div class="control">
+                        <input 
+                            class="input yield-input" 
+                            name="@nameof(RecipeModel.YieldQuantity)" 
+                            type="number" 
+                            placeholder="4" 
+                            value="@Recipe.Bind(r => r.YieldQuantity).Unwrap()"
+                            step="any"
+                            _="on input call calculateServingSize()">
+                    </div>
+                    <div class="control">
+                        <input 
+                            class="input yield-input unit-input" 
+                            name="@nameof(RecipeModel.YieldUnit)" 
+                            type="text" 
+                            placeholder="cups"
+                            value="@Recipe.Bind(r => r.YieldUnit).Unwrap()"
+                            _="on input call calculateServingSize()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Number of servings</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <input 
+                        class="input servings-input" 
+                        name="@nameof(RecipeModel.NumberOfServings)" 
+                        type="number" 
+                        placeholder="4" 
+                        value="@Recipe.Bind(r => r.NumberOfServings).Unwrap()"
+                        min="1"
+                        _="on input call calculateServingSize()">
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Serving size</label>
+            </div>
+            <div class="field-body">
+                <div class="field has-addons is-flex-grow-0">
+                    <div class="control">
+                        <input 
+                            class="input is-static-input" 
+                            id="serving-size-quantity"
+                            type="number" 
+                            placeholder="1" 
+                            step="any"
+                            readonly>
+                    </div>
+                    <div class="control">
+                        <input 
+                            class="input is-static-input unit-input" 
+                            id="serving-size-unit"
+                            type="text" 
+                            placeholder="cup"
+                            readonly>
                     </div>
                 </div>
             </div>
@@ -113,4 +192,18 @@
     </form>
 
 </div>
+
+<script type="text/hyperscript">
+    def calculateServingSize()
+        set yieldQuantity to the first .yield-input's value as a Number
+        set numberOfServings to the first .servings-input's value as a Number
+        set yieldUnit to the last .yield-input's value
+        
+        if yieldQuantity and numberOfServings and numberOfServings > 0 then
+            set servingSize to yieldQuantity / numberOfServings
+            set #serving-size-quantity's value to servingSize
+            set #serving-size-unit's value to yieldUnit
+        end
+    end
+</script>
 

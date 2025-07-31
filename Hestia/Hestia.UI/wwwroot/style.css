@@ -310,3 +310,11 @@ tr.border-bottom-none > td {
     display: inline-block;
 }
 
+.is-static-input {
+    background-color: var(--bulma-scheme-main-ter);
+    border-color: var(--bulma-border);
+    box-shadow: none;
+    color: var(--bulma-text-weak);
+    pointer-events: none;
+}
+
