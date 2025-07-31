@@ -93,4 +93,10 @@ public class UnitConversionsService(ApplicationDbContext dbContext) : IUnitConve
             _graphCache.Invalidate();
         }
     }
+
+    public async Task<bool> CheckUnitCompatibilityAsync(NormalizedString unit1, NormalizedString unit2)
+    {
+        var graph = await GetCachedGraphAsync();
+        return graph.Convert(unit1, unit2, 1m).IsSuccessful;
+    }
 }

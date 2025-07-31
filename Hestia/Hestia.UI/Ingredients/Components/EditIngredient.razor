@@ -1,10 +1,16 @@
 @using Hestia.Domain.Models
+@using Hestia.Domain.Services
 @using Hestia.UI.Core.Components
+@using Hestia.UI.Core.Extensions
+@using System.Text.Json
 
 @attribute [RenderPage]
+@inject IUnitConversionsService UnitConversionsService
 <div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
 
 @code {
+    public const string UnitIncompatibilityMessage = "Cannot convert between serving size and package size units.";
+
     [Parameter]
     public Optional<IngredientModel> Ingredient { get; set; }
 
@@ -13,17 +19,29 @@
 
     private Dictionary<string, object> _submitAttributes = new();
 
-    protected override void OnInitialized()
+    private List<string> _warningTooltipIds = [];
+    private bool _areUnitsCompatible = true;
+
+    protected override async Task OnInitializedAsync()
     {
         if (IngredientId.TryGetValue(out var id))
             _submitAttributes["hx-put"] =    $"/ingredients/edit/{id}";
         else
             _submitAttributes["hx-post"] = "/ingredients/new";
+
+        for(int i=0; i< 3;i++)
+            _warningTooltipIds.Add(Guid.NewGuid().ToString("N"));
+
+        _areUnitsCompatible = true;
+        if (Ingredient.TryGetValue(out var ingredient))
+            _areUnitsCompatible = await UnitConversionsService.CheckIngredientUnitCompatibilityAsync(ingredient, true);
+
         base.OnInitialized();
     }
 
     private bool AreUnitsCompatible()
     {
+
         if (
             !Ingredient.Bind(q => q.ServingSizeUnit).Map(u => u.ToLowerInvariant()).TryGetValue(out var servingUnit) ||
             !Ingredient.Bind(q => q.PackageSizeUnit).Map(u => u.ToLowerInvariant()).TryGetValue(out var packageUnit))
@@ -47,7 +65,7 @@
             </li>
         </ul>
     </div>
-    <form id="edit-ingredient-form" class="control" >
+    <form id="edit-ingredient-form" class="control">
 
         <div class="field is-horizontal">
             <div class="field-label is-normal">
@@ -84,6 +102,20 @@
 
         <hr />
 
+        <div class="is-hidden"
+            hx-swap="none"
+            hx-trigger="input from:.unit-input delay:200ms"
+            hx-get="/utils/check-unit-compatibility"
+            hx-sync="this:replace"
+            hx-include=".unit-input"
+            hx-rename="@nameof(IngredientModel.ServingSizeUnit):from,@nameof(IngredientModel.AlternateServingSizeUnit):from,@nameof(IngredientModel.PackageSizeUnit):to"
+            hx-vals='@JsonSerializer.Serialize(new {
+                @default = true,
+                swap = _warningTooltipIds,
+                message = UnitIncompatibilityMessage
+            })'
+            ></div>
+
         <div class="field is-horizontal">
             <div class="field-label is-normal">
                 <label class="label">Serving size</label>
@@ -92,6 +124,9 @@
                 <div class="field has-addons is-flex-grow-0">
                     <div class="control"><input class="input" name="@nameof(IngredientModel.ServingSizeQuantity)" type="number" placeholder="1" value="@Ingredient.Bind(q => q.ServingSizeQuantity).Unwrap()"></div>
                     <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.ServingSizeUnit)" type="text" placeholder="cup" value="@Ingredient.Bind(q => q.ServingSizeUnit).Unwrap()"></div>
+                    <FieldWarningTooltip
+                        IsVisible="@(!_areUnitsCompatible)"
+                        Id="@_warningTooltipIds[0]" Message="@UnitIncompatibilityMessage" />
                 </div>
             </div>
         </div>
@@ -104,6 +139,9 @@
                 <div class="field has-addons is-flex-grow-0">
                     <div class="control"><input class="input" name="@nameof(IngredientModel.AlternateServingSizeQuantity)" type="number" placeholder="250" value="@Ingredient.Bind(q => q.AlternateServingSizeQuantity).Unwrap()"></div>
                     <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.AlternateServingSizeUnit)" type="text" placeholder="mL" value="@Ingredient.Bind(q => q.AlternateServingSizeUnit).Unwrap()"></div>
+                    <FieldWarningTooltip
+                        IsVisible="@(!_areUnitsCompatible)"
+                        Id="@_warningTooltipIds[1]" Message="@UnitIncompatibilityMessage" />
                 </div>
             </div>
         </div>
@@ -167,23 +205,9 @@
                 <div class="field has-addons ">
                     <div class="control"><input class="input" name="@nameof(IngredientModel.PackageSizeQuantity)" type="number" placeholder="4" value="@Ingredient.Bind(q => q.PackageSizeQuantity).Unwrap()"></div>
                     <div class="control"><input class="input unit-input" name="@nameof(IngredientModel.PackageSizeUnit)" type="text" placeholder="L" value="@Ingredient.Bind(q => q.PackageSizeUnit).Unwrap()"></div>
-                    @if (!AreUnitsCompatible())
-                    {
-                        <Tooltip TriggerClasses="@("is-flex")" Position="Tooltip.TooltipPosition.BottomStart">
-                            <TriggerContent>
-                                <div class="is-flex is-align-items-center">
-                                    <span class="icon">
-                                        <LucideIcon CssClass="has-text-warning" Name="triangle-alert" Size="20" />
-                                    </span>
-                                </div>
-                            </TriggerContent>
-                            <ToolTipContent>
-                                <div class="card p-3">
-                                    Serving size and package size units are not compatible.
-                                </div>
-                            </ToolTipContent>
-                        </Tooltip>
-                    }
+                    <FieldWarningTooltip
+                        IsVisible="@(!_areUnitsCompatible)"
+                        Id="@_warningTooltipIds[2]" Message="@UnitIncompatibilityMessage" />
                 </div>
             </div>
         </div>

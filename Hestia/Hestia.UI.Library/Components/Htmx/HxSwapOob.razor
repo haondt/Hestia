@@ -8,11 +8,15 @@
     [Parameter, EditorRequired]
     public required IComponent Content { get; set; }
 
-
+    [Parameter]
+    public bool ScrollToTop { get; set; } = false;
 
 }
 <div 
     hx-swap-oob="@Strategy:@Target">
-    <div _="on load go to the top of #body-content then remove me"></div>
+    @if (ScrollToTop)
+    {
+        <div _="on load go to the top of #body-content then remove me"></div>
+    }
     <Haondt.Web.Components.ObjectComponent Component="Content" />
 </div>

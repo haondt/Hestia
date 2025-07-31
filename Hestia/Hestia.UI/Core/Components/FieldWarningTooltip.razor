@@ -1,0 +1,40 @@
+@using Hestia.UI.Core.Components
+
+@code {
+    [Parameter] public string Message { get; set; } = string.Empty;
+    [Parameter] public Optional<string> Id { get; set; }
+    [Parameter] public Optional<string> HxSwapOob { get; set; }
+    [Parameter] public bool IsVisible { get; set; } = true;
+
+    private Dictionary<string, object> _containerAttributes = [];
+
+    protected override void OnInitialized()
+    {
+        if (Id.HasValue)
+            _containerAttributes["id"] = Id.Value;
+        if (HxSwapOob.HasValue)
+            _containerAttributes["hx-swap-oob"] = HxSwapOob.Value;
+    }
+}
+
+@if (IsVisible)
+{
+    <Tooltip HxSwapOob="@HxSwapOob" TriggerClasses="@("is-flex")" ContainerId="@Id" Position="Tooltip.TooltipPosition.BottomStart">
+        <TriggerContent>
+            <div class="is-flex is-align-items-center">
+                <span class="icon">
+                    <LucideIcon CssClass="has-text-warning" Name="triangle-alert" Size="20" />
+                </span>
+            </div>
+        </TriggerContent>
+        <TooltipContent>
+            <div class="card p-3">
+                @Message
+            </div>
+        </TooltipContent>
+    </Tooltip>
+}
+else
+{
+    <span class="tooltip is-hidden" @attributes="_containerAttributes"></span>
+}

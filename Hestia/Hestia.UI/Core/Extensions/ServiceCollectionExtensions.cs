@@ -73,6 +73,10 @@ namespace Hestia.UI.Core.Extensions
             {
                 Uri = "/static/shared/js/tooltip.js"
             });
+            services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
+            {
+                Uri = "/static/shared/js/hx-rename.js"
+            });
             services.AddScoped<IHeadEntryDescriptor>(_ => new TitleDescriptor
             {
                 Title = "Hestia",

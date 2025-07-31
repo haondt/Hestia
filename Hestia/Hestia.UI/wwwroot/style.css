@@ -290,11 +290,11 @@ tr.border-bottom-none > td {
     background: none;
 }
 
-.field.has-addons .control:not(:first-child):not(:last-child):has(+ .tooltip-trigger) .input  {
+.field.has-addons .control:not(:first-child):not(:last-child):has(+ .tooltip) .input  {
     border-start-end-radius:var(--bulma-control-radius);
     border-end-end-radius:var(--bulma-control-radius);
 }
-.field.has-addons .control:not(:first-child):not(:last-child):has(+ .tooltip-trigger) {
+.field.has-addons .control:not(:first-child):not(:last-child):has(+ .tooltip) {
     margin-right: 0.5rem;
 }
 

@@ -17,9 +17,21 @@
 
     [Parameter] public RenderFragment? TriggerContent { get; set; }
     [Parameter] public Optional<string> TriggerClasses { get; set; } 
-    [Parameter] public RenderFragment? ToolTipContent { get; set; }
+    [Parameter] public Optional<string> ContainerId { get; set; } 
+    [Parameter] public RenderFragment? TooltipContent { get; set; }
     [Parameter] public TooltipPosition Position { get; set; } = TooltipPosition.Top;
     [Parameter] public int Offset { get; set; } = 10;
+    [Parameter] public Optional<string> HxSwapOob { get; set; }
+
+    private Dictionary<string, object> _containerAttributes = [];
+
+    protected override void OnInitialized()
+    {
+        if (ContainerId.HasValue)
+            _containerAttributes["id"] = ContainerId.Value;
+        if (HxSwapOob.HasValue)
+            _containerAttributes["hx-swap-oob"] = HxSwapOob.Value;
+    }
 
     private string GetPositionString() => Position switch
     {
@@ -39,47 +51,48 @@
     };
 }
 
-<span class="tooltip-trigger @TriggerClasses.Unwrap()" 
-    _="
-        on showTooltip
-            if not :cleanup
-                set tooltip to the next .tooltip-body
-                toggle .is-hidden on tooltip
-                js(me, tooltip)
-                    return HestiaUI.autoPositionTooltip({ 
-                        trigger: me, 
-                        tooltip: tooltip, 
-                        position: '@GetPositionString()', 
-                        offset: @Offset,
-                        padding: 15,
-                    });
+<div class="tooltip is-flex" @attributes="_containerAttributes">
+    <span class="tooltip-trigger @TriggerClasses.Unwrap()" 
+        _="
+            on showTooltip
+                if not :cleanup
+                    set tooltip to the next .tooltip-body
+                    toggle .is-hidden on tooltip
+                    js(me, tooltip)
+                        return HestiaUI.autoPositionTooltip({ 
+                            trigger: me, 
+                            tooltip: tooltip, 
+                            position: '@GetPositionString()', 
+                            offset: @Offset,
+                            padding: 15,
+                        });
+                    end
+                    set :cleanup to it
                 end
-                set :cleanup to it
             end
-        end
-        on hideTooltip
-            if :cleanup
-                set cleanup to :cleanup
-                js(cleanup)
-                    cleanup();
+            on hideTooltip
+                if :cleanup
+                    set cleanup to :cleanup
+                    js(cleanup)
+                        cleanup();
+                    end
+                    set tooltip to the next .tooltip-body
+                    toggle .is-hidden on tooltip
+                    set :cleanup to null
                 end
-                set tooltip to the next .tooltip-body
-                toggle .is-hidden on tooltip
-                set :cleanup to null
             end
-        end
 
-        on htmx:beforeCleanupElement send hideTooltip to me end
-        on mouseleave send hideTooltip to me end
-        on blur send hideTooltip to me end
+            on htmx:beforeCleanupElement send hideTooltip to me end
+            on mouseleave send hideTooltip to me end
+            on blur send hideTooltip to me end
 
-        on mouseenter send showTooltip to me end
-        on focus send showTooltip to me end
-    "
->
-    @TriggerContent
-</span>
-<div class="tooltip-body is-hidden">
-    @ToolTipContent
-</div>
-
+            on mouseenter send showTooltip to me end
+            on focus send showTooltip to me end
+        "
+    >
+        @TriggerContent
+    </span>
+    <div class="tooltip-body is-hidden">
+        @TooltipContent
+    </div>
+</div> 

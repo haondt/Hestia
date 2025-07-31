@@ -19,7 +19,8 @@ namespace Hestia.UI.Ingredients.Controllers
 {
     [Route("ingredients")]
     public class IngredientsController(IComponentFactory componentFactory,
-        IIngredientsService ingredientsService) : UIController(componentFactory)
+        IIngredientsService ingredientsService,
+        IUnitConversionsService unitConversionsService) : UIController(componentFactory)
     {
         private readonly IComponentFactory _componentFactory = componentFactory;
 
@@ -97,7 +98,8 @@ namespace Hestia.UI.Ingredients.Controllers
                             Ingredient = model,
                             IngredientId = id
                         },
-                        Target = "#page-container"
+                        Target = "#page-container",
+                        ScrollToTop = true
                     },
                     new Toast
                     {
@@ -127,7 +129,8 @@ namespace Hestia.UI.Ingredients.Controllers
                         new HxSwapOob
                         {
                             Content =  new EditIngredient(),
-                            Target = "#page-container"
+                            Target = "#page-container",
+                            ScrollToTop = true
                         },
                         new Toast
                         {
@@ -149,7 +152,8 @@ namespace Hestia.UI.Ingredients.Controllers
                             Ingredient = model,
                             IngredientId = id
                         },
-                        Target = "#page-container"
+                        Target = "#page-container",
+                        ScrollToTop = true
                     },
                     new Toast
                     {
@@ -158,6 +162,27 @@ namespace Hestia.UI.Ingredients.Controllers
                     }
                 }
             });
+        }
+
+        [HttpGet("unit-compatibility")]
+        public async Task<IResult> CheckUnitCompatibility([FromQuery] string? unit1, [FromQuery] string? unit2, [FromQuery] string? servingUnit, [FromQuery] string? altServingUnit)
+        {
+            var compatibilities = new
+            {
+                ServingPackageCompatible = await GetCompatibility(servingUnit, unit1),
+                AltServingPackageCompatible = await GetCompatibility(altServingUnit, unit1),
+                ServingAltServingCompatible = await GetCompatibility(servingUnit, altServingUnit)
+            };
+
+            return Results.Json(compatibilities);
+        }
+
+        private async Task<bool> GetCompatibility(string? unitA, string? unitB)
+        {
+            if (string.IsNullOrWhiteSpace(unitA) || string.IsNullOrWhiteSpace(unitB))
+                return true;
+
+            return await unitConversionsService.CheckUnitCompatibilityAsync(unitA, unitB);
         }
     }
 }

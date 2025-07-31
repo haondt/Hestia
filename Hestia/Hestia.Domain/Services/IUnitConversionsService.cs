@@ -13,5 +13,6 @@ namespace Hestia.Domain.Services
         Task RemoveAsync(UnitConversionModel conversion);
         Task<DetailedResult<decimal, string>> ConvertAsync(NormalizedString fromUnit, NormalizedString toUnit, decimal amount);
         Task<DetailedResult<List<UnitConversionModel>, string>> AddAsync(ICollection<UnitConversionModel> conversions);
+        Task<bool> CheckUnitCompatibilityAsync(NormalizedString unit1, NormalizedString unit2);
     }
 }
