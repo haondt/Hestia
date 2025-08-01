@@ -226,7 +226,8 @@
             <div class="field-body">
                 <div class="field">
                     <div class="mb-4">
-                        <div class="field has-addons">
+                        <!-- Desktop: single line layout -->
+                        <div class="field has-addons is-hidden-mobile">
                             <div class="control">
                                 <input 
                                     form="edit-recipe-add-ingredient-form"
@@ -297,6 +298,90 @@
                                     </div>
                                 </TooltipContent>
                             </Tooltip>
+                        </div>
+
+                        <!-- Mobile: two line layout -->
+                        <div class="is-hidden-tablet">
+                            <!-- First line: quantity, unit, and help -->
+                            <div class="is-flex is-align-items-center mb-3">
+                                <div class="field has-addons is-flex-grow-1 mb-0">
+                                    <div class="control">
+                                        <input 
+                                            form="edit-recipe-add-ingredient-form"
+                                            name="quantity"
+                                            class="input unit-input" 
+                                            type="number" 
+                                            placeholder="1" 
+                                            step="any" 
+                                            required>
+                                    </div>
+                                    <div class="control is-expanded">
+                                        <input 
+                                            _="on change set <#ingredients-list-item-template input[name='unit'] />'s value to my value"
+                                            form="edit-recipe-add-ingredient-form"
+                                            class="input" 
+                                            type="text" 
+                                            placeholder="cup" 
+                                            name="unit"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="ml-2">
+                                    <Tooltip Position="Tooltip.TooltipPosition.TopEnd" >
+                                        <TriggerContent>
+                                            <div class="is-flex is-align-items-center">
+                                                <span class="icon">
+                                                    <LucideIcon CssClass="has-text-grey" Name="info" Size="20" />
+                                                </span>
+                                            </div>
+                                        </TriggerContent>
+                                        <TooltipContent>
+                                            <div class="card p-3 content">
+                                                <p>
+                                                    Any ingredients marked with a <span class="icon"><LucideIcon Name="asterisk" Size="20" CssClass="has-text-info" /></span> do not already exist
+                                                    and will be created when the recipe is saved.
+                                                </p>
+                                            </div>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
+                            </div>
+                            <!-- Second line: ingredient search and add button -->
+                            <div class="field has-addons">
+                                <div class="control is-expanded"
+                                    _="on ingredientChanged
+                                        halt the event
+        
+                                        if the event's detail.value is ''
+                                        and the event's detail.text is not ''
+                                            remove .is-hidden from the first .lucide in me
+                                        else
+                                            add .is-hidden to the first .lucide in me
+                                        end
+                                    end
+                                    ">
+                                    <Autocomplete 
+                                        ValueName="@("id")"
+                                        Form="@("edit-recipe-add-ingredient-form")"
+                                        IsRequired="true"
+                                        Name="@("search")"
+                                        Id="@("ingredient-search-mobile")"
+                                        Placeholder="@("Flour")"
+                                        SuggestionUri="@("/recipes/search-ingredients")"
+                                        ChangedEvent="@("ingredientChanged")">
+                                        <Icon>
+                                            <LucideIcon CssClass="has-text-info is-hidden" Name="asterisk" Size="20" />
+                                        </Icon>
+                                    </Autocomplete>
+                                </div>
+                                <div class="control">
+                                    <input 
+                                        type="submit"
+                                        form="edit-recipe-add-ingredient-form"
+                                        class="button is-primary" 
+                                         value="Add"/>
+                                </div>
+                            </div>
                         </div>
                     
                         <div id="ingredients-list" class="columns is-gapless">

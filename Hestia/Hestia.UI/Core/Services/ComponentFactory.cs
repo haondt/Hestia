@@ -1,5 +1,4 @@
-﻿using Haondt.Web.Components;
-using Haondt.Web.Core.Components;
+﻿using Haondt.Web.Core.Components;
 using Haondt.Web.Core.Extensions;
 using Haondt.Web.Core.Http;
 using Haondt.Web.Core.Services;
@@ -34,8 +33,8 @@ namespace Hestia.UI.Core.Services
             if (!request.IsHxRequest() && componentType.GetCustomAttributes(typeof(RenderPageAttribute), false).Length != 0)
             {
                 component = await layoutFactory.GetLayoutAsync(component);
-                component = new Page { Content = component };
-                componentType = typeof(Page);
+                component = new Core.Components.Page { Content = component };
+                componentType = typeof(Core.Components.Page);
             }
 
             var rootComponent = new RootComponent

@@ -1,5 +1,4 @@
-﻿using Haondt.Web.Components;
-using Haondt.Web.Core.Extensions;
+﻿using Haondt.Web.Core.Extensions;
 using Haondt.Web.Core.Services;
 using Hestia.UI.Core.Components;
 using Microsoft.AspNetCore.Components;
@@ -29,7 +28,7 @@ namespace Hestia.UI.Core.Middlewares
             };
 
             if (!context.Request.AsRequestData().IsHxRequest())
-                component = new Page
+                component = new Core.Components.Page
                 {
                     Content = component
                 };

@@ -1,0 +1,24 @@
+@using Haondt.Web.Core.Components
+@using Haondt.Web.Core.Extensions
+@using Haondt.Web.Services
+@inject IEnumerable<IHeadEntryDescriptor> HeadEntries
+
+@code {
+
+    [Parameter]
+    public required IComponent Content { get; set; }
+}
+
+<!DOCTYPE html>
+<html lang="en" style="overflow:auto;">
+    <head>
+        <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+    @foreach(var headEntry in HeadEntries)
+    {
+        <text>@((MarkupString)headEntry.Render())</text>
+    }
+    </head>
+    <body style="display:flex;flex-direction:column;overflow:auto;min-height:100vh;">
+        <ObjectComponent Component="Content"/>
+    </body>
+</html>
