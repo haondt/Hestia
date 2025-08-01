@@ -82,3 +82,7 @@
     border-top-left-radius: var(--bulma-input-radius);
     border-top-right-radius: var(--bulma-input-radius);
 }
+
+.ql-editor {
+    min-height: 200px;
+}

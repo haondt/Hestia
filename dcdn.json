@@ -13,10 +13,6 @@
     "bulma": [
       "css/bulma.min.css"
     ],
-    "quill": [
-      "dist/quill.js",
-      "dist/quill.snow.css"
-    ],
     "lucide-static": [
       "icons/beef.svg",
       "icons/droplet.svg",
@@ -38,6 +34,10 @@
     ],
     "sortablejs": [
       "Sortable.min.js"
+    ],
+    "quill": [
+      "dist/quill.js",
+      "dist/quill.snow.css"
     ]
   }
 }

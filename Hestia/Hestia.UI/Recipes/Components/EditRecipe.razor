@@ -67,28 +67,6 @@
 
         <div class="field is-horizontal">
             <div class="field-label is-normal">
-                <label class="label">Photo</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFaksC-wuUxI6PkfrTLIO06xLsSiZGYyWYPA&s" alt="Recipe Image"/>
-                </div>
-            </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal"></div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="buttons">
-                        <button class="button is-ghost has-text-danger">Delete</button>
-                        <button class="button is-ghost has-text-link">Upload</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
                 <label class="label">Prep Time</label>
             </div>
             <div class="field-body">
@@ -151,22 +129,24 @@
                 <div class="field has-addons is-flex-grow-0">
                     <div class="control">
                         <input 
-                            class="input yield-input" 
+                            id="yield-quantity-input"
+                            class="input" 
                             name="@nameof(RecipeModel.YieldQuantity)" 
                             type="number" 
                             placeholder="4" 
                             value="@Recipe.Bind(r => r.YieldQuantity).Unwrap()"
                             step="any"
-                            _="on input call calculateServingSize()">
+                            _="on input send calculateServingSize to #serving-size-field">
                     </div>
                     <div class="control">
                         <input 
-                            class="input yield-input unit-input" 
+                            id="yield-unit-input"
+                            class="input unit-input" 
                             name="@nameof(RecipeModel.YieldUnit)" 
                             type="text" 
                             placeholder="cup"
                             value="@Recipe.Bind(r => r.YieldUnit).Unwrap()"
-                            _="on input call calculateServingSize()">
+                            _="on input send calculateServingSize to #serving-size-field">
                     </div>
                 </div>
             </div>
@@ -179,18 +159,36 @@
             <div class="field-body">
                 <div class="field">
                     <input 
+                        id="servings-number-input"
                         class="input servings-input" 
                         name="@nameof(RecipeModel.NumberOfServings)" 
                         type="number" 
                         placeholder="4" 
                         value="@Recipe.Bind(r => r.NumberOfServings).Unwrap()"
                         min="1"
-                        _="on input call calculateServingSize()">
+                        _="on input send calculateServingSize to #serving-size-field">
                 </div>
             </div>
         </div>
 
-        <div class="field is-horizontal">
+        <div class="field is-horizontal" id="serving-size-field"
+            _="
+                on calculateServingSize
+                    halt the event
+                    set yieldQuantity to #yield-quantity-input's value as a Number
+                    set yieldUnit to #yield-unit-input's value
+                    set numberOfServings to #servings-number-input's value as a Number
+                    log 'yieldQuantity: ' + yieldQuantity
+                    if yieldQuantity > 0 and yieldUnit is not '' and numberOfServings > 0 then
+                        set servingSize to yieldQuantity / numberOfServings
+                        set #serving-size-quantity's value to servingSize
+                        set #serving-size-unit's value to yieldUnit
+                    else
+                        set #serving-size-quantity's value to ''
+                        set #serving-size-unit's value to ''
+                    end
+                end
+            ">
             <div class="field-label is-normal">
                 <label class="label">Serving size</label>
             </div>
@@ -409,46 +407,6 @@
                                         }
                                     end
                                 end">
-                                <RecipeIngredientsListItem
-                                    GroupId="0"
-                                    Id="1"
-                                    Name="@("All-purpose flour")"
-                                    Quantity="2.5m"
-                                    Unit="@("cups")"
-                                    />
-                                <RecipeIngredientsListItem
-                                    GroupId="1"
-                                    Name="@("Greek yogurt")"
-                                    Quantity="1"
-                                    Unit="@("cup")"
-                                    />
-                                <RecipeIngredientsListItem
-                                    Id="3"
-                                    GroupId="2"
-                                    Name="@("Large eggs")"
-                                    Quantity="3"
-                                    Unit="@("whole")"
-                                    />
-                                <RecipeIngredientsListItem
-                                    Id="4"
-                                    GroupId="3"
-                                    Name="@("Unsalted butter")"
-                                    Quantity="0.5m"
-                                    Unit="@("cup")"
-                                    />
-                                <RecipeIngredientsListItem
-                                    GroupId="4"
-                                    Name="@("Vanilla extract")"
-                                    Quantity="1"
-                                    Unit="@("tsp")"
-                                    />
-                                <RecipeIngredientsListItem
-                                    Id="6"
-                                    GroupId="5"
-                                    Name="@("Baking powder")"
-                                    Quantity="2"
-                                    Unit="@("tsp")"
-                                    />
                             </div>
                         </div>
                     </div>
@@ -462,36 +420,68 @@
             </div>
             <div class="field-body">
                 <div class="field">
-                    <div 
-                        _="
-                            on load[event.target==me]
-                                js(me)
-                                   return new Quill(me, {
-                                        theme: 'snow',
-                                    });
-                                end
-                                set :q to it
-                            end
-                            
-                            on htmx:beforeCleanupElement[event.target==me]
-                                set q to :q
-                                if q is not null then
-                                    js(q)
-                                        // Quill doesn't have a proper destroy method
-                                        // Best practice is to clear references and let DOM removal handle cleanup
-                                        if (q.root) {
-                                            q.root.innerHTML = '';
-                                        }
+                    <div class="is-flex is-flex-direction-column">
+                        <div 
+                            _="
+                                on load[event.target==me]
+                                    js(me)
+                                       return new Quill(me, {
+                                            theme: 'snow',
+                                        });
                                     end
-                                    set :q to null
+                                    set :q to it
                                 end
-                            end
-                        "
-                    ></div>
+                                
+                                on htmx:beforeCleanupElement[event.target==me]
+                                    set q to :q
+                                    if q is not null then
+                                        js(q)
+                                            // Quill doesn't have a proper destroy method
+                                            // Best practice is to clear references and let DOM removal handle cleanup
+                                            if (q.root) {
+                                                q.root.innerHTML = '';
+                                            }
+                                        end
+                                        set :q to null
+                                    end
+                                end
+                            "
+                        ></div>
+</div>
                 </div>
             </div>
         </div>
     </form>
+    
+    <div class="field is-horizontal mt-5">
+        <div class="field-label is-normal"></div>
+        <div class="field-body">
+            <div class="field">
+                <div class="control buttons">
+                    <button
+                        class="button is-primary"
+                        hx-include="#edit-recipe-form"
+                        hx-swap="none"
+                        type="submit"
+                        form="edit-recipe-form"
+                    >
+                        Save
+                    </button>
+                    @if(RecipeId.HasValue) {
+                        <button
+                            hx-get="/recipes/view/@RecipeId.Value"
+                            hx-push-url="/recipes/view/@RecipeId.Value"
+                            hx-swap="innerHTML"
+                            hx-target="#page-container"
+                            class="button is-danger"
+                        >
+                            Cancel
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 @*
