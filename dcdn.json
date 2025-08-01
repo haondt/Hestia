@@ -24,7 +24,10 @@
       "icons/search.svg",
       "icons/book-open.svg",
       "icons/cog.svg",
-      "icons/triangle-alert.svg"
+      "icons/triangle-alert.svg",
+      "icons/info.svg",
+      "icons/asterisk.svg",
+      "icons/x.svg"
     ],
     "@floating-ui/dom": [
       "./dist/floating-ui.dom.umd.js"

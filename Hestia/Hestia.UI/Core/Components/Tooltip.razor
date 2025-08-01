@@ -18,10 +18,12 @@
     [Parameter] public RenderFragment? TriggerContent { get; set; }
     [Parameter] public Optional<string> TriggerClasses { get; set; } 
     [Parameter] public Optional<string> ContainerId { get; set; } 
+    [Parameter] public Optional<string> ContainerClasses { get; set; } 
     [Parameter] public RenderFragment? TooltipContent { get; set; }
     [Parameter] public TooltipPosition Position { get; set; } = TooltipPosition.Top;
     [Parameter] public int Offset { get; set; } = 10;
     [Parameter] public Optional<string> HxSwapOob { get; set; }
+    [Parameter] public bool Debug { get; set; }
 
     private Dictionary<string, object> _containerAttributes = [];
 
@@ -50,8 +52,43 @@
         _ => "top"
     };
 }
+@if (Debug)
+{
+<div class="tooltip is-flex @ContainerClasses.Unwrap()" @attributes="_containerAttributes">
+    <span class="tooltip-trigger @TriggerClasses.Unwrap()" 
+        _="
+            on load
+                set tooltip to the next .tooltip-body
+                js(me, tooltip)
+                    return HestiaUI.autoPositionTooltip({ 
+                        trigger: me, 
+                        tooltip: tooltip, 
+                        position: '@GetPositionString()', 
+                        offset: @Offset,
+                        padding: 15,
+                    });
+                end
+                set :cleanup to it
+            end
+            on htmx:beforeCleanupElement
+                set cleanup to :cleanup
+                js(cleanup)
+                    cleanup();
+                end
+            end
+        "
+    >
+        @TriggerContent
+    </span>
+    <div class="tooltip-body">
+        @TooltipContent
+    </div>
+</div> 
+}
+else
+{
 
-<div class="tooltip is-flex" @attributes="_containerAttributes">
+<div class="tooltip is-flex @ContainerClasses.Unwrap()" @attributes="_containerAttributes">
     <span class="tooltip-trigger @TriggerClasses.Unwrap()" 
         _="
             on showTooltip
@@ -96,3 +133,4 @@
         @TooltipContent
     </div>
 </div> 
+}

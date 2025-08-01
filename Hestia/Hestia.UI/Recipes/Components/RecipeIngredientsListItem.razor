@@ -1,0 +1,72 @@
+@using Haondt.Core.Extensions
+@using Haondt.Core.Models
+@using Hestia.UI.Core.Components
+
+@code {
+    [Parameter]
+    public Optional<int> Id { get; set; }
+
+    [Parameter]
+    public Optional<string> Name { get; set; }
+
+    [Parameter]
+    public Optional<decimal> Quantity { get; set; }
+
+    [Parameter]
+    public Optional<string> Unit { get; set; }
+
+    [Parameter, EditorRequired]
+    public required int GroupId { get; set; }
+}
+
+ <div class="recipe-ingredients-list-item mt-2 columns is-gapless mb-0">
+    <div class="column">
+        <input 
+            name="ingredientId[@GroupId]"
+            type="hidden" 
+            value="@Id.Unwrap()" />
+        <div class="field has-addons is-flex-grow-1">
+            <div class="control">
+                <input 
+                    name="ingredientQuantity[@GroupId]"
+                    class="input unit-input" 
+                    type="number" 
+                    value="@Quantity.Unwrap()"
+                    step="any"
+                    readonly>
+            </div>
+            <div class="control">
+                <input 
+                    name="ingredientUnit[@GroupId]"
+                    class="input unit-input" 
+                    type="text"
+                    value="@Unit.Unwrap()"
+                    readonly>
+            </div>
+            <div class="control is-expanded @(Id.HasValue ? "" : "has-icons-right")">
+                <input 
+                    name="ingredientName[@GroupId]"
+                    class="input" 
+                    type="text" 
+                    value="@Name.Unwrap()"
+                    readonly>
+                @if (!Id.HasValue)
+                {
+                    <span class="icon is-right">
+                        <LucideIcon CssClass="has-text-info" Name="asterisk" Size="20" />
+                    </span>
+                }
+            </div>
+        </div>
+    </div>
+
+     <div class="column is-align-content-center is-narrow">
+        <div class="addon-end is-flex is-gap-1 is-align-items-center ml-3">
+            <p 
+                class="is-clickable has-text-danger is-ghost"
+                _="on click remove closest .recipe-ingredients-list-item">
+                Delete
+            </p>
+        </div>
+     </div>
+</div>

@@ -1,0 +1,165 @@
+@using Haondt.Core.Extensions
+@using Haondt.Core.Models
+
+@code {
+    [Parameter, EditorRequired]
+    public required string SuggestionUri { get; set; }
+    [Parameter]
+    public Optional<string> Name { get; set; }
+    [Parameter]
+    public Optional<string> ValueName { get; set; }
+    [Parameter]
+    public Optional<string> Id { get; set; }
+    [Parameter]
+    public Optional<string> ValueId { get; set; }
+    [Parameter]
+    public Optional<string> Classes { get; set; }
+    [Parameter]
+    public Optional<string> Placeholder { get; set; }
+    [Parameter]
+    public Optional<string> Value { get; set; }
+    [Parameter]
+    public Optional<string> HxInclude { get; set; }
+    [Parameter]
+    public Optional<string> CompletionEvent { get; set; }
+    [Parameter]
+    public Optional<string> CompletionEventTarget { get; set; }
+    [Parameter]
+    public Optional<string> ChangedEvent { get; set; }
+    [Parameter]
+    public Optional<string> ChangedEventTarget { get; set; }
+    [Parameter]
+    public bool IsRight { get; set; } = false;
+    [Parameter]
+    public bool IsRequired { get; set; } = false;
+    [Parameter]
+    public RenderFragment? Icon { get; set; }
+    [Parameter]
+    public IconSideEnum IconSide { get; set; } = Autocomplete.IconSideEnum.Right;
+    [Parameter]
+    public Optional<string> Form { get; set; }
+
+    public enum IconSideEnum { Left, Right }
+
+    private string HxIncludeString
+    {
+        get
+        {
+            var result = "previous .input";
+            if (HxInclude.HasValue)
+                result = $"{HxInclude.Value}, {result}";
+            return result;
+        }
+    }
+
+    private Dictionary<string, object> InputAttributes = new();
+    private Dictionary<string, object> ValueInputAttributes = new();
+    private string _completionEventString = "";
+    private string _changedEventString = "";
+
+    protected override void OnInitialized()
+    {
+        if (Name.HasValue)
+            InputAttributes["name"] = Name.Value;
+        if (Id.HasValue)
+            InputAttributes["id"] = Id.Value;
+        if (Placeholder.HasValue)
+            InputAttributes["placeholder"] = Placeholder.Value;
+        if (Value.HasValue)
+            InputAttributes["value"] = Value.Value;
+        if (IsRequired)
+            InputAttributes["required"] = true;
+        if (Form.HasValue)
+        {
+            InputAttributes["form"] = Form.Value;
+            ValueInputAttributes["form"] = Form.Value;
+        }
+
+        _completionEventString = CompletionEvent
+            .Map(e => $"then send {e}(text: my value, value: :vi's value){(CompletionEventTarget.Map(t => $" to {t}").Or(""))}")
+            .Or("");
+        _changedEventString = ChangedEvent
+            .Map(e => $"then send {e}(text: my value, value: :vi's value){(ChangedEventTarget.Map(t => $" to {t}").Or(""))}")
+            .Or("");
+    }
+}
+<div class="control is-expanded autocomplete is-flex is-flex-direction-column @(Icon is not null ? (IconSide == IconSideEnum.Left ? $"has-icons-left" : "has-icons-right") : "")">
+    <input class="input" name="@ValueName.Or(Name.Map(n => $"{n}Value")).Or("")" type="hidden" @attributes=ValueInputAttributes /> 
+    <input class="input @Classes.Or("")" type="text" 
+        @attributes="InputAttributes"
+        _="
+            on load
+                set :vi to the previous <.input/>
+            end
+            on input debounced at 200ms
+                send focus to me
+                set :vi's value to ''
+                @_changedEventString
+            end
+            on selectionClicked
+                set my value to event.detail.text
+                set :vi's value to event.detail.value or ''
+                @_completionEventString
+                @_changedEventString
+            end
+            on focus
+                add .is-active to the next .dropdown 
+                send update to the next .dropdown
+            end
+            on focusout
+                remove .is-active from the next .dropdown
+                set (the next .dropdown-content)'s innerHTML to ''
+            end
+            on keydown
+                if the event's key is 'Enter'
+                    if (the next <.dropdown-item.is-active />) is not null
+                        halt the event
+                        set my value to (the next <.dropdown-item.is-active/>)'s textContent
+                        set :vi's value to (the next <.dropdown-item.is-active />)'s @@data-dropdown-value or ''
+                        send focusout to me
+                        @_completionEventString
+						@_changedEventString
+                    end
+                end
+                if the event's key is 'ArrowDown'
+                    halt the event
+                    if (the next <.dropdown-item.is-active />) is null
+                        if (the next <.dropdown-item />) is not null
+                            add .is-active to the next .dropdown-item
+                        end
+                    else
+                        if (the next <.dropdown-item.is-active + .dropdown-item/>) is not null
+                            add .is-active to the next <.dropdown-item.is-active + .dropdown-item/>
+                            remove .is-active from the next <.dropdown-item.is-active/>
+                        end
+                    end
+                end
+                if the event's key is 'ArrowUp'
+                    halt the event
+                    if (the next <.dropdown-item.is-active />) is not null
+                        if (the next <.dropdown-item:has(+ .dropdown-item.is-active)/>) is not null
+                            add .is-active to the next <.dropdown-item:has(+ .dropdown-item.is-active)/>
+                            remove .is-active from the next <.dropdown-item.is-active + .dropdown-item.is-active/>
+                        end
+                    end
+                end
+            end
+        "/>
+    @if (Icon is not null)
+    {
+        <span class="icon @(IconSide == IconSideEnum.Left ? "is-left" : "is-right")">
+            @Icon
+        </span>
+    }
+    <div 
+        class="dropdown @(IsRight ? "is-right" : "")"
+        hx-trigger="update" 
+        hx-get="@((MarkupString)SuggestionUri)" 
+        hx-swap="innerHTML" 
+        hx-include="@((MarkupString)HxIncludeString)"
+        hx-target="find .dropdown-content">
+        <div class="dropdown-menu">
+            <div class="dropdown-content"></div>
+        </div>
+    </div>
+</div>

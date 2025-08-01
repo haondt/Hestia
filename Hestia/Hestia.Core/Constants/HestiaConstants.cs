@@ -9,6 +9,7 @@
         /// </summary>
         public const decimal UnitConversionRelativeTolerance = 0.1m;
 
+        // TODO: make this an appsetting
         public const int PageSize = 20;
     }
 }

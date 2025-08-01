@@ -1,5 +1,6 @@
 @using Haondt.Core.Extensions
 @using Hestia.Domain.Models
+@using Hestia.UI.Core.Components
 
 @attribute [RenderPage]
 <div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
@@ -25,6 +26,14 @@
     <div class="page-header">
         <p>@Recipe.Map(_ => "Edit").Or("New") recipe</p>
     </div>
+    <form id="edit-recipe-add-ingredient-form" 
+        hx-get="/recipes/add-ingredient"
+        hx-target="#ingredients-list > .column"
+        hx-swap="beforeend"
+        hx-rename="afterbegin:name"
+        _="
+            on htmx:afterRequest if the event's detail.successful is true then reset() me
+           "></form>
     <form id="edit-recipe-form" class="control" hx-swap="none" hx-post="@_target">
         <div class="field is-horizontal">
             <div class="field-label is-normal">
@@ -93,7 +102,7 @@
                             class="input yield-input unit-input" 
                             name="@nameof(RecipeModel.YieldUnit)" 
                             type="text" 
-                            placeholder="cups"
+                            placeholder="cup"
                             value="@Recipe.Bind(r => r.YieldUnit).Unwrap()"
                             _="on input call calculateServingSize()">
                     </div>
@@ -153,18 +162,86 @@
                 <label class="label">Ingredients</label>
             </div>
             <div class="field-body">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>TODO</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>TODO</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="field">
+                    <div class="mb-4">
+                        <div class="field has-addons">
+                            <div class="control">
+                                <input 
+                                    form="edit-recipe-add-ingredient-form"
+                                    name="quantity"
+                                    class="input unit-input" 
+                                    type="number" 
+                                    placeholder="1" 
+                                    step="any" 
+                                    required>
+                            </div>
+                            <div class="control">
+                                <input 
+                                    _="on change set <#ingredients-list-item-template input[name='unit'] />'s value to my value"
+                                    form="edit-recipe-add-ingredient-form"
+                                    class="input unit-input" 
+                                    type="text" 
+                                    placeholder="cup" 
+                                    name="unit"
+                                    required>
+                            </div>
+                            <div class="control is-expanded"
+                                _="on ingredientChanged
+                                    halt the event
+        
+                                    if the event's detail.value is ''
+                                    and the event's detail.text is not ''
+                                        remove .is-hidden from the first .lucide in me
+                                    else
+                                        add .is-hidden to the first .lucide in me
+                                    end
+                                end
+                                ">
+                                <Autocomplete 
+                                    ValueName="@("id")"
+                                    Form="@("edit-recipe-add-ingredient-form")"
+                                    IsRequired="true"
+                                    Name="@("search")"
+                                    Id="@("ingredient-search")"
+                                    Placeholder="@("Flour")"
+                                    SuggestionUri="@("/recipes/search-ingredients")"
+                                    ChangedEvent="@("ingredientChanged")">
+                                    <Icon>
+                                        <LucideIcon CssClass="has-text-info is-hidden" Name="asterisk" Size="20" />
+                                    </Icon>
+                                </Autocomplete>
+                            </div>
+                            <div class="control">
+                                <input 
+                                    type="submit"
+                                    form="edit-recipe-add-ingredient-form"
+                                    class="button is-primary" 
+                                     value="Add"/>
+                            </div>
+                            <Tooltip Position="Tooltip.TooltipPosition.TopEnd" >
+                                <TriggerContent>
+                                    <div class="is-flex is-align-items-center has-height-full">
+                                        <span class="icon">
+                                            <LucideIcon CssClass="has-text-grey" Name="info" Size="20" />
+                                        </span>
+                                    </div>
+                                </TriggerContent>
+                                <TooltipContent>
+                                    <div class="card p-3 content">
+                                        <p>
+                                            Any ingredients marked with a <span class="icon"><LucideIcon Name="asterisk" Size="20" CssClass="has-text-info" /></span> do not already exist
+                                            and will be created when the recipe is saved.
+                                        </p>
+                                    </div>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
+                    
+                        <div id="ingredients-list" class="columns is-gapless">
+                            <div class="column is-10 "></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -184,6 +261,20 @@
                                 end
                                 set :q to it
                             end
+                            
+                            on htmx:beforeCleanupElement[event.target==me]
+                                set q to :q
+                                if q is not null then
+                                    js(q)
+                                        // Quill doesn't have a proper destroy method
+                                        // Best practice is to clear references and let DOM removal handle cleanup
+                                        if (q.root) {
+                                            q.root.innerHTML = '';
+                                        }
+                                    end
+                                    set :q to null
+                                end
+                            end
                         "
                     ></div>
                 </div>
@@ -192,8 +283,9 @@
     </form>
 
 </div>
+@*
 
-<script type="text/hyperscript">
+<span>
     def calculateServingSize()
         set yieldQuantity to the first .yield-input's value as a Number
         set numberOfServings to the first .servings-input's value as a Number
@@ -205,5 +297,59 @@
             set #serving-size-unit's value to yieldUnit
         end
     end
-</script>
+    
+    def addIngredient()
+        set ingredientName to #ingredient-search's value
+        set quantity to #ingredient-quantity's value
+        set unit to #ingredient-unit's value
+        
+        if ingredientName and quantity then
+            -- Create ingredient item HTML
+            set ingredientHtml to `
+                <div class="box ingredient-item" data-name="${ingredientName}">
+                    <div class="is-flex is-justify-content-space-between is-align-items-center">
+                        <div>
+                            <strong>${quantity} ${unit}</strong> ${ingredientName}
+                        </div>
+                        <button class="delete" type="button" _="on click remove closest .ingredient-item then call updateIngredientsVisibility()"></button>
+                    </div>
+                    <input type="hidden" name="ingredients[]" value="${ingredientName}|${quantity}|${unit}">
+                </div>
+            `
+            
+            -- Add to ingredients list
+            if #ingredients-list.children.length == 1 and #ingredients-list.children[0].classList.contains('notification') then
+                set #ingredients-list.innerHTML to ingredientHtml
+            else
+                put ingredientHtml at the end of #ingredients-list
+            end
+            
+            -- Clear form
+            set #ingredient-search's value to ''
+            set #ingredient-quantity's value to ''
+            set #ingredient-unit's value to ''
+        end
+    end
+    
+    def updateIngredientsVisibility()
+        if #ingredients-list.children.length == 0 then
+            set #ingredients-list.innerHTML to '<div class="notification is-light">No ingredients added yet.</div>'
+        end
+    end
+    
+    def selectIngredient(name)
+        focus #ingredient-quantity
+    end
+</span>
+
+<style>
+    .ingredient-item {
+        margin-bottom: 0.5rem;
+    }
+    
+    .ingredient-item:last-child {
+        margin-bottom: 0;
+    }
+</style>
+*@
 

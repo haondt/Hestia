@@ -1,0 +1,8 @@
+@code {
+    [Parameter]
+    public List<(int Id, string Text)> Suggestions { get; set; } = [];
+}
+@foreach(var (id, text) in Suggestions)
+{
+    <a class="dropdown-item" data-dropdown-value="@id" _="on mousedown send selectionClicked(text:(my textContent), value: @id) to the previous .input">@text</a>
+}
