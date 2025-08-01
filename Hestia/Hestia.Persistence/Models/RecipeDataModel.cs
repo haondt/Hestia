@@ -12,5 +12,7 @@ namespace Hestia.Persistence.Models
         public decimal? YieldQuantity { get; set; }
         public string? YieldUnit { get; set; }
         public int? NumberOfServings { get; set; }
+        public int? PrepTimeMinutes { get; set; }
+        public int? CookTimeMinutes { get; set; }
     }
 }

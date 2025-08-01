@@ -17,6 +17,11 @@ namespace Hestia.Domain.Models
         public required Optional<string> YieldUnit { get; set; }
 
         public required Optional<int> NumberOfServings { get; set; }
+
+        public required Optional<int> PrepTimeMinutes { get; set; }
+
+        public required Optional<int> CookTimeMinutes { get; set; }
+
         public List<object> Ingredients { get; set; } = [];// todo
 
         public static RecipeModel FromDataModel(RecipeDataModel model) => new()
@@ -25,7 +30,9 @@ namespace Hestia.Domain.Models
             Description = model.Description.AsOptional(),
             YieldQuantity = model.YieldQuantity.AsOptional(),
             YieldUnit = model.YieldUnit.AsOptional(),
-            NumberOfServings = model.NumberOfServings.AsOptional()
+            NumberOfServings = model.NumberOfServings.AsOptional(),
+            PrepTimeMinutes = model.PrepTimeMinutes.AsOptional(),
+            CookTimeMinutes = model.CookTimeMinutes.AsOptional()
         };
 
         public RecipeDataModel AsDataModel() => new()
@@ -35,7 +42,9 @@ namespace Hestia.Domain.Models
             Description = Description.Unwrap(),
             YieldQuantity = YieldQuantity.Unwrap(),
             YieldUnit = YieldUnit.Unwrap(),
-            NumberOfServings = NumberOfServings.Unwrap()
+            NumberOfServings = NumberOfServings.Unwrap(),
+            PrepTimeMinutes = PrepTimeMinutes.Unwrap(),
+            CookTimeMinutes = CookTimeMinutes.Unwrap()
         };
     }
 }

@@ -187,6 +187,9 @@
 .unit-input-short {
     width: 2.5em;
 }
+.unit-input-tiny {
+    width: 2em;
+}
 .hestia-progress-container {
     border: 1px solid var(--bulma-border-weak);
     border-radius: 9999px;
@@ -334,4 +337,12 @@ tr.border-bottom-none > td {
 
 p > .icon {
     vertical-align: bottom;
+}
+
+.dropdown-content {
+    box-shadow: initial;
+    border-width: 1px;
+    border-style: solid;
+    border-color: hsl(var(--bulma-scheme-h),var(--bulma-scheme-s),calc(var(--bulma-border-l)));
+    margin-top: 0.25rem;
 }
