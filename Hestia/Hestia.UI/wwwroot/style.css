@@ -339,6 +339,56 @@ p > .icon {
     vertical-align: bottom;
 }
 
+/* SortableJS styles */
+.sortable-ghost {
+    opacity: 1;
+
+}
+
+.sortable-ghost .input {
+    border-color: var(--bulma-link);
+}
+
+.sortable-ghost .has-text-danger {
+    color: var(--bulma-text-weak) !important;
+    opacity: 0.5;
+}
+
+.sortable-drag {
+    opacity: 0;
+}
+
+.drag-handle {
+    cursor: grab;
+    width: 12px;
+    height: 12px;
+    position: relative;
+}
+
+.drag-handle::before,
+.drag-handle::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--bulma-text);
+    border-radius: 1px;
+}
+
+.drag-handle::before {
+    top: 3px;
+}
+
+.drag-handle::after {
+    bottom: 3px;
+}
+
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
 .dropdown-content {
     box-shadow: initial;
     border-width: 1px;

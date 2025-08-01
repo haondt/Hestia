@@ -385,7 +385,71 @@
                         </div>
                     
                         <div id="ingredients-list" class="columns is-gapless">
-                            <div class="column is-10 "></div>
+                            <div class="column is-10 " 
+                                _="on load[event.target==me]
+                                    js(me)
+                                        if (typeof Sortable !== 'undefined') {
+                                            return new Sortable(me, {
+                                                animation: 100,
+                                                ghostClass: 'sortable-ghost',
+                                                chosenClass: 'sortable-chosen',
+                                                dragClass: 'sortable-drag',
+                                                handle: '.drag-handle'
+                                            });
+                                        }
+                                    end
+                                    set :sortable to it
+                                end
+
+                                on htmx:beforeCleanupElement[event.target==me]
+                                    set sortable to :sortable
+                                    js(sortable)
+                                        if (sortable) {
+                                            sortable.destroy();
+                                        }
+                                    end
+                                end">
+                                <RecipeIngredientsListItem
+                                    GroupId="0"
+                                    Id="1"
+                                    Name="@("All-purpose flour")"
+                                    Quantity="2.5m"
+                                    Unit="@("cups")"
+                                    />
+                                <RecipeIngredientsListItem
+                                    GroupId="1"
+                                    Name="@("Greek yogurt")"
+                                    Quantity="1"
+                                    Unit="@("cup")"
+                                    />
+                                <RecipeIngredientsListItem
+                                    Id="3"
+                                    GroupId="2"
+                                    Name="@("Large eggs")"
+                                    Quantity="3"
+                                    Unit="@("whole")"
+                                    />
+                                <RecipeIngredientsListItem
+                                    Id="4"
+                                    GroupId="3"
+                                    Name="@("Unsalted butter")"
+                                    Quantity="0.5m"
+                                    Unit="@("cup")"
+                                    />
+                                <RecipeIngredientsListItem
+                                    GroupId="4"
+                                    Name="@("Vanilla extract")"
+                                    Quantity="1"
+                                    Unit="@("tsp")"
+                                    />
+                                <RecipeIngredientsListItem
+                                    Id="6"
+                                    GroupId="5"
+                                    Name="@("Baking powder")"
+                                    Quantity="2"
+                                    Unit="@("tsp")"
+                                    />
+                            </div>
                         </div>
                     </div>
                 </div>

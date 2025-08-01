@@ -27,13 +27,17 @@
       "icons/triangle-alert.svg",
       "icons/info.svg",
       "icons/asterisk.svg",
-      "icons/x.svg"
+      "icons/x.svg",
+      "icons/grip-vertical.svg"
     ],
     "@floating-ui/dom": [
       "./dist/floating-ui.dom.umd.js"
     ],
     "@floating-ui/core": [
       "./dist/floating-ui.core.umd.js"
+    ],
+    "sortablejs": [
+      "Sortable.min.js"
     ]
   }
 }
