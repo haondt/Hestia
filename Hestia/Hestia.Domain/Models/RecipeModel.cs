@@ -17,6 +17,7 @@ namespace Hestia.Domain.Models
         public required Optional<string> YieldUnit { get; set; }
 
         public required Optional<int> NumberOfServings { get; set; }
+        public List<object> Ingredients { get; set; } = [];// todo
 
         public static RecipeModel FromDataModel(RecipeDataModel model) => new()
         {

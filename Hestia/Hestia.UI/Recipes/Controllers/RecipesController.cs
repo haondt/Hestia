@@ -48,7 +48,8 @@ namespace Hestia.UI.Recipes.Controllers
             [FromQuery] int? id,
             [FromQuery, Required] string name,
             [FromQuery, Required] decimal quantity,
-            [FromQuery, Required] string unit)
+            [FromQuery, Required] string unit,
+            [FromQuery, Required] int groupId)
         {
             return await _componentFactory.RenderComponentAsync(new RecipeIngredientsListItem
             {
@@ -56,7 +57,7 @@ namespace Hestia.UI.Recipes.Controllers
                 Name = new(name),
                 Quantity = new(quantity),
                 Unit = new(unit),
-                GroupId = 4 // random number, chosen by fair dice roll
+                GroupId = groupId
             });
         }
     }

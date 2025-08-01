@@ -13,10 +13,12 @@
     public Optional<int> RecipeId { get; set; }
 
     private string _target = default!;
+    private int _groupId = default!;
 
     protected override void OnInitialized()
     {
         _target = RecipeId.Map(r => $"/recipes/edit/{r}").Or("/recipes/new");
+        _groupId = Recipe.Map(r => r.Ingredients.Count).Or(0);
         base.OnInitialized();
     }
 
@@ -30,10 +32,16 @@
         hx-get="/recipes/add-ingredient"
         hx-target="#ingredients-list > .column"
         hx-swap="beforeend"
-        hx-rename="afterbegin:name"
+        hx-rename="search:name"
         _="
-            on htmx:afterRequest if the event's detail.successful is true then reset() me
-           "></form>
+            on htmx:afterRequest 
+                if the event's detail.successful is true then 
+                    reset() me
+                    increment the #group-id's value
+                end
+           ">
+        <input id="group-id" name="groupId" type="hidden" value="@_groupId" />
+    </form>
     <form id="edit-recipe-form" class="control" hx-swap="none" hx-post="@_target">
         <div class="field is-horizontal">
             <div class="field-label is-normal">
