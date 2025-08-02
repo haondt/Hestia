@@ -396,3 +396,11 @@ p > .icon {
     border-color: hsl(var(--bulma-scheme-h),var(--bulma-scheme-s),calc(var(--bulma-border-l)));
     margin-top: 0.25rem;
 }
+
+
+@media screen and (max-width: 1024px) {
+  .columns {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
