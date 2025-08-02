@@ -8,16 +8,20 @@
     [Parameter] public Optional<string> CurrentSearch { get; set; }
 }
 
-    <div id="ingredients-grid" class="grid is-col-min-10 mt-5">
+    <div id="ingredients-grid" class="fixed-grid   has-1-cols has-2-cols-tablet has-3-cols-desktop has-5-cols-widescreen mt-5">
+        <div class="grid">
+
         @foreach (var (id, ingredient) in Ingredients)
         {
             <div class="cell is-align-items-stretch"> 
                 <div class="has-width-full is-clickable is-align-items-stretch " hx-get="/ingredients/view/@id" hx-target="#page-container" hx-push-url="true">
+
                     <Card Classes="@("has-height-full")" ContentClasses="@("has-height-full")">
                         <Content>
+
                             <div class="is-flex has-height-full">
-                                <div class="is-flex is-flex-direction-column gap-3 is-flex-grow-1 is-justify-content-space-between" style="width:15rem;">
-                                    <div class="is-flex is-justify-content-space-between gap-6">
+                                <div class="is-flex is-flex-direction-column gap-3 is-flex-grow-1 is-justify-content-space-between">
+                                    <div class="content">
                                         <strong>@ingredient.Name</strong>
                                     </div>
                                     <div class="is-flex is-flex-direction-row is-justify-content-space-between">
@@ -35,16 +39,18 @@
                                                 </div>
                                             }
                                         </span>
-                                        <p>@(ingredient.Calories.HasValue ? ingredient.Calories.Value.ToString("F0") + " Calories" : "-")</p>
+                                        <p>@(ingredient.Calories.HasValue ? ingredient.Calories.Value.ToString("F0") + " Calories" : "")</p>
                                     </div>
                                 </div>
                             </div>
                         </Content>
                     </Card>
+
                 </div>
             </div>
         }
         
+        </div>
         @if (NextPage.HasValue)
         {
             <div
