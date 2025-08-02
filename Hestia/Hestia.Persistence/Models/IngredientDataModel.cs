@@ -1,15 +1,16 @@
-﻿using Hestia.Core.Models;
-
-namespace Hestia.Persistence.Models
+﻿namespace Hestia.Persistence.Models
 {
     public record class IngredientDataModel
     {
         public int Id { get; set; }
 
+
         public required string Name { get; set; }
         public required string NormalizedName { get; set; }
         public required string? Brand { get; set; }
         public required string? Vendor { get; set; }
+
+        public ICollection<RecipeIngredientDataModel> Recipes { get; set; } = [];
 
         public required decimal? ServingSizeQuantity { get; set; }
         public required string? ServingSizeUnit { get; set; }

@@ -8,6 +8,8 @@ namespace Hestia.Persistence
     public class ApplicationDbContext : DbContext
     {
         public DbSet<IngredientDataModel> Ingredients { get; set; } = default!;
+        public DbSet<RecipeDataModel> Recipes { get; set; } = default!;
+        public DbSet<RecipeIngredientDataModel> RecipeIngredients { get; set; } = default!;
         public DbSet<UnitConversionDataModel> UnitConversions { get; set; } = default!;
         public DbSet<HestiaStateDataModel> HestiaStates { get; set; } = default!;
 

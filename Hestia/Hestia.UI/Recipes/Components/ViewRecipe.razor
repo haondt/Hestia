@@ -1,0 +1,149 @@
+@using Hestia.Domain.Models
+@using Hestia.UI.Core.Components
+@attribute [RenderPage]
+
+<div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required RecipeModel Recipe { get; set; }
+
+    [Parameter, EditorRequired]
+    public required int RecipeId { get; set; }
+}
+
+<div class="content-container mt-5">
+    <div class="page-header">
+        <p>@Recipe.Title</p>
+    </div>
+
+    <div class="columns">
+        <div class="column is-8">
+            @if (Recipe.Description.HasValue)
+            {
+                <div class="content mb-5">
+                    <p>@Recipe.Description.Value</p>
+                </div>
+
+                <hr />
+            }
+
+            <div class="columns is-mobile">
+                @if (Recipe.PrepTimeQuantity.HasValue && Recipe.PrepTimeUnit.HasValue)
+                {
+                    <div class="column">
+                        <div class="has-text-centered">
+                            <p class="heading">Prep Time</p>
+                            <p class="title is-4">@Recipe.PrepTimeQuantity.Value @Recipe.PrepTimeUnit.Value.ToString().ToLower()</p>
+                        </div>
+                    </div>
+                }
+                @if (Recipe.CookTimeQuantity.HasValue && Recipe.CookTimeUnit.HasValue)
+                {
+                    <div class="column">
+                        <div class="has-text-centered">
+                            <p class="heading">Cook Time</p>
+                            <p class="title is-4">@Recipe.CookTimeQuantity.Value @Recipe.CookTimeUnit.Value.ToString().ToLower()</p>
+                        </div>
+                    </div>
+                }
+                @if (Recipe.NumberOfServings.HasValue)
+                {
+                    <div class="column">
+                        <div class="has-text-centered">
+                            <p class="heading">Servings</p>
+                            <p class="title is-4">@Recipe.NumberOfServings.Value</p>
+                        </div>
+                    </div>
+                }
+                @if (Recipe.YieldQuantity.HasValue && Recipe.YieldUnit.HasValue)
+                {
+                    <div class="column">
+                        <div class="has-text-centered">
+                            <p class="heading">Yield</p>
+                            <p class="title is-4">@Recipe.YieldQuantity.Value @Recipe.YieldUnit.Value</p>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <hr />
+
+            @if (Recipe.Instructions.HasValue && !string.IsNullOrWhiteSpace(Recipe.Instructions.Value))
+            {
+                <div class="content mb-5">
+                    <h3 class="title is-4">Instructions</h3>
+                    <div class="content">
+                        @((MarkupString)Recipe.Instructions.Value)
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="column is-4">
+            <div class="card">
+                <div class="card-content">
+                    <h4 class="title is-5">Ingredients</h4>
+                    <div class="content">
+                        @if (Recipe.Ingredients.Any())
+                        {
+                            <ul class="ingredients-list">
+                                @foreach (var ingredient in Recipe.Ingredients)
+                                {
+                                    <li class="mb-2">
+                                        <div class="is-flex is-align-items-center">
+                                            @if (ingredient.Quantity.HasValue)
+                                            {
+                                                <span class="has-text-weight-semibold mr-2">@ingredient.Quantity.Value</span>
+                                            }
+                                            @if (ingredient.Unit.HasValue)
+                                            {
+                                                <span class="mr-2">@ingredient.Unit.Value</span>
+                                            }
+                                            <span>@ingredient.IngredientName.Or(ingredient.Name)</span>
+                                            @if (!ingredient.IngredientId.HasValue)
+                                            {
+                                                <span class="icon ml-1">
+                                                    <LucideIcon CssClass="has-text-info" Name="asterisk" Size="16" />
+                                                </span>
+                                            }
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                            @if (Recipe.Ingredients.Any(i => !i.IngredientId.HasValue))
+                            {
+                                <div class="notification is-info is-light mt-3">
+                                    <small>
+                                        <span class="icon-text">
+                                            <span class="icon">
+                                                <LucideIcon Name="asterisk" Size="16" />
+                                            </span>
+                                            <span>Items marked with an asterisk are custom ingredients.</span>
+                                        </span>
+                                    </small>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="has-text-grey-light"><em>No ingredients listed.</em></p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="field is-grouped mt-4">
+                <div class="control">
+                    <a href="/recipes/edit/@RecipeId" 
+                       hx-get="/recipes/edit/@RecipeId"
+                       hx-target="#page-container"
+                       hx-push-url="/recipes/edit/@RecipeId"
+                       class="button is-primary">
+                        Edit Recipe
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

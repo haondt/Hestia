@@ -45,7 +45,7 @@ namespace Hestia.Tests.Static
         [InlineData(-0.000000000000000000000000000001, 0.01, 0)] // Extremely small negative value
         [InlineData(1, 0, 1)] // Zero tolerance
         [InlineData(999999999999, 0.01, 1000000000000)] // Very large number
-        [InlineData(0.5, 1, 1)] // Tolerance equals 100%
+        [InlineData(0.5, 1, 1)] // Tolerance equals 100% todo: fix later
         [InlineData(1.5, 0.5, 2)] // 50% tolerance
         public void Snap_EdgeCases(decimal value, decimal relativeTolerance, decimal expected)
         {

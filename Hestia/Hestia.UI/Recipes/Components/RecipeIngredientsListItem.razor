@@ -1,61 +1,51 @@
 @using Haondt.Core.Extensions
 @using Haondt.Core.Models
+@using Hestia.Domain.Models
 @using Hestia.UI.Core.Components
 
 @code {
-    [Parameter]
-    public Optional<int> Id { get; set; }
-
-    [Parameter]
-    public Optional<string> Name { get; set; }
-
-    [Parameter]
-    public Optional<decimal> Quantity { get; set; }
-
-    [Parameter]
-    public Optional<string> Unit { get; set; }
+    [Parameter, EditorRequired]
+    public required RecipeIngredientModel Ingredient { get; set; }
 
     [Parameter, EditorRequired]
     public required int GroupId { get; set; }
 }
 
  <div class="recipe-ingredients-list-item mt-2 columns is-gapless mb-0">
-    <div class="column is-narrow is-flex is-align-items-center pl-2 pr-2">
-    </div>
     <div class="column">
         <input 
-            name="ingredientId[@GroupId]"
+            name="@(nameof(RecipeModel.Ingredients))[@GroupId].@(nameof(RecipeIngredientModel.IngredientId))"
             type="hidden" 
-            value="@Id.Unwrap()" />
+            value="@Ingredient.IngredientId.Unwrap()" />
             <div class="is-flex is-align-items-center">
 
             <span class="drag-handle is-hidden-mobile mr-3"></span>
         <div class="field has-addons is-flex-grow-1">
             <div class="control">
                 <input 
-                    name="ingredientQuantity[@GroupId]"
+                    name="@(nameof(RecipeModel.Ingredients))[@GroupId].@(nameof(RecipeIngredientModel.Quantity))"
                     class="input unit-input" 
                     type="number" 
-                    value="@Quantity.Unwrap()"
+                    value="@Ingredient.Quantity.Unwrap()"
                     step="any"
                     readonly>
             </div>
             <div class="control">
                 <input 
-                    name="ingredientUnit[@GroupId]"
+                    name="@(nameof(RecipeModel.Ingredients))[@GroupId].@(nameof(RecipeIngredientModel.Unit))"
                     class="input unit-input" 
                     type="text"
-                    value="@Unit.Unwrap()"
+                    value="@Ingredient.Unit.Unwrap()"
                     readonly>
             </div>
-            <div class="control is-expanded @(Id.HasValue ? "" : "has-icons-right")">
+            <div class="control is-expanded @(Ingredient.IngredientId.HasValue ? "" : "has-icons-right")">
                 <input 
-                    name="ingredientName[@GroupId]"
+                    name="@(nameof(RecipeModel.Ingredients))[@GroupId].@(nameof(RecipeIngredientModel.Name))"
                     class="input" 
                     type="text" 
-                    value="@Name.Unwrap()"
+                    value="@Ingredient.IngredientName.Or(Ingredient.Name)"
                     readonly>
-                @if (!Id.HasValue)
+                @if (!Ingredient.IngredientId.HasValue)
                 {
                     <span class="icon is-right">
                         <LucideIcon CssClass="has-text-info" Name="asterisk" Size="20" />

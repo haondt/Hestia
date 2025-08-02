@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Haondt.Core" Version="0.2.9" />
+    <PackageReference Include="Haondt.Core" Version="0.2.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" />
@@ -18,6 +18,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hestia.Core\Hestia.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\Sqlite\" />
   </ItemGroup>
 
 

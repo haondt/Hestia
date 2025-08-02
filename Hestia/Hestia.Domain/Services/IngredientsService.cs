@@ -1,4 +1,5 @@
-﻿using Haondt.Core.Models;
+﻿using Haondt.Core.Extensions;
+using Haondt.Core.Models;
 using Hestia.Core.Models;
 using Hestia.Domain.Models;
 using Hestia.Persistence;
@@ -33,14 +34,25 @@ namespace Hestia.Domain.Services
                 .Skip(page * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            
+
             return dataModels.Select(m => (m.Id, IngredientModel.FromDataModel(m))).ToList();
+        }
+
+        public async Task<Result> DeleteIngredientAsync(int id)
+        {
+            var ingredient = await dbContext.Ingredients.FindAsync(id);
+            if (ingredient == null)
+                return Result.Failure;
+
+            dbContext.Ingredients.Remove(ingredient);
+            await dbContext.SaveChangesAsync();
+            return Result.Success;
         }
 
         public async Task<Result<IngredientModel>> GetIngredientAsync(int id)
         {
             var dataModel = await dbContext.Ingredients.FirstOrDefaultAsync(i => i.Id == id);
-            return dataModel is null ? new() : new(IngredientModel.FromDataModel(dataModel));
+            return dataModel.AsOptional().Map(IngredientModel.FromDataModel).AsResult();
         }
 
         public async Task<List<(int Id, IngredientModel Ingredient)>> SearchIngredientsAsync(NormalizedString searchTerm, int page = 0, int pageSize = 20)

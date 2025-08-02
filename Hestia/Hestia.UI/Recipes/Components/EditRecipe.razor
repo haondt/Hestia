@@ -1,5 +1,6 @@
-@using Haondt.Core.Extensions
 @using Hestia.Domain.Models
+@using Haondt.Core.Extensions
+@using Hestia.Persistence.Models
 @using Hestia.UI.Core.Components
 
 @attribute [RenderPage]
@@ -13,12 +14,23 @@
     public Optional<int> RecipeId { get; set; }
 
     private string _target = default!;
-    private int _groupId = default!;
+    private Dictionary<string, object> _formAttributes = new();
+    private int _groupId;
 
     protected override void OnInitialized()
     {
         _target = RecipeId.Map(r => $"/recipes/edit/{r}").Or("/recipes/new");
         _groupId = Recipe.Map(r => r.Ingredients.Count).Or(0);
+
+        if (RecipeId.HasValue)
+        {
+            _formAttributes["hx-put"] = _target;
+        }
+        else
+        {
+            _formAttributes["hx-post"] = _target;
+        }
+
         base.OnInitialized();
     }
 
@@ -31,8 +43,8 @@
     <form id="edit-recipe-add-ingredient-form" 
         hx-get="/recipes/add-ingredient"
         hx-target="#ingredients-list > .column"
-        hx-swap="beforeend"
-        hx-rename="search:name"
+        hx-swap="afterbegin"
+        hx-rename="search:@(nameof(RecipeIngredientModel.Name))"
         _="
             on htmx:afterRequest 
                 if the event's detail.successful is true then 
@@ -42,7 +54,33 @@
            ">
         <input id="group-id" name="groupId" type="hidden" value="@_groupId" />
     </form>
-    <form id="edit-recipe-form" class="control" hx-swap="none" hx-post="@_target">
+    <form
+        hx-trigger="finalSubmit"
+        id="edit-recipe-form" class="control" hx-swap="none" hx-encoding="multipart/form-data" @attributes="_formAttributes"
+        _="
+            on submit
+                halt the event
+                set id to 0
+                for i in (<.recipe-ingredients-list-item/> in #ingredients-list)
+                    for input in (<input/> in i)
+                        set name to input's name
+                        if name contains '[' then
+                            set baseName to name.split('[')[0]
+                            set suffix to name.split('].')[1] or ''
+                            if suffix is not '' then
+                                set input's name to baseName + '[' + id + '].' + suffix
+                            else
+                                set input's name to baseName + '[' + id + ']'
+                            end
+                        end
+                    end
+                    increment id
+                end
+                send finalSubmit to me
+            end 
+        "
+        >
+
         <div class="field is-horizontal">
             <div class="field-label is-normal">
                 <label class="label">Title</label>
@@ -74,17 +112,27 @@
                     <div class="control">
                         <input 
                             class="input unit-input"
-                            name="@nameof(RecipeModel.PrepTimeMinutes)"
+                            name="@nameof(RecipeModel.PrepTimeQuantity)"
                             type="number"
-                            value="@Recipe.Map(r => r.PrepTimeMinutes).Unwrap()"
+                            value="@Recipe.Bind(r => r.PrepTimeQuantity).Unwrap()"
                             placeholder="30"
-                            min="0" />
+                            min="0"
+                            step="0.1" />
                     </div>
                     <div class="control">
                         <div class="select">
-                            <select name="prepTimeUnit">
-                                <option value="minutes">minutes</option>
-                                <option value="hours">hours</option>
+                            <select name="@nameof(RecipeModel.PrepTimeUnit)">
+                                @foreach(var unit in new List<string> { RecipeTimeUnit.Minutes, RecipeTimeUnit.Hours })
+                                {
+                                    if (Recipe.Bind(r => r.PrepTimeUnit).TryGetValue(out var fieldUnit) && fieldUnit == unit)
+                                    {
+                                        <option value="@unit" selected>@unit</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@unit">@unit</option>
+                                    }
+                                }
                             </select>
                         </div>
                     </div>
@@ -101,17 +149,27 @@
                     <div class="control">
                         <input 
                             class="input unit-input"
-                            name="@nameof(RecipeModel.CookTimeMinutes)"
+                            name="@nameof(RecipeModel.CookTimeQuantity)"
                             type="number"
-                            value="@Recipe.Map(r => r.CookTimeMinutes).Unwrap()"
+                            value="@Recipe.Bind(r => r.CookTimeQuantity).Unwrap()"
                             placeholder="45"
-                            min="0" />
+                            min="0"
+                            step="0.1" />
                     </div>
                     <div class="control">
                         <div class="select">
-                            <select name="cookTimeUnit">
-                                <option value="minutes">minutes</option>
-                                <option value="hours">hours</option>
+                            <select name="@nameof(RecipeModel.CookTimeUnit)">
+                                @foreach(var unit in new List<string> { RecipeTimeUnit.Minutes, RecipeTimeUnit.Hours })
+                                {
+                                    if (Recipe.Bind(r => r.CookTimeUnit).TryGetValue(out var fieldUnit) && fieldUnit == unit)
+                                    {
+                                        <option value="@unit" selected>@unit</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@unit">@unit</option>
+                                    }
+                                }
                             </select>
                         </div>
                     </div>
@@ -178,7 +236,6 @@
                     set yieldQuantity to #yield-quantity-input's value as a Number
                     set yieldUnit to #yield-unit-input's value
                     set numberOfServings to #servings-number-input's value as a Number
-                    log 'yieldQuantity: ' + yieldQuantity
                     if yieldQuantity > 0 and yieldUnit is not '' and numberOfServings > 0 then
                         set servingSize to yieldQuantity / numberOfServings
                         set #serving-size-quantity's value to servingSize
@@ -224,17 +281,17 @@
             <div class="field-body">
                 <div class="field">
                     <div class="mb-4">
-                        <!-- Desktop: single line layout -->
+
+                        <!-- Desktop Layout -->
                         <div class="field has-addons is-hidden-mobile">
                             <div class="control">
                                 <input 
                                     form="edit-recipe-add-ingredient-form"
-                                    name="quantity"
+                                    name="@nameof(RecipeIngredientModel.Quantity)"
                                     class="input unit-input" 
                                     type="number" 
                                     placeholder="1" 
-                                    step="any" 
-                                    required>
+                                    step="any">
                             </div>
                             <div class="control">
                                 <input 
@@ -243,8 +300,7 @@
                                     class="input unit-input" 
                                     type="text" 
                                     placeholder="cup" 
-                                    name="unit"
-                                    required>
+                                    name="@nameof(RecipeIngredientModel.Unit)">
                             </div>
                             <div class="control is-expanded"
                                 _="on ingredientChanged
@@ -259,9 +315,8 @@
                                 end
                                 ">
                                 <Autocomplete 
-                                    ValueName="@("id")"
+                                    ValueName="@(nameof(RecipeIngredientModel.IngredientId))"
                                     Form="@("edit-recipe-add-ingredient-form")"
-                                    IsRequired="true"
                                     Name="@("search")"
                                     Id="@("ingredient-search")"
                                     Placeholder="@("Flour")"
@@ -298,20 +353,18 @@
                             </Tooltip>
                         </div>
 
-                        <!-- Mobile: two line layout -->
+                        <!-- Mobile layout-->
                         <div class="is-hidden-tablet">
-                            <!-- First line: quantity, unit, and help -->
                             <div class="is-flex is-align-items-center mb-3">
                                 <div class="field has-addons is-flex-grow-1 mb-0">
                                     <div class="control">
                                         <input 
                                             form="edit-recipe-add-ingredient-form"
-                                            name="quantity"
+                                            name="@nameof(RecipeIngredientModel.Quantity)"
                                             class="input unit-input" 
                                             type="number" 
                                             placeholder="1" 
-                                            step="any" 
-                                            required>
+                                            step="any" >
                                     </div>
                                     <div class="control is-expanded">
                                         <input 
@@ -320,8 +373,7 @@
                                             class="input" 
                                             type="text" 
                                             placeholder="cup" 
-                                            name="unit"
-                                            required>
+                                            name="@nameof(RecipeIngredientModel.Unit)">
                                     </div>
                                 </div>
                                 <div class="ml-2">
@@ -344,7 +396,6 @@
                                     </Tooltip>
                                 </div>
                             </div>
-                            <!-- Second line: ingredient search and add button -->
                             <div class="field has-addons">
                                 <div class="control is-expanded"
                                     _="on ingredientChanged
@@ -359,9 +410,8 @@
                                     end
                                     ">
                                     <Autocomplete 
-                                        ValueName="@("id")"
+                                        ValueName="@(nameof(RecipeIngredientModel.IngredientId))"
                                         Form="@("edit-recipe-add-ingredient-form")"
-                                        IsRequired="true"
                                         Name="@("search")"
                                         Id="@("ingredient-search-mobile")"
                                         Placeholder="@("Flour")"
@@ -407,6 +457,16 @@
                                         }
                                     end
                                 end">
+                                @if(Recipe.HasValue)
+                                {
+                                    for(int i=0; i < Recipe.Value.Ingredients.Count; i++)
+                                    {
+
+                                        <RecipeIngredientsListItem 
+                                            Ingredient="Recipe.Value.Ingredients[i]"
+                                            GroupId="@i"/>
+                                    }
+                                }
                             </div>
                         </div>
                     </div>
@@ -420,16 +480,32 @@
             </div>
             <div class="field-body">
                 <div class="field">
+                    <input type="hidden" name="@nameof(RecipeModel.Instructions)" id="instructions-input" value="@Recipe.Bind(r => r.Instructions).Unwrap()" />
                     <div class="is-flex is-flex-direction-column">
                         <div 
                             _="
                                 on load[event.target==me]
-                                    js(me)
-                                       return new Quill(me, {
+                                    set storage to #instructions-input
+                                    js(me, storage)
+                                        const quill = new Quill(me, {
                                             theme: 'snow',
                                         });
+                                        
+                                        // Load initial content from model
+                                        // var initialContent = document.getElementById('instructions-input').value;
+                                        // if (initialContent) {
+                                        //    quill.root.innerHTML = initialContent;
+                                        // }
+                                        
+                                        // Sync content to hidden input on changes
+                                        quill.on('text-change', function() {
+                                            storage.value = quill.root.innerHTML;
+                                        });
+                                        
+                                        return quill;
                                     end
                                     set :q to it
+                                    set :q.root.innerHTML to #instructions-input's value
                                 end
                                 
                                 on htmx:beforeCleanupElement[event.target==me]
@@ -447,7 +523,7 @@
                                 end
                             "
                         ></div>
-</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -460,8 +536,6 @@
                 <div class="control buttons">
                     <button
                         class="button is-primary"
-                        hx-include="#edit-recipe-form"
-                        hx-swap="none"
                         type="submit"
                         form="edit-recipe-form"
                     >
@@ -484,73 +558,3 @@
     </div>
 
 </div>
-@*
-
-<span>
-    def calculateServingSize()
-        set yieldQuantity to the first .yield-input's value as a Number
-        set numberOfServings to the first .servings-input's value as a Number
-        set yieldUnit to the last .yield-input's value
-        
-        if yieldQuantity and numberOfServings and numberOfServings > 0 then
-            set servingSize to yieldQuantity / numberOfServings
-            set #serving-size-quantity's value to servingSize
-            set #serving-size-unit's value to yieldUnit
-        end
-    end
-    
-    def addIngredient()
-        set ingredientName to #ingredient-search's value
-        set quantity to #ingredient-quantity's value
-        set unit to #ingredient-unit's value
-        
-        if ingredientName and quantity then
-            -- Create ingredient item HTML
-            set ingredientHtml to `
-                <div class="box ingredient-item" data-name="${ingredientName}">
-                    <div class="is-flex is-justify-content-space-between is-align-items-center">
-                        <div>
-                            <strong>${quantity} ${unit}</strong> ${ingredientName}
-                        </div>
-                        <button class="delete" type="button" _="on click remove closest .ingredient-item then call updateIngredientsVisibility()"></button>
-                    </div>
-                    <input type="hidden" name="ingredients[]" value="${ingredientName}|${quantity}|${unit}">
-                </div>
-            `
-            
-            -- Add to ingredients list
-            if #ingredients-list.children.length == 1 and #ingredients-list.children[0].classList.contains('notification') then
-                set #ingredients-list.innerHTML to ingredientHtml
-            else
-                put ingredientHtml at the end of #ingredients-list
-            end
-            
-            -- Clear form
-            set #ingredient-search's value to ''
-            set #ingredient-quantity's value to ''
-            set #ingredient-unit's value to ''
-        end
-    end
-    
-    def updateIngredientsVisibility()
-        if #ingredients-list.children.length == 0 then
-            set #ingredients-list.innerHTML to '<div class="notification is-light">No ingredients added yet.</div>'
-        end
-    end
-    
-    def selectIngredient(name)
-        focus #ingredient-quantity
-    end
-</span>
-
-<style>
-    .ingredient-item {
-        margin-bottom: 0.5rem;
-    }
-    
-    .ingredient-item:last-child {
-        margin-bottom: 0;
-    }
-</style>
-*@
-

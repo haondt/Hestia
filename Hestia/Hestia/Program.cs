@@ -1,4 +1,3 @@
-using Haondt.Web.Core.Middleware;
 using Haondt.Web.Extensions;
 using Hestia.Domain.Extensions;
 using Hestia.ModelBinders;
@@ -7,6 +6,14 @@ using Hestia.UI.Core.Extensions;
 using Hestia.UI.Core.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsDevelopment())
+{
+    var testConfigFile = Path.Combine(Environment.CurrentDirectory, "appsettings.Test.json");
+    if (File.Exists(testConfigFile))
+        builder.Configuration.AddJsonFile(testConfigFile, optional: true, reloadOnChange: true);
+}
+
 
 // Add services to the container.
 
@@ -37,7 +44,7 @@ var app = builder.Build();
 
 app.UseAuthorization();
 app.MapControllers();
-app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseMiddleware<Hestia.Middleware.ExceptionHandlerMiddleware>();
 app.UseMiddleware<UnmappedRouteHandlerMiddleware>();
 
 app.Services.PerformDatabaseMigrations();

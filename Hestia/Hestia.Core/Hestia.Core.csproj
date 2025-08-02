@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Haondt.Core" Version="0.2.9" />
+    <PackageReference Include="Haondt.Core" Version="0.2.10" />
   </ItemGroup>
 
 </Project>
