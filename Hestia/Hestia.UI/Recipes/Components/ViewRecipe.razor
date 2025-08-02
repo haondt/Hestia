@@ -1,3 +1,4 @@
+@using Hestia.Core.Models
 @using Hestia.Domain.Models
 @using Hestia.UI.Core.Components
 @attribute [RenderPage]
@@ -17,84 +18,69 @@
         <p>@Recipe.Title</p>
     </div>
 
-    <div class="columns">
-        <div class="column is-8">
-            @if (Recipe.Description.HasValue)
-            {
-                <div class="content mb-5">
-                    <p>@Recipe.Description.Value</p>
-                </div>
-
-                <hr />
-            }
-
-            <div class="columns is-mobile">
-                @if (Recipe.PrepTimeQuantity.HasValue && Recipe.PrepTimeUnit.HasValue)
-                {
-                    <div class="column">
-                        <div class="has-text-centered">
-                            <p class="heading">Prep Time</p>
-                            <p class="title is-4">@Recipe.PrepTimeQuantity.Value @Recipe.PrepTimeUnit.Value.ToString().ToLower()</p>
-                        </div>
-                    </div>
-                }
-                @if (Recipe.CookTimeQuantity.HasValue && Recipe.CookTimeUnit.HasValue)
-                {
-                    <div class="column">
-                        <div class="has-text-centered">
-                            <p class="heading">Cook Time</p>
-                            <p class="title is-4">@Recipe.CookTimeQuantity.Value @Recipe.CookTimeUnit.Value.ToString().ToLower()</p>
-                        </div>
-                    </div>
-                }
-                @if (Recipe.NumberOfServings.HasValue)
-                {
-                    <div class="column">
-                        <div class="has-text-centered">
-                            <p class="heading">Servings</p>
-                            <p class="title is-4">@Recipe.NumberOfServings.Value</p>
-                        </div>
-                    </div>
-                }
-                @if (Recipe.YieldQuantity.HasValue && Recipe.YieldUnit.HasValue)
-                {
-                    <div class="column">
-                        <div class="has-text-centered">
-                            <p class="heading">Yield</p>
-                            <p class="title is-4">@Recipe.YieldQuantity.Value @Recipe.YieldUnit.Value</p>
-                        </div>
-                    </div>
-                }
-            </div>
-
-            <hr />
-
-            @if (Recipe.Instructions.HasValue && !string.IsNullOrWhiteSpace(Recipe.Instructions.Value))
-            {
-                <div class="content mb-5">
-                    <h3 class="title is-4">Instructions</h3>
+    <div class="columns is-8">
+        <div class="column is-one-quarter">
                     <div class="content">
-                        @((MarkupString)Recipe.Instructions.Value)
-                    </div>
-                </div>
-            }
-        </div>
+                        <div class="fixed-grid has-2-cols">
+                            <div class="grid">
 
-        <div class="column is-4">
-            <div class="card">
-                <div class="card-content">
-                    <h4 class="title is-5">Ingredients</h4>
+                                @if (Recipe.PrepTimeQuantity.HasValue && Recipe.PrepTimeUnit.HasValue)
+                                {
+                                    <div class="cell"><p class="section-label">Prep Time</p></div>
+                                    <div class="cell"><p>@Recipe.PrepTimeQuantity.Value.ToString("0.##") @Recipe.PrepTimeUnit.Value.ToString().ToLower()</p></div>
+                                }
+                                @if (Recipe.CookTimeQuantity.HasValue && Recipe.CookTimeUnit.HasValue)
+                                {
+                                    <div class="cell"><p class="section-label">Cook Time</p></div>
+                                    <div class="cell"><p>@Recipe.CookTimeQuantity.Value.ToString("0.##") @Recipe.CookTimeUnit.Value.ToString().ToLower()</p></div>
+                                }
+                                @if (Recipe.YieldQuantity.HasValue && Recipe.YieldUnit.HasValue)
+                                {
+                                    <div class="cell"><p class="section-label">Yield</p></div>
+                                    <div class="cell"><p>@Recipe.YieldQuantity.Value.ToString("0.##") @Recipe.YieldUnit.Value</p></div>
+                                }
+                                @if (Recipe.NumberOfServings.HasValue)
+                                {
+                                    <div class="cell"><p class="section-label">Servings</p></div>
+                                    <div class="cell"><p>@Recipe.NumberOfServings.Value.ToString("0.##")</p></div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+
                     <div class="content">
+                            @if (Recipe.Ingredients.Any(i => !i.IngredientId.HasValue))
+                            {
+                                    <Tooltip
+                                        MaxWidth="250"
+                                        Position="Tooltip.TooltipPosition.RightStart" >
+                                        <TriggerContent>
+                                            <div class="is-flex is-align-items-center">
+                                                <span class="icon">
+                                                    <LucideIcon CssClass="has-text-grey" Name="info" Size="20" />
+                                                </span>
+                                            </div>
+                                        </TriggerContent>
+                                        <TooltipContent>
+                                            <div class="card p-3 content">
+                                                <p>
+                                                    Any ingredients marked with a <span class="icon"><LucideIcon Name="asterisk" Size="20" CssClass="has-text-info" /></span> have been orphaned from their referenced ingredients. Edit and save the recipe to recreate the references.
+                                                </p>
+                                            </div>
+                                        </TooltipContent>
+                                    </Tooltip>
+                            }
                         @if (Recipe.Ingredients.Any())
                         {
-                            <ul class="ingredients-list">
+                            <div class="is-flex is-flex-direction-column is-gap-2">
                                 @foreach (var ingredient in Recipe.Ingredients)
                                 {
-                                    <li class="mb-2">
+                                    <div>
                                         <div class="is-flex is-align-items-center">
                                             @if (ingredient.Quantity.HasValue)
                                             {
-                                                <span class="has-text-weight-semibold mr-2">@ingredient.Quantity.Value</span>
+                                                <span class="has-text-weight-semibold mr-2">@ingredient.Quantity.Value.ToString("0.##")</span>
                                             }
                                             @if (ingredient.Unit.HasValue)
                                             {
@@ -108,29 +94,32 @@
                                                 </span>
                                             }
                                         </div>
-                                    </li>
+                                    </div>
                                 }
-                            </ul>
-                            @if (Recipe.Ingredients.Any(i => !i.IngredientId.HasValue))
-                            {
-                                <div class="notification is-info is-light mt-3">
-                                    <small>
-                                        <span class="icon-text">
-                                            <span class="icon">
-                                                <LucideIcon Name="asterisk" Size="16" />
-                                            </span>
-                                            <span>Items marked with an asterisk are custom ingredients.</span>
-                                        </span>
-                                    </small>
-                                </div>
-                            }
+                            </div>
                         }
                         else
                         {
                             <p class="has-text-grey-light"><em>No ingredients listed.</em></p>
                         }
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="is-flex is-flex-direction-column is-gap-3">
+                @if (Recipe.Description.HasValue)
+                {
+                    <div class="content">
+                        <em>@Recipe.Description.Value</em>
                     </div>
-                </div>
+                }
+
+                @if (Recipe.Instructions.HasValue && !string.IsNullOrWhiteSpace(Recipe.Instructions.Value))
+                {
+                    <div class="content">
+                        @((MarkupString)Recipe.Instructions.Value)
+                    </div>
+                }
             </div>
 
             <div class="field is-grouped mt-4">

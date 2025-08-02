@@ -1,6 +1,6 @@
 window.HestiaUI = window.HestiaUI || {};
 window.HestiaUI.positionTooltip = function(options) {
-    const { trigger, tooltip, position, offset, padding } = options;
+    const { trigger, tooltip, position, offset, padding, maxWidth } = options;
     FloatingUIDOM.computePosition(trigger, tooltip, {
         placement: position,
         middleware: [
@@ -11,7 +11,7 @@ window.HestiaUI.positionTooltip = function(options) {
                 padding: padding,
                 apply({ availableWidth, availableHeight, elements }) {
                     Object.assign(elements.floating.style, {
-                        maxWidth: `${Math.max(0, availableWidth)}px`,
+                        maxWidth: `${maxWidth ? Math.min(maxWidth, Math.max(0, availableWidth)) : Math.max(0, availableWidth)}px`,
                         maxHeight: `${Math.max(0, availableHeight)}px`,
                     });
                 }
