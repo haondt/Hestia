@@ -385,16 +385,19 @@ p > .icon {
 }
 
 
-@media screen and (max-width: 1024px) {
   .columns {
     margin-left: 0;
     margin-right: 0;
   }
-}
 
 .text-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.flex-divider {
+  width: 1px;
+  background-color: var(--bulma-border);
 }

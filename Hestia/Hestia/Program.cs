@@ -52,6 +52,7 @@ await app.Services.SeedDbAsync();
 //await app.Services.DevSeedDbAsync(o =>
 //{
 //    o.AddIngredients(100);
+//    o.AddRecipes(200);
 //});
 
 app.UseHestiaUI();

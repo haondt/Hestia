@@ -19,7 +19,7 @@
     </div>
 
     <div class="columns is-8">
-        <div class="column is-one-quarter">
+        <div class="column is-one-third is-one-quarter-desktop">
                     <div class="content">
                         <div class="fixed-grid has-2-cols">
                             <div class="grid">
@@ -73,11 +73,11 @@
                             }
                         @if (Recipe.Ingredients.Count != 0)
                         {
-                            <div class="is-flex is-flex-direction-column is-gap-1">
+                            <div class="is-flex is-flex-direction-column is-gap-0.5">
                                 @foreach (var ingredient in Recipe.Ingredients)
                                 {
                                     <div>
-                                        <div class="is-flex is-align-items-center">
+                                        <div class="is-flex is-align-items-top">
                                             @if (ingredient.Quantity.HasValue)
                                             {
                                                 <span class="mr-2">@ingredient.Quantity.Value.ToString("0.##")</span>
