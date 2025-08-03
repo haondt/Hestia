@@ -1,7 +1,12 @@
 @using Hestia.Core.Models
 @using Hestia.Domain.Models
+@using Hestia.Domain.Services
 @using Hestia.UI.Core.Components
+@using Hestia.UI.Library.Components.Element
 @attribute [RenderPage]
+
+@inject IUnitConversionsService UnitConversionsService
+@inject IIngredientsService IngredientsService
 
 <div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
 
@@ -11,137 +16,374 @@
 
     [Parameter, EditorRequired]
     public required int RecipeId { get; set; }
+
+    private RecipeInsightsModel _insights = default!;
+    private List<(string Title, List<string> Warnings)> _warnings = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        (_insights, _warnings) = await Recipe.GetInsightsAsync(UnitConversionsService, IngredientsService);
+    }
+
 }
 
 <div class="content-container mt-5">
-    <div class="page-header">
+    <div class="page-header mb-2">
         <p>@Recipe.Title</p>
     </div>
+    <div class="is-flex is-flex-direction-row is-fullwidth z-500 is-position-relative mb-5">
+        <div class="is-fullwidth is-flex-grow-1">
 
-    <div class="columns is-8">
-        <div class="column is-one-third is-one-quarter-desktop">
-                    <div class="content">
-                        <div class="fixed-grid has-2-cols">
-                            <div class="grid">
+            <div class="tabs is-flex-grow-1">
+                <ul 
+                    _="
+                        on setActive
+                            halt the event
+                            if :active is not null
+                                remove .is-active from the :active's parentElement
+                                add .is-hidden to :activeBody
+                            end
 
-                                @if (Recipe.PrepTimeQuantity.HasValue && Recipe.PrepTimeUnit.HasValue)
-                                {
-                                    <div class="cell"><p class="section-label">Prep Time</p></div>
-                                    <div class="cell"><p>@Recipe.PrepTimeQuantity.Value.ToString("0.##") @Recipe.PrepTimeUnit.Value.ToString().ToLower()</p></div>
-                                }
-                                @if (Recipe.CookTimeQuantity.HasValue && Recipe.CookTimeUnit.HasValue)
-                                {
-                                    <div class="cell"><p class="section-label">Cook Time</p></div>
-                                    <div class="cell"><p>@Recipe.CookTimeQuantity.Value.ToString("0.##") @Recipe.CookTimeUnit.Value.ToString().ToLower()</p></div>
-                                }
-                                @if (Recipe.YieldQuantity.HasValue && Recipe.YieldUnit.HasValue)
-                                {
-                                    <div class="cell"><p class="section-label">Yield</p></div>
-                                    <div class="cell"><p>@Recipe.YieldQuantity.Value.ToString("0.##") @Recipe.YieldUnit.Value</p></div>
-                                }
-                                @if (Recipe.NumberOfServings.HasValue)
-                                {
-                                    <div class="cell"><p class="section-label">Servings</p></div>
-                                    <div class="cell"><p>@Recipe.NumberOfServings.Value.ToString("0.##")</p></div>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                    <hr />
-
-                    <div class="content">
-                            @if (Recipe.Ingredients.Any(i => !i.IngredientId.HasValue))
-                            {
-                                    <Tooltip
-                                        MaxWidth="250"
-                                        Position="Tooltip.TooltipPosition.RightStart" >
-                                        <TriggerContent>
-                                            <div class="is-flex is-align-items-center mb-3">
-                                                <span class="icon">
-                                                    <LucideIcon CssClass="has-text-grey" Name="info" Size="20" />
-                                                </span>
-                                            </div>
-                                        </TriggerContent>
-                                        <TooltipContent>
-                                            <div class="card p-3 content">
-                                                <p>
-                                                    Any ingredients marked with a <span class="icon"><LucideIcon Name="asterisk" Size="20" CssClass="has-text-info" /></span> have been orphaned from their referenced ingredients. Edit and save the recipe to recreate the references.
-                                                </p>
-                                            </div>
-                                        </TooltipContent>
-                                    </Tooltip>
-                            }
-                        @if (Recipe.Ingredients.Count != 0)
-                        {
-                            <div class="is-flex is-flex-direction-column is-gap-0.5">
-                                @foreach (var ingredient in Recipe.Ingredients)
-                                {
-                                    <div>
-                                        <div class="is-flex is-align-items-top">
-                                            @if (ingredient.Quantity.HasValue)
-                                            {
-                                                <span class="mr-2">@ingredient.Quantity.Value.ToString("0.##")</span>
-                                            }
-                                            @if (ingredient.Unit.HasValue)
-                                            {
-                                                <span class="mr-2">@ingredient.Unit.Value</span>
-                                            }
-                                            @if (ingredient.IngredientId.HasValue)
-                                            {
-                                                <a href="/ingredients/view/@ingredient.IngredientId.Value" 
-                                                    hx-boost="true"
-                                                    hx-target="#page-container"
-                                                    hx-push-url="true"
-                                                    class="has-text-link">
-                                                    @ingredient.IngredientName.Or(ingredient.Name)
-                                                </a>
-                                            }
-                                            else
-                                            {
-                                                <span>@ingredient.IngredientName.Or(ingredient.Name)</span>
-                                            }
-                                            @if (!ingredient.IngredientId.HasValue)
-                                            {
-                                                <span class="icon ml-1">
-                                                    <LucideIcon CssClass="has-text-info" Name="asterisk" Size="16" />
-                                                </span>
-                                            }
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
+                            set :active to the event's srcElement
+                            set :activeBody to #{:active's @@data-body-id}
+                            add .is-active to the :active's parentElement
+                            remove .is-hidden from :activeBody
+                        end
+                    "
+                >
+                    <li>
+                        <a _="on load send setActive end on click send setActive end"
+                            data-body-id="recipe-tab-body"
+                        >
+                            Recipe
+                        </a>
+                    </li>
+                    <li>
+                        <a _="on click send setActive end"
+                            data-body-id="insights-tab-body"
+                        >
+                            Insights
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
+        <div class="is-fullwidth">
+            <div class="tabs">
+                <ul
+                    _="
+                        on toggleDelete
+                            halt the event
+                            toggle .is-hidden on #recipe-edit-button
+                            toggle .is-hidden on #recipe-delete-button
+                            toggle .is-hidden on #recipe-cancel-button
+                            toggle .is-hidden on #recipe-confirm-button
+                        end
+                    "
+                >
+                    <li>
+                        <a href="/recipes/edit/@RecipeId" 
+                           hx-get="/recipes/edit/@RecipeId"
+                           hx-target="#page-container"
+                           hx-push-url="/recipes/edit/@RecipeId"
+                           id="recipe-edit-button">
+                            Edit
+                        </a>
+                    </li>
+                    <li>
+                        <a 
+                            id="recipe-delete-button"
+                            _="on click send toggleDelete">
+                            Delete
+                        </a>
+                    </li>
+                    <li>
+                        <a 
+                            id="recipe-confirm-button"
+                            class="has-text-danger is-hidden">
+                            Confirm
+                        </a>
+                    </li>
+                    <li>
+                        <a 
+                            id="recipe-cancel-button"
+                            class="has-text-danger is-hidden"
+                            _="on click send toggleDelete">
+                            Cancel
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-        <div class="column">
-            <div class="is-flex is-flex-direction-column is-gap-3">
-                @if (Recipe.Description.HasValue)
+    <div id="recipe-tab-body" class="is-hidden">
+        <div class="columns is-1 is-8-desktop">
+            <div class="column is-one-third is-one-quarter-desktop">
+                <div class="fixed-grid has-2-cols mb-0">
+                    <div class="grid">
+
+                        @if (Recipe.PrepTimeQuantity.HasValue && Recipe.PrepTimeUnit.HasValue)
+                        {
+                            <div class="cell"><p class="section-label">Prep time</p></div>
+                            <div class="cell"><p>@Recipe.PrepTimeQuantity.Value.ToString("0.##") @Recipe.PrepTimeUnit.Value.ToString().ToLower()</p></div>
+                        }
+                        @if (Recipe.CookTimeQuantity.HasValue && Recipe.CookTimeUnit.HasValue)
+                        {
+                            <div class="cell"><p class="section-label">Cook Time</p></div>
+                            <div class="cell"><p>@Recipe.CookTimeQuantity.Value.ToString("0.##") @Recipe.CookTimeUnit.Value.ToString().ToLower()</p></div>
+                        }
+                        @if (Recipe.YieldQuantity.HasValue && Recipe.YieldUnit.HasValue)
+                        {
+                            <div class="cell"><p class="section-label">Yield</p></div>
+                            <div class="cell"><p>@Recipe.YieldQuantity.Value.ToString("0.##") @Recipe.YieldUnit.Value</p></div>
+                        }
+                        @if (Recipe.NumberOfServings.HasValue)
+                        {
+                            <div class="cell"><p class="section-label">Servings</p></div>
+                            <div class="cell"><p>@Recipe.NumberOfServings.Value.ToString("0.##")</p></div>
+                        }
+                    </div>
+                </div>
+                <hr />
+                @if (Recipe.Ingredients.Any(i => !i.IngredientId.HasValue))
                 {
-                    <div class="content">
-                        <em>@Recipe.Description.Value</em>
+                        <Tooltip
+                            MaxWidth="250"
+                            Position="Tooltip.TooltipPosition.RightStart" >
+                            <TriggerContent>
+                                <div class="is-flex is-align-items-center mb-3">
+                                    <span class="icon">
+                                        <LucideIcon CssClass="has-text-grey" Name="info" Size="20" />
+                                    </span>
+                                </div>
+                            </TriggerContent>
+                            <TooltipContent>
+                                <div class="card p-3 content">
+                                    <p>
+                                        Any ingredients marked with a <span class="icon"><LucideIcon Name="asterisk" Size="20" CssClass="has-text-info" /></span> have been orphaned from their referenced ingredients. Edit and save the recipe to recreate the references.
+                                    </p>
+                                </div>
+                            </TooltipContent>
+                        </Tooltip>
+                }
+                @if (Recipe.Ingredients.Count != 0)
+                {
+                    <div class="is-flex is-flex-direction-column is-gap-0.5">
+                        @foreach (var ingredient in Recipe.Ingredients)
+                        {
+                            <div>
+                                <div class="is-flex is-align-items-top">
+                                    @if (ingredient.Quantity.HasValue)
+                                    {
+                                        <span class="mr-2">@ingredient.Quantity.Value.ToString("0.##")</span>
+                                    }
+                                    @if (ingredient.Unit.HasValue)
+                                    {
+                                        <span class="mr-2">@ingredient.Unit.Value</span>
+                                    }
+                                    @if (ingredient.IngredientId.HasValue)
+                                    {
+                                        <a href="/ingredients/view/@ingredient.IngredientId.Value" 
+                                            hx-boost="true"
+                                            hx-target="#page-container"
+                                            hx-push-url="true"
+                                            >
+                                            @ingredient.IngredientName.Or(ingredient.Name)
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>@ingredient.IngredientName.Or(ingredient.Name)</span>
+                                    }
+                                    @if (!ingredient.IngredientId.HasValue)
+                                    {
+                                        <span class="icon ml-1">
+                                            <LucideIcon CssClass="has-text-info" Name="asterisk" Size="16" />
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        }
                     </div>
                 }
-
-                @if (Recipe.Instructions.HasValue && !string.IsNullOrWhiteSpace(Recipe.Instructions.Value))
-                {
-                    <div class="content">
-                        @((MarkupString)Recipe.Instructions.Value)
-                    </div>
-                }
+                <hr class="is-invisible-tablet" />
             </div>
 
-            <div class="field is-grouped mt-4">
-                <div class="control">
-                    <a href="/recipes/edit/@RecipeId" 
-                       hx-get="/recipes/edit/@RecipeId"
-                       hx-target="#page-container"
-                       hx-push-url="/recipes/edit/@RecipeId"
-                       class="button is-primary">
-                        Edit Recipe
-                    </a>
+            <div class="column">
+                <div class="is-flex is-flex-direction-column ">
+                    @if (Recipe.Description.HasValue)
+                    {
+                        <div class="content has-text-grey">
+                            <em style="white-space:pre-line;">@Recipe.Description.Value</em>
+                        </div>
+                    }
+
+                    @if (Recipe.Instructions.HasValue && !string.IsNullOrWhiteSpace(Recipe.Instructions.Value))
+                    {
+                        <div class="content">
+                            @((MarkupString)Recipe.Instructions.Value)
+                        </div>
+                    }
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div id="insights-tab-body" class="is-hidden">
+        @if (_warnings.Any())
+        {
+            <div class="notification py-3 px-4">
+                <details>
+                    <summary class="has-text-warning"><strong>Calculation Warnings (@_warnings.Sum(w => w.Warnings.Count))</strong></summary>
+                    @foreach (var (title, warnings) in _warnings)
+                    {
+                        <div class="mt-3">
+                            <p class="section-label">@title</p>
+                                @foreach (var warning in warnings)
+                                {
+                                    <p>@warning</p>
+                                }
+                        </div>
+                    }
+                </details>
+            </div>
+        }
+
+        <div class="grid is-col-min-12 is-column-gap-4 is-row-gap-4">
+            @if (_insights.ServingInsights.HasValue)
+            {
+                <div class="cell">
+                    <p class="section-label">Per Serving (@(Recipe.NumberOfServings.Or(1)) servings)</p>
+                    <div class="is-flex is-flex-direction-column gap-2">
+                        <div class="is-flex is-justify-content-space-between">
+                            <span>Calories:</span>
+                            <span class="has-text-weight-semibold">@_insights.ServingInsights.Value.CaloriesPerServing.ToString("F0")</span>
+                        </div>
+                        <div class="is-flex is-justify-content-space-between">
+                            <span>Protein:</span>
+                            <span class="has-text-weight-semibold">@_insights.ServingInsights.Value.ProteinGramsPerServing.ToString("F1")g</span>
+                        </div>
+                        <div class="is-flex is-justify-content-space-between">
+                            <span>Fat:</span>
+                            <span class="has-text-weight-semibold">@_insights.ServingInsights.Value.FatGramsPerServing.ToString("F1")g</span>
+                        </div>
+                        <div class="is-flex is-justify-content-space-between">
+                            <span>Carbs:</span>
+                            <span class="has-text-weight-semibold">@_insights.ServingInsights.Value.CarbGramsPerServing.ToString("F1")g</span>
+                        </div>
+                        @if (_insights.CostAnalysis.CostPerServing > 0)
+                        {
+                            <div class="is-flex is-justify-content-space-between">
+                                <span>Cost:</span>
+                                <span class="has-text-weight-semibold">$@_insights.CostAnalysis.CostPerServing.ToString("F2")</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (_insights.MacroNutrientBreakdown.HasValue)
+            {
+                <div class="cell">
+                    <p class="section-label">Macro Breakdown</p>
+                    <div class="fixed-grid has-3-cols">
+                        <div class="grid" style="grid-template-columns: max-content 1fr max-content;gap:0.5rem;">
+                            @foreach(var (name, proportion) in new List<(string, double)>
+                            {
+                                ("Protein", _insights.MacroNutrientBreakdown.Value.ProportionProtein),
+                                ("Fat", _insights.MacroNutrientBreakdown.Value.ProportionFat),
+                                ("Carbs", _insights.MacroNutrientBreakdown.Value.ProportionCarbs)
+                            })
+                            {
+                                <div class="cell">
+                                    <p>@name</p>
+                                </div>
+                                <div class="cell">
+                                    <Progress Percentage="@proportion"></Progress>
+                                </div>
+                                <div class="cell">
+                                    <p>@proportion.ToString("P0")</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="cell">
+                <p class="section-label">Macro efficiency</p>
+                @{
+                    var hasAnyMacroEfficiency = _insights.MacroEfficiency.ProteinPerDollar.HasValue 
+                        || _insights.MacroEfficiency.FatPerDollar.HasValue 
+                        || _insights.MacroEfficiency.CarbsPerDollar.HasValue
+                        || _insights.MacroEfficiency.ProteinPerCalorie.HasValue
+                        || _insights.MacroEfficiency.FatPerCalorie.HasValue
+                        || _insights.MacroEfficiency.CarbsPerCalorie.HasValue;
+                }
+                @if (hasAnyMacroEfficiency)
+                {
+                    <div class="is-grid is-fullwidth" style="grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem 1rem;">
+                        <div>Protein</div>
+                        <div>@(_insights.MacroEfficiency.ProteinPerDollar.TryGetValue(out var proteinPerDollar) ? $"{proteinPerDollar:F2} g/$" : "—")</div>
+                        <div>@(_insights.MacroEfficiency.ProteinPerCalorie.TryGetValue(out var proteinPerCalorie) ? $"{proteinPerCalorie * 1000:F0} mg/cal" : "—")</div>
+
+                        <div>Fat</div>
+                        <div>@(_insights.MacroEfficiency.FatPerDollar.TryGetValue(out var fatPerDollar) ? $"{fatPerDollar:F2} g/$" : "—")</div>
+                        <div>@(_insights.MacroEfficiency.FatPerCalorie.TryGetValue(out var fatPerCalorie) ? $"{fatPerCalorie * 1000:F0} mg/cal" : "—")</div>
+
+                        <div>Carbs</div>
+                        <div>@(_insights.MacroEfficiency.CarbsPerDollar.TryGetValue(out var carbsPerDollar) ? $"{carbsPerDollar:F2} g/$" : "—")</div>
+                        <div>@(_insights.MacroEfficiency.CarbsPerCalorie.TryGetValue(out var carbsPerCalorie) ? $"{carbsPerCalorie * 1000:F0} mg/cal" : "—")</div>
+                    </div>
+                }
+                else
+                {
+                    <p class="has-text-grey">Insufficient data for macro efficiency analysis</p>
+                }
+            </div>
+
+            <div class="cell">
+                <p class="section-label">Cost analysis</p>
+                @{
+                    var hasAnyCostAnalysis = _insights.CostAnalysis.CostPerServing > 0 
+                        || _insights.CostAnalysis.CaloriesPerDollar.HasValue;
+                }
+                @if (hasAnyCostAnalysis)
+                {
+                    <div class="is-flex is-flex-direction-column gap-2">
+                        @if (_insights.CostAnalysis.CostPerServing > 0)
+                        {
+                            <div class="is-flex is-justify-content-space-between">
+                                <span>Cost per serving:</span>
+                                <span class="has-text-weight-semibold">$@_insights.CostAnalysis.CostPerServing.ToString("F2")</span>
+                            </div>
+                        }
+                        @if (_insights.CostAnalysis.CaloriesPerDollar.TryGetValue(out var caloriesPerDollar))
+                        {
+                            <div class="is-flex is-justify-content-space-between">
+                                <span>Calories per dollar:</span>
+                                <span class="has-text-weight-semibold">@caloriesPerDollar.ToString("F0")</span>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="has-text-grey">Insufficient data for cost analysis</p>
+                }
+            </div>
+
+            @if (_insights.ProteinScore.HasValue)
+            {
+                <div class="cell">
+                    <p class="section-label">Protein score</p>
+                    <div class="has-text-centered">
+                        <p class="title is-2 has-text-primary">@_insights.ProteinScore.Value.ToString("F2")</p>
+                        <p class="subtitle is-6">Protein efficiency rating</p>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>

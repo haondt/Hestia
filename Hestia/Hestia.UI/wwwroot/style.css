@@ -158,14 +158,14 @@
 
 .page-header {
     margin-bottom: var(--bulma-block-spacing);
-    border-bottom: 1px solid var(--bulma-link-text);
 }
 
 .page-header p {
-    color: var(--bulma-link-text);
-    padding: 0.5em 1em;
-    display: flex;
-    font-size: var(--bulma-size-normal);
+/*    color:hsl(var(--bulma-primary-h), var(--bulma-primary-s), var(--bulma-primary-l)) ;
+*/    
+    color: var(--bulma-text-strong);
+    font-size: var(--bulma-size-large);
+    text-align: center;
 }
 
 .unit-input {
@@ -386,8 +386,7 @@ p > .icon {
 
 
   .columns {
-    margin-left: 0;
-    margin-right: 0;
+      overflow-x: hidden;
   }
 
 .text-clamp-2 {
@@ -400,4 +399,22 @@ p > .icon {
 .flex-divider {
   width: 1px;
   background-color: var(--bulma-border);
+}
+
+.notification {
+    background-color: inherit;
+    border: 1px solid var(--bulma-border);
+    color: var(--bulma-text);
+}
+
+details > summary {
+    cursor: pointer;
+}
+
+.z-500 {
+    z-index: 500;
+}
+
+hr {
+    height: 1px;
 }
