@@ -56,7 +56,7 @@
                                         MaxWidth="250"
                                         Position="Tooltip.TooltipPosition.RightStart" >
                                         <TriggerContent>
-                                            <div class="is-flex is-align-items-center">
+                                            <div class="is-flex is-align-items-center mb-3">
                                                 <span class="icon">
                                                     <LucideIcon CssClass="has-text-grey" Name="info" Size="20" />
                                                 </span>
@@ -71,22 +71,35 @@
                                         </TooltipContent>
                                     </Tooltip>
                             }
-                        @if (Recipe.Ingredients.Any())
+                        @if (Recipe.Ingredients.Count != 0)
                         {
-                            <div class="is-flex is-flex-direction-column is-gap-2">
+                            <div class="is-flex is-flex-direction-column is-gap-1">
                                 @foreach (var ingredient in Recipe.Ingredients)
                                 {
                                     <div>
                                         <div class="is-flex is-align-items-center">
                                             @if (ingredient.Quantity.HasValue)
                                             {
-                                                <span class="has-text-weight-semibold mr-2">@ingredient.Quantity.Value.ToString("0.##")</span>
+                                                <span class="mr-2">@ingredient.Quantity.Value.ToString("0.##")</span>
                                             }
                                             @if (ingredient.Unit.HasValue)
                                             {
                                                 <span class="mr-2">@ingredient.Unit.Value</span>
                                             }
-                                            <span>@ingredient.IngredientName.Or(ingredient.Name)</span>
+                                            @if (ingredient.IngredientId.HasValue)
+                                            {
+                                                <a href="/ingredients/view/@ingredient.IngredientId.Value" 
+                                                    hx-boost="true"
+                                                    hx-target="#page-container"
+                                                    hx-push-url="true"
+                                                    class="has-text-link">
+                                                    @ingredient.IngredientName.Or(ingredient.Name)
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span>@ingredient.IngredientName.Or(ingredient.Name)</span>
+                                            }
                                             @if (!ingredient.IngredientId.HasValue)
                                             {
                                                 <span class="icon ml-1">
@@ -97,10 +110,6 @@
                                     </div>
                                 }
                             </div>
-                        }
-                        else
-                        {
-                            <p class="has-text-grey-light"><em>No ingredients listed.</em></p>
                         }
             </div>
         </div>

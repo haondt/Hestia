@@ -79,13 +79,6 @@
     width: calc(100% - 40px);
 }
 
-.recipe-card-tag {
-    position: absolute;
-    z-index: 100;
-    top: 0.5rem;
-    left: 0.5rem;
-}
-
 .card {
     box-shadow: initial;
     border-width: 1px;
@@ -139,12 +132,6 @@
     --bulma-content-heading-weight: var(--bulma-weight-semibold);
 }
 
-  .masonry-container {
-      position: relative;
-  }
-  .masonry-child {
-      position: absolute;
-  }
 
 .label {
     font-weight: inherit;
@@ -403,4 +390,11 @@ p > .icon {
     margin-left: 0;
     margin-right: 0;
   }
+}
+
+.text-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

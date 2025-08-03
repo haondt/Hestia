@@ -19,14 +19,14 @@ namespace Hestia.Domain.Services
             return dataModel.AsOptional().Map(RecipeModel.FromDataModel).AsResult();
         }
 
-        public async Task<List<(int Id, RecipeModel Recipe)>> GetRecipesAsync(int offset = 0, int limit = 50)
+        public async Task<List<(int Id, RecipeModel Recipe)>> GetRecipesAsync(int page = 0, int pageSize = 50)
         {
             var dataModels = await dbContext.Recipes
                 .Include(r => r.Ingredients)
                     .ThenInclude(ri => ri.Ingredient)
                 .OrderBy(r => r.Title)
-                .Skip(offset)
-                .Take(limit)
+                .Skip(page * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             return dataModels.Select(m => (m.Id, RecipeModel.FromDataModel(m))).ToList();
@@ -110,8 +110,9 @@ namespace Hestia.Domain.Services
             var dataModels = await dbContext.Recipes
                 .Include(r => r.Ingredients)
                     .ThenInclude(ri => ri.Ingredient)
-                .Where(r => r.NormalizedTitle.Contains(query) ||
-                           (r.Description != null && r.Description.Contains(query)))
+                //.Where(r => r.NormalizedTitle.Contains(query) ||
+                //           (r.Description != null && r.NormalizedDescription.Contains(query)))
+                .Where(r => r.NormalizedTitle.Contains(query))
                 .OrderBy(r => r.Title)
                 .Skip(offset)
                 .Take(limit)

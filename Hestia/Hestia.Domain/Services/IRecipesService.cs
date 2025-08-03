@@ -7,7 +7,7 @@ namespace Hestia.Domain.Services
     public interface IRecipesService
     {
         Task<Result<RecipeModel>> GetRecipeAsync(int id);
-        Task<List<(int Id, RecipeModel Recipe)>> GetRecipesAsync(int offset = 0, int limit = 50);
+        Task<List<(int Id, RecipeModel Recipe)>> GetRecipesAsync(int page = 0, int pageSize = 50);
         Task<(int Id, RecipeModel Recipe)> CreateRecipeAsync(RecipeModel recipe);
         Task<RecipeModel> UpdateRecipeAsync(int id, RecipeModel recipe);
         Task<Result> DeleteRecipeAsync(int id);

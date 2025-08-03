@@ -1,8 +1,10 @@
 ﻿using Haondt.Core.Extensions;
+using Haondt.Core.Models;
 using Haondt.Web.BulmaCSS.Services;
 using Haondt.Web.Components;
 using Haondt.Web.Core.Extensions;
 using Haondt.Web.Core.Services;
+using Hestia.Core.Constants;
 using Hestia.Domain.Models;
 using Hestia.Domain.Services;
 using Hestia.UI.Core.Components;
@@ -42,6 +44,24 @@ namespace Hestia.UI.Recipes.Controllers
         public Task<IResult> GetRecipes()
         {
             return _componentFactory.RenderComponentAsync<Recipes.Components.Recipes>();
+        }
+
+        [HttpGet("search")]
+        public async Task<IResult> Search([FromQuery] string? search, [FromQuery] int page = 0, [FromQuery] bool isScroll = false)
+        {
+            var recipes = string.IsNullOrWhiteSpace(search)
+                ? await _recipesService.GetRecipesAsync(page, HestiaConstants.PageSize)
+                : await _recipesService.SearchRecipesAsync(search, page, HestiaConstants.PageSize);
+
+            return await _componentFactory.RenderComponentAsync(new RecipesGrid
+            {
+                IsScroll = isScroll,
+                Recipes = recipes,
+                CurrentSearch = search.AsOptional(),
+                NextPage = recipes.Count == HestiaConstants.PageSize
+                    ? page + 1
+                    : new Optional<int>()
+            });
         }
 
         [HttpGet("edit/{recipeId}")]
