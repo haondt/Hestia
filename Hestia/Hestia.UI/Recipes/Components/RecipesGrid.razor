@@ -23,67 +23,66 @@
 
     <div id="recipes-grid" class="fixed-grid has-1-cols has-2-cols-tablet has-3-cols-desktop has-5-cols-widescreen mt-5">
         <div class="grid">
+            @foreach (var (id, recipe) in Recipes)
+            {
+                <div class="cell is-align-items-stretch">
+                    <div class="has-width-full is-clickable is-align-items-stretch " hx-get="/recipes/view/@id" hx-target="#page-container" hx-push-url="true">
 
-        @foreach (var (id, recipe) in Recipes)
-        {
-            <div class="cell is-align-items-stretch">
-                <div class="has-width-full is-clickable is-align-items-stretch " hx-get="/recipes/view/@id" hx-target="#page-container" hx-push-url="true">
+                        <Card Classes="@("has-height-full")" ContentClasses="@("has-height-full")">
+                            <Content>
 
-                    <Card Classes="@("has-height-full")" ContentClasses="@("has-height-full")">
-                        <Content>
-
-                            <div class="is-flex has-height-full">
-                                <div class="is-flex is-flex-direction-column gap-3 is-flex-grow-1 is-justify-content-space-between">
-                                    <div class="content">
-                                        <strong>@recipe.Title</strong>
-                                        @if (recipe.Description.HasValue)
-                                        {
-                                            <p class="has-text-grey text-clamp-2">
-                                                @recipe.Description.Value
-                                            </p>
-                                        }
-                                    </div>
-                                    <div class="is-flex is-flex-direction-column is-gap-2">
-                                        <div class="is-flex is-flex-wrap-wrap is-gap-1">
-                                            @if (recipe.PrepTimeQuantity.HasValue && recipe.PrepTimeUnit.HasValue)
+                                <div class="is-flex has-height-full">
+                                    <div class="is-flex is-flex-direction-column gap-3 is-flex-grow-1 is-justify-content-space-between">
+                                        <div class="content">
+                                            <strong>@recipe.Title</strong>
+                                            @if (recipe.Description.HasValue)
                                             {
-                                                <Tag Text="@($"Prep: {recipe.PrepTimeQuantity.Value:0.##} {FormatTimeUnit(recipe.PrepTimeUnit.Value)}")" 
-                                                     ColorClasses=""
-                                                     IsStatic="true" 
-                                                     IsMonospace="false" />
+                                                <p class="has-text-grey text-clamp-2">
+                                                    @recipe.Description.Value
+                                                </p>
                                             }
-                                            @if (recipe.CookTimeQuantity.HasValue && recipe.CookTimeUnit.HasValue)
-                                            {
-                                                <Tag Text="@($"Cook: {recipe.CookTimeQuantity.Value:0.##} {FormatTimeUnit(recipe.CookTimeUnit.Value)}")" 
-                                                     ColorClasses=""
-                                                     IsStatic="true" 
-                                                     IsMonospace="false" />
-                                            }
+                                        </div>
+                                        <div class="is-flex is-flex-direction-column is-gap-2">
+                                            <div class="is-flex is-flex-wrap-wrap is-gap-1">
+                                                @if (recipe.PrepTimeQuantity.HasValue && recipe.PrepTimeUnit.HasValue)
+                                                {
+                                                    <Tag Text="@($"Prep: {recipe.PrepTimeQuantity.Value:0.##} {FormatTimeUnit(recipe.PrepTimeUnit.Value)}")" 
+                                                         ColorClasses=""
+                                                         IsStatic="true" 
+                                                         IsMonospace="false" />
+                                                }
+                                                @if (recipe.CookTimeQuantity.HasValue && recipe.CookTimeUnit.HasValue)
+                                                {
+                                                    <Tag Text="@($"Cook: {recipe.CookTimeQuantity.Value:0.##} {FormatTimeUnit(recipe.CookTimeUnit.Value)}")" 
+                                                         ColorClasses=""
+                                                         IsStatic="true" 
+                                                         IsMonospace="false" />
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </Content>
-                    </Card>
+                            </Content>
+                        </Card>
 
+                    </div>
                 </div>
-            </div>
-        }
+            }
+            @if (NextPage.HasValue)
+            {
+                <div
+                     hx-get="/recipes/search" 
+                     hx-trigger="intersect once"
+                     hx-select="#recipes-grid > .grid > *"
+                     hx-swap="outerHTML"
+                     hx-vals='{
+                         "search": "@CurrentSearch.Unwrap()",
+                         "page": "@(NextPage.Value)",
+                         "isScroll": true
+                     }'
+                     style="height: 1px;">
+                </div>
+            }
         
         </div>
-        @if (NextPage.HasValue)
-        {
-            <div
-                 hx-get="/recipes/search" 
-                 hx-trigger="intersect once"
-                 hx-select="#recipes-grid > *"
-                 hx-swap="outerHTML"
-                 hx-vals='{
-                     "search": "@CurrentSearch.Unwrap()",
-                     "page": "@(NextPage.Value)",
-                     "isScroll": true
-                 }'
-                 style="height: 1px;">
-            </div>
-        }
     </div>

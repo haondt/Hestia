@@ -11,73 +11,72 @@
     <div id="ingredients-grid" class="fixed-grid   has-1-cols has-2-cols-tablet has-3-cols-desktop has-5-cols-widescreen mt-5">
         <div class="grid">
 
-        @foreach (var (id, ingredient) in Ingredients)
-        {
-            <div class="cell is-align-items-stretch"> 
-                <div class="has-width-full is-clickable is-align-items-stretch " hx-get="/ingredients/view/@id" hx-target="#page-container" hx-push-url="true">
+            @foreach (var (id, ingredient) in Ingredients)
+            {
+                <div class="cell is-align-items-stretch"> 
+                    <div class="has-width-full is-clickable is-align-items-stretch " hx-get="/ingredients/view/@id" hx-target="#page-container" hx-push-url="true">
 
-                    <Card Classes="@("has-height-full")" ContentClasses="@("has-height-full")">
-                        <Content>
+                        <Card Classes="@("has-height-full")" ContentClasses="@("has-height-full")">
+                            <Content>
 
-                            <div class="is-flex has-height-full">
-                                <div class="is-flex is-flex-direction-column gap-2 is-flex-grow-1 is-justify-content-space-between">
-                                    <p class="section-label">@ingredient.Name</p>
-                                    
-                                    <!-- Macros row -->
-                                        <div class="is-flex">
-                                            <div class="has-text-centered is-flex-grow-1">
-                                                <div>@ingredient.ProteinGrams.Map(p => p.ToString("F0")).Or("-")</div>
-                                                <div class="is-size-7 has-text-grey">protein</div>
+                                <div class="is-flex has-height-full">
+                                    <div class="is-flex is-flex-direction-column gap-2 is-flex-grow-1 is-justify-content-space-between">
+                                        <p class="section-label">@ingredient.Name</p>
+                                        
+                                        <!-- Macros row -->
+                                            <div class="is-flex">
+                                                <div class="has-text-centered is-flex-grow-1">
+                                                    <div>@ingredient.ProteinGrams.Map(p => p.ToString("F0")).Or("-")</div>
+                                                    <div class="is-size-7 has-text-grey">protein</div>
+                                                </div>
+                                                <div class="flex-divider my-2"></div>
+                                                <div class="has-text-centered is-flex-grow-1">
+                                                    <div>@ingredient.FatGrams.Map(f => f.ToString("F0")).Or("-")</div>
+                                                    <div class="is-size-7 has-text-grey">fat</div>
+                                                </div>
+                                                <div class="flex-divider my-2"></div>
+                                                <div class="has-text-centered is-flex-grow-1">
+                                                    <div>@ingredient.CarbGrams.Map(c => c.ToString("F0")).Or("-")</div>
+                                                    <div class="is-size-7 has-text-grey">carbs</div>
+                                                </div>
                                             </div>
-                                            <div class="flex-divider my-2"></div>
-                                            <div class="has-text-centered is-flex-grow-1">
-                                                <div>@ingredient.FatGrams.Map(f => f.ToString("F0")).Or("-")</div>
-                                                <div class="is-size-7 has-text-grey">fat</div>
-                                            </div>
-                                            <div class="flex-divider my-2"></div>
-                                            <div class="has-text-centered is-flex-grow-1">
-                                                <div>@ingredient.CarbGrams.Map(c => c.ToString("F0")).Or("-")</div>
-                                                <div class="is-size-7 has-text-grey">carbs</div>
-                                            </div>
+
+                                        <!-- Bottom row with cost and calories -->
+                                        <div class="is-flex is-justify-content-space-between is-align-items-center">
+                                            @if (ingredient.PackageCostDollars.HasValue)
+                                            {
+                                                <span>$@ingredient.PackageCostDollars.Value.ToString("F2")</span>
+                                            }
+                                            else
+                                            {
+                                                <span></span>
+                                            }
+                                            @if (ingredient.Calories.HasValue)
+                                            {
+                                                <span >@ingredient.Calories.Value.ToString("F0") calories</span>
+                                            }
                                         </div>
-
-                                    <!-- Bottom row with cost and calories -->
-                                    <div class="is-flex is-justify-content-space-between is-align-items-center">
-                                        @if (ingredient.PackageCostDollars.HasValue)
-                                        {
-                                            <span>$@ingredient.PackageCostDollars.Value.ToString("F2")</span>
-                                        }
-                                        else
-                                        {
-                                            <span></span>
-                                        }
-                                        @if (ingredient.Calories.HasValue)
-                                        {
-                                            <span >@ingredient.Calories.Value.ToString("F0") calories</span>
-                                        }
                                     </div>
                                 </div>
-                            </div>
-                        </Content>
-                    </Card>
+                            </Content>
+                        </Card>
 
+                    </div>
                 </div>
-            </div>
-        }
-        
+            }
+            @if (NextPage.HasValue)
+            {
+                <div
+                     hx-get="/ingredients/search" 
+                     hx-trigger="intersect once"
+                     hx-select="#ingredients-grid > .grid > *"
+                     hx-swap="outerHTML"
+                     hx-vals='{
+                         "search": "@CurrentSearch.Unwrap()",
+                         "page": "@(NextPage.Value)"
+                     }'
+                     style="height: 1px;">
+                </div>
+            }
         </div>
-        @if (NextPage.HasValue)
-        {
-            <div
-                 hx-get="/ingredients/search" 
-                 hx-trigger="intersect once"
-                 hx-select="#ingredients-grid > *"
-                 hx-swap="outerHTML"
-                 hx-vals='{
-                     "search": "@CurrentSearch.Unwrap()",
-                     "page": "@(NextPage.Value)"
-                 }'
-                 style="height: 1px;">
-            </div>
-        }
     </div>
