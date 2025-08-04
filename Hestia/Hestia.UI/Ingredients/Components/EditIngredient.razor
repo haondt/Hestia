@@ -239,34 +239,56 @@
             <div class="field-label is-normal"></div>
             <div class="field-body">
                 <div class="field">
-                    <div class="control buttons">
-                        <button
-                            class="button is-primary"
-                            hx-include="#edit-ingredient-form"
-                            hx-swap="none" @attributes="_submitAttributes"
-                        >
-                            Save
-                        </button>
+                    <div class="control">
                         @if(IngredientId.HasValue) {
-                            <button
-                                hx-get="/ingredients/view/@IngredientId.Value"
-                                hx-push-url="/ingredients/view/@IngredientId.Value"
-                                hx-swap="innerHTML"
-                                hx-target="#page-container"
-                                class="button is-danger"
-                            >
-                                Cancel
-                            </button>
+                            <div class="is-flex is-justify-content-space-between mb-3">
+                                <button
+                                    class="button is-primary"
+                                    hx-include="#edit-ingredient-form"
+                                    hx-swap="none" @attributes="_submitAttributes"
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    hx-get="/ingredients/view/@IngredientId.Value"
+                                    hx-push-url="/ingredients/view/@IngredientId.Value"
+                                    hx-swap="innerHTML"
+                                    hx-target="#page-container"
+                                    class="button is-danger"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         }
                         else{
-                            <button
-                                class="button is-primary"
-                                hx-include="#edit-ingredient-form"
-                                hx-swap="none" @attributes="_submitAttributes"
-                                hx-vals='{"createAnother": "true"}'
-                            >
-                                Save & create another
-                            </button>
+                            <div class="is-flex is-justify-content-space-between mb-3">
+                                <button
+                                    class="button is-primary"
+                                    hx-include="#edit-ingredient-form"
+                                    hx-swap="none" @attributes="_submitAttributes"
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    hx-get="/ingredients"
+                                    hx-push-url="/ingredients"
+                                    hx-swap="innerHTML"
+                                    hx-target="#page-container"
+                                    class="button is-danger"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                            <div>
+                                <button
+                                    class="button is-primary"
+                                    hx-include="#edit-ingredient-form"
+                                    hx-swap="none" @attributes="_submitAttributes"
+                                    hx-vals='{"createAnother": "true"}'
+                                >
+                                    Save & create another
+                                </button>
+                            </div>
                         }
                     </div>
                 </div>

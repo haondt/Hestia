@@ -107,9 +107,17 @@ namespace Hestia.UI.Recipes.Controllers
         }
 
         [HttpPost("new")]
-        public async Task<IResult> CreateRecipe([FromForm] RecipeModel recipe)
+        public async Task<IResult> CreateRecipe([FromForm] RecipeModel recipe, [FromForm] bool createAnother)
         {
             var (newRecipeId, createdRecipe) = await _recipesService.CreateRecipeAsync(recipe);
+
+            if (createAnother)
+                return await _componentFactory.RenderComponentAsync(new HxSwapOob
+                {
+                    Content = new EditRecipe(),
+                    Target = "#page-container",
+                    ScrollToTop = true
+                });
 
             Response.AsResponseData().HxPushUrl($"/recipes/view/{newRecipeId}");
             return await _componentFactory.RenderComponentAsync(new HxSwapOob

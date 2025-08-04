@@ -534,24 +534,57 @@
         <div class="field-label is-normal"></div>
         <div class="field-body">
             <div class="field">
-                <div class="control buttons">
-                    <button
-                        class="button is-primary"
-                        type="submit"
-                        form="edit-recipe-form"
-                    >
-                        Save
-                    </button>
+                <div class="control">
                     @if(RecipeId.HasValue) {
-                        <button
-                            hx-get="/recipes/view/@RecipeId.Value"
-                            hx-push-url="/recipes/view/@RecipeId.Value"
-                            hx-swap="innerHTML"
-                            hx-target="#page-container"
-                            class="button is-danger"
-                        >
-                            Cancel
-                        </button>
+                        <div class="is-flex is-justify-content-space-between mb-3">
+                            <button
+                                class="button is-primary"
+                                type="submit"
+                                form="edit-recipe-form"
+                            >
+                                Save
+                            </button>
+                            <button
+                                hx-get="/recipes/view/@RecipeId.Value"
+                                hx-push-url="/recipes/view/@RecipeId.Value"
+                                hx-swap="innerHTML"
+                                hx-target="#page-container"
+                                class="button is-danger"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    }
+                    else {
+                        <div class="is-flex is-justify-content-space-between mb-3">
+                            <button
+                                class="button is-primary"
+                                type="submit"
+                                form="edit-recipe-form"
+                            >
+                                Save
+                            </button>
+                            <button
+                                hx-get="/recipes"
+                                hx-push-url="/recipes"
+                                hx-swap="innerHTML"
+                                hx-target="#page-container"
+                                class="button is-danger"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                        <div>
+                            <button
+                                class="button is-primary"
+                                hx-include="#edit-recipe-form"
+                                hx-swap="none"
+                                hx-post="/recipes/new"
+                                hx-vals='{"createAnother": "true"}'
+                            >
+                                Save & create another
+                            </button>
+                        </div>
                     }
                 </div>
             </div>
