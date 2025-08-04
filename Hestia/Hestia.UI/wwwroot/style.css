@@ -376,14 +376,16 @@ p > .icon {
     cursor: grabbing;
 }
 
+
 .dropdown-content {
-    box-shadow: initial;
+    box-shadow: 0 0 9px 10px var(--bulma-body-background-color);
+    clip-path: inset(0 -19px -19px -19px);
+
     border-width: 1px;
     border-style: solid;
     border-color: hsl(var(--bulma-scheme-h),var(--bulma-scheme-s),calc(var(--bulma-border-l)));
     margin-top: 0.25rem;
 }
-
 
   .columns {
       overflow-x: hidden;
@@ -418,3 +420,14 @@ details > summary {
 hr {
     height: 1px;
 }
+
+.tabs a:hover, .tabs-action-button:hover, .tabs-action-button.is-active {
+    border-bottom-color: inherit;
+    color: inherit;
+}
+
+.tabs-action-button {
+    transition-duration: var(--bulma-duration);
+    transition-property: background-color, border-color, color;
+}
+

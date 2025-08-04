@@ -85,7 +85,7 @@
 }
 <div class="control is-expanded autocomplete is-flex is-flex-direction-column @(Icon is not null ? (IconSide == IconSideEnum.Left ? $"has-icons-left" : "has-icons-right") : "")">
     <input class="input" name="@ValueName.Or(Name.Map(n => $"{n}Value")).Or("")" type="hidden" @attributes=ValueInputAttributes /> 
-    <input class="input @Classes.Or("")" type="text" 
+    <input class="input autocomplete-input @Classes.Or("")" type="text" 
         @attributes="InputAttributes"
         _="
             on load

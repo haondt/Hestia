@@ -68,53 +68,49 @@
                 </ul>
             </div>
         </div>
-        <div class="is-fullwidth">
-            <div class="tabs">
-                <ul
-                    _="
-                        on toggleDelete
-                            halt the event
-                            toggle .is-hidden on #recipe-edit-button
-                            toggle .is-hidden on #recipe-delete-button
-                            toggle .is-hidden on #recipe-cancel-button
-                            toggle .is-hidden on #recipe-confirm-button
-                        end
-                    "
-                >
-                    <li>
-                        <a href="/recipes/edit/@RecipeId" 
-                           hx-get="/recipes/edit/@RecipeId"
-                           hx-target="#page-container"
-                           hx-push-url="/recipes/edit/@RecipeId"
-                           id="recipe-edit-button">
-                            Edit
-                        </a>
-                    </li>
-                    <li>
-                        <a 
-                            id="recipe-delete-button"
-                            _="on click send toggleDelete">
-                            Delete
-                        </a>
-                    </li>
-                    <li>
-                        <a 
-                            id="recipe-confirm-button"
-                            class="has-text-danger is-hidden">
-                            Confirm
-                        </a>
-                    </li>
-                    <li>
-                        <a 
-                            id="recipe-cancel-button"
-                            class="has-text-danger is-hidden"
-                            _="on click send toggleDelete">
-                            Cancel
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <TabsActionsDropdown ResetListeners="@(["#recipe-delete-button"])">
+            <a 
+                class="dropdown-item"  
+                href="/recipes/edit/@RecipeId" 
+                hx-get="/recipes/edit/@RecipeId"
+                hx-target="#page-container"
+                hx-push-url="/recipes/edit/@RecipeId"
+                id="recipe-edit-button">
+                Edit
+            </a>
+            <a 
+                id="recipe-delete-button"
+                class="dropdown-item"  
+                _="
+                    on click send delete to me end
+                    on actionsDropdownReset send cancelDelete to me end
+                    on cancelDelete
+                        remove .is-hidden from #recipe-delete-button
+                        add .is-hidden to #recipe-cancel-button
+                        add .is-hidden to #recipe-confirm-button
+                    end
+                    on delete
+                        add .is-hidden to #recipe-delete-button
+                        remove .is-hidden from #recipe-cancel-button
+                        remove .is-hidden from #recipe-confirm-button
+                    end
+                ">
+                Delete
+            </a>
+            <a 
+                id="recipe-cancel-button"
+                class="dropdown-item has-text-danger is-hidden"
+                _="
+                    on click send cancelDelete to #recipe-delete-button
+                ">
+                Cancel Delete
+            </a>
+            <a 
+                id="recipe-confirm-button"
+                class="dropdown-item has-text-danger is-hidden">
+                Confirm Delete
+            </a>
+        </TabsActionsDropdown>
     </div>
 
     <div id="recipe-tab-body" class="is-hidden">
@@ -214,8 +210,13 @@
                 <div class="is-flex is-flex-direction-column ">
                     @if (Recipe.Description.HasValue)
                     {
-                        <div class="content has-text-grey">
-                            <em style="white-space:pre-line;">@Recipe.Description.Value</em>
+                        <div class="content has-text-grey" style="--bulma-content-block-margin-bottom: 0.5em;">
+                            @{
+                                var paragraphs = Recipe.Description.Value.Split(new[] { "\r\n\r\n", "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
+                            }
+                            @foreach(var p in paragraphs){
+                                <p><i>@p</i></p>
+                            }
                         </div>
                     }
 

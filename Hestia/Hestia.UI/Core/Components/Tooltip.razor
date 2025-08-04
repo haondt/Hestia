@@ -24,7 +24,8 @@
     [Parameter] public int Offset { get; set; } = 10;
     [Parameter] public Optional<string> HxSwapOob { get; set; }
     [Parameter] public bool Debug { get; set; }
-    [Parameter] public Optional<double> MaxWidth { get; set; } 
+    [Parameter] public Optional<double> MaxWidth { get; set; }
+    [Parameter] public bool Hover { get; set; } = true;
 
     private Dictionary<string, object> _containerAttributes = [];
 
@@ -94,6 +95,7 @@ else
     <span class="tooltip-trigger @TriggerClasses.Unwrap()" 
         _="
             on showTooltip
+                halt the event
                 if not :cleanup
                     set tooltip to the next .tooltip-body
                     toggle .is-hidden on tooltip
@@ -111,6 +113,7 @@ else
                 end
             end
             on hideTooltip
+                halt the event
                 if :cleanup
                     set cleanup to :cleanup
                     js(cleanup)
@@ -123,11 +126,13 @@ else
             end
 
             on htmx:beforeCleanupElement send hideTooltip to me end
-            on mouseleave send hideTooltip to me end
-            on blur send hideTooltip to me end
+            @(Hover ? @"
+                on mouseleave send hideTooltip to me end
+                on blur send hideTooltip to me end
 
-            on mouseenter send showTooltip to me end
-            on focus send showTooltip to me end
+                on mouseenter send showTooltip to me end
+                on focus send showTooltip to me end
+            ".Trim() : "")
         "
     >
         @TriggerContent

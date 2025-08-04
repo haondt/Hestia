@@ -231,6 +231,7 @@
 
         <div class="field is-horizontal" id="serving-size-field"
             _="
+                on load send calculateServingSize to me end
                 on calculateServingSize
                     halt the event
                     set yieldQuantity to #yield-quantity-input's value as a Number

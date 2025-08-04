@@ -1,0 +1,52 @@
+
+@code{
+    [Parameter, EditorRequired]
+    public required RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public List<string> ResetListeners { get; set; } = [];
+    private string _hyperscript = default!;
+    protected override void OnInitialized()
+    {
+        var resetListenersScript = string.Join('\n', ResetListeners
+            .Select(l => $"send actionsDropdownReset to {l}"));
+        _hyperscript = $@"
+set :dd to the next .dropdown
+set :active to false
+on click 
+    set :active to not :active
+    send updateState to me
+end
+on click from elsewhere
+    if the event's target is not in :dd
+        set :active to false
+        send updateState to me
+    end
+end
+on updateState
+    if :active
+        add .is-active to :dd
+        add .is-active to me
+    else
+        remove .is-active from :dd
+        remove .is-active from me
+        {resetListenersScript}
+    end
+end
+";
+        base.OnInitialized();
+    }
+
+}
+<p 
+    _="@_hyperscript"
+    class="px-3 py-2 has-border-bottom is-clickable tabs-action-button">
+    Actions
+</p>
+<div 
+    class="dropdown tabs-action-dropdown is-right">
+    <div class="dropdown-menu">
+        <div class="dropdown-content">
+            @ChildContent
+        </div>
+    </div>
+</div>
