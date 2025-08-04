@@ -64,6 +64,26 @@ namespace Hestia.UI.Ingredients.Controllers
             });
         }
 
+        [HttpDelete("view/{id}")]
+        public async Task<IResult> DeleteIngredient(int id)
+        {
+            var result = await ingredientsService.DeleteIngredientAsync(id);
+            if (!result.IsSuccessful)
+            {
+                Response.AsResponseData()
+                    .Status(404);
+                return await _componentFactory.RenderComponentAsync(new Toast
+                {
+                    Message = $"Ingredient with id {id} not found",
+                    Severity = ToastSeverity.Error
+                });
+            }
+
+            Response.AsResponseData()
+                .HxLocation("/ingredients", target: "#page-container");
+            return TypedResults.Ok();
+        }
+
         [HttpGet("edit/{id}")]
         public async Task<IResult> EditIngredient(int id)
         {
@@ -87,26 +107,15 @@ namespace Hestia.UI.Ingredients.Controllers
             var model = await ingredientsService.UpdateIngredientAsync(id, ingredient);
 
             Response.AsResponseData().HxPushUrl($"/ingredients/view/{id}");
-            return await _componentFactory.RenderComponentAsync(new AppendComponentLayout
+            return await _componentFactory.RenderComponentAsync(new HxSwapOob
             {
-                Components = new()
+                Content = new ViewIngredient
                 {
-                    new HxSwapOob
-                    {
-                        Content =  new ViewIngredient
-                        {
-                            Ingredient = model,
-                            IngredientId = id
-                        },
-                        Target = "#page-container",
-                        ScrollToTop = true
-                    },
-                    new Toast
-                    {
-                        Message = $"Updated ingredient \"{model.Name}\"",
-                        Severity = ToastSeverity.Success
-                    }
-                }
+                    Ingredient = model,
+                    IngredientId = id
+                },
+                Target = "#page-container",
+                ScrollToTop = true
             });
         }
 

@@ -27,51 +27,90 @@
 }
 
 <div class="content-container mt-5">
-    <div class="is-flex is-flex-direction-row is-fullwidth gap-4">
-        <div class="tabs is-flex-grow-1">
-            <ul 
-                _="
-                    on setActive
-                        halt the event
-                        if :active is not null
-                            remove .is-active from the :active's parentElement
-                            add .is-hidden to :activeBody
-                        end
+    <div class="page-header mb-2">
+        <p>@Ingredient.Name</p>
+    </div>
+    <div class="is-flex is-flex-direction-row is-fullwidth z-500 is-position-relative mb-5">
+        <div class="is-fullwidth is-flex-grow-1">
+            <div class="tabs is-flex-grow-1">
+                <ul 
+                    _="
+                        on setActive
+                            halt the event
+                            if :active is not null
+                                remove .is-active from the :active's parentElement
+                                add .is-hidden to :activeBody
+                            end
 
-                        set :active to the event's srcElement
-                        set :activeBody to #{:active's @@data-body-id}
-                        add .is-active to the :active's parentElement
-                        remove .is-hidden from :activeBody
-                    end
-                "
-            >
-                <li>
-                    <a _="on load send setActive end on click send setActive end"
-                        data-body-id="ingredient-tab-body"
-                    >
-                        Ingredient
-                    </a>
-                </li>
-                <li>
-                    <a _="on click send setActive end"
-                        data-body-id="insights-tab-body"
-                    >
-                        Insights
-                    </a>
-                </li>
-            </ul>
+                            set :active to the event's srcElement
+                            set :activeBody to #{:active's @@data-body-id}
+                            add .is-active to the :active's parentElement
+                            remove .is-hidden from :activeBody
+                        end
+                    "
+                >
+                    <li>
+                        <a _="on load send setActive end on click send setActive end"
+                            data-body-id="ingredient-tab-body"
+                        >
+                            Ingredient
+                        </a>
+                    </li>
+                    <li>
+                        <a _="on click send setActive end"
+                            data-body-id="insights-tab-body"
+                        >
+                            Insights
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div >
-            <button
+        <TabsActionsDropdown ResetListeners="@(["#ingredient-delete-button"])">
+            <a 
+                class="dropdown-item"  
                 hx-get="/ingredients/edit/@IngredientId"
                 hx-push-url="/ingredients/edit/@IngredientId"
                 hx-swap="innerHTML"
                 hx-target="#page-container"
-                class="button is-primary"
-            >
+                id="ingredient-edit-button">
                 Edit
-            </button>
-        </div>
+            </a>
+            <a 
+                id="ingredient-delete-button"
+                class="dropdown-item"  
+                _="
+                    on click send delete to me end
+                    on actionsDropdownReset send cancelDelete to me end
+                    on cancelDelete
+                        remove .is-hidden from #ingredient-delete-button
+                        add .is-hidden to #ingredient-cancel-button
+                        add .is-hidden to #ingredient-confirm-button
+                    end
+                    on delete
+                        add .is-hidden to #ingredient-delete-button
+                        remove .is-hidden from #ingredient-cancel-button
+                        remove .is-hidden from #ingredient-confirm-button
+                    end
+                ">
+                Delete
+            </a>
+            <a 
+                id="ingredient-cancel-button"
+                class="dropdown-item has-text-danger is-hidden"
+                _="
+                    on click send cancelDelete to #ingredient-delete-button
+                ">
+                Cancel Delete
+            </a>
+            <a 
+                id="ingredient-confirm-button"
+                class="dropdown-item has-text-danger is-hidden"
+                hx-delete="/ingredients/view/@IngredientId"
+                hx-swap="none">
+                Confirm Delete
+            </a>
+        </TabsActionsDropdown>
     </div>
     <div id="ingredient-tab-body" class="is-hidden">
         <form id="view-recipe-form" class="control" >
