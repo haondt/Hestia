@@ -24,37 +24,27 @@
                                         <p class="section-label">@ingredient.Name</p>
                                         
                                         <!-- Macros row -->
-                                            <div class="is-flex">
-                                                <div class="has-text-centered is-flex-grow-1">
-                                                    <div>@ingredient.ProteinGrams.Map(p => p.ToString("F0")).Or("-")</div>
-                                                    <div class="is-size-7 has-text-grey">protein</div>
-                                                </div>
-                                                <div class="flex-divider my-2"></div>
-                                                <div class="has-text-centered is-flex-grow-1">
-                                                    <div>@ingredient.FatGrams.Map(f => f.ToString("F0")).Or("-")</div>
-                                                    <div class="is-size-7 has-text-grey">fat</div>
-                                                </div>
-                                                <div class="flex-divider my-2"></div>
-                                                <div class="has-text-centered is-flex-grow-1">
-                                                    <div>@ingredient.CarbGrams.Map(c => c.ToString("F0")).Or("-")</div>
-                                                    <div class="is-size-7 has-text-grey">carbs</div>
-                                                </div>
+                                        <div class="is-flex">
+                                            <div class="has-text-centered is-flex-grow-1">
+                                                <div>@ingredient.ProteinGrams.Map(p => p.ToString("F0")).Or("-")</div>
+                                                <div class="is-size-7 has-text-grey">protein</div>
+                                            </div>
+                                            <div class="flex-divider my-2 mx-2"></div>
+                                            <div class="has-text-centered is-flex-grow-1">
+                                                <div>@ingredient.FatGrams.Map(f => f.ToString("F0")).Or("-")</div>
+                                                <div class="is-size-7 has-text-grey">fat</div>
+                                            </div>
+                                            <div class="flex-divider my-2 mx-2"></div>
+                                            <div class="has-text-centered is-flex-grow-1">
+                                                <div>@ingredient.CarbGrams.Map(c => c.ToString("F0")).Or("-")</div>
+                                                <div class="is-size-7 has-text-grey">carbs</div>
                                             </div>
 
-                                        <!-- Bottom row with cost and calories -->
-                                        <div class="is-flex is-justify-content-space-between is-align-items-center">
-                                            @if (ingredient.PackageCostDollars.HasValue)
-                                            {
-                                                <span>$@ingredient.PackageCostDollars.Value.ToString("F2")</span>
-                                            }
-                                            else
-                                            {
-                                                <span></span>
-                                            }
-                                            @if (ingredient.Calories.HasValue)
-                                            {
-                                                <span >@ingredient.Calories.Value.ToString("F0") calories</span>
-                                            }
+                                            <div class="flex-divider my-2 mx-2"></div>
+                                            <div class="has-text-centered is-flex-grow-1">
+                                                <div>@ingredient.Calories.Map(c => c.ToString("F0")).Or("-")</div>
+                                                <div class="is-size-7 has-text-grey">calories</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
