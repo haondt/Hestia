@@ -107,7 +107,9 @@
             </a>
             <a 
                 id="recipe-confirm-button"
-                class="dropdown-item has-text-danger is-hidden">
+                class="dropdown-item has-text-danger is-hidden"
+                hx-delete="/recipes/view/@RecipeId"
+                hx-swap="none">
                 Confirm Delete
             </a>
         </TabsActionsDropdown>

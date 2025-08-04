@@ -1,7 +1,6 @@
 ﻿using Haondt.Core.Extensions;
 using Haondt.Core.Models;
 using Haondt.Web.BulmaCSS.Services;
-using Haondt.Web.Components;
 using Haondt.Web.Core.Extensions;
 using Haondt.Web.Core.Services;
 using Hestia.Core.Constants;
@@ -38,6 +37,26 @@ namespace Hestia.UI.Recipes.Controllers
                 Recipe = recipe,
                 RecipeId = recipeId
             });
+        }
+
+        [HttpDelete("view/{recipeId}")]
+        public async Task<IResult> DeleteRecipe(int recipeId)
+        {
+            var result = await _recipesService.DeleteRecipeAsync(recipeId);
+            if (!result.IsSuccessful)
+            {
+                Response.AsResponseData()
+                    .Status(404);
+                return await componentFactory.RenderComponentAsync(new Toast
+                {
+                    Message = $"Recipe with id {recipeId} not found",
+                    Severity = ToastSeverity.Error
+                });
+            }
+
+            Response.AsResponseData()
+                .HxLocation("/recipes", target: "#page-container");
+            return TypedResults.Ok();
         }
 
         [HttpGet]
@@ -93,26 +112,15 @@ namespace Hestia.UI.Recipes.Controllers
             var (newRecipeId, createdRecipe) = await _recipesService.CreateRecipeAsync(recipe);
 
             Response.AsResponseData().HxPushUrl($"/recipes/view/{newRecipeId}");
-            return await _componentFactory.RenderComponentAsync(new AppendComponentLayout
+            return await _componentFactory.RenderComponentAsync(new HxSwapOob
             {
-                Components = new()
+                Content = new ViewRecipe
                 {
-                    new HxSwapOob
-                    {
-                        Content = new ViewRecipe
-                        {
-                            Recipe = createdRecipe,
-                            RecipeId = newRecipeId
-                        },
-                        Target = "#page-container",
-                        ScrollToTop = true
-                    },
-                    new Toast
-                    {
-                        Message = $"Created recipe \"{createdRecipe.Title}\"",
-                        Severity = ToastSeverity.Success
-                    }
-                }
+                    Recipe = createdRecipe,
+                    RecipeId = newRecipeId
+                },
+                Target = "#page-container",
+                ScrollToTop = true
             });
         }
 
@@ -122,26 +130,15 @@ namespace Hestia.UI.Recipes.Controllers
             var updatedRecipe = await _recipesService.UpdateRecipeAsync(recipeId, recipe);
 
             Response.AsResponseData().HxPushUrl($"/recipes/view/{recipeId}");
-            return await _componentFactory.RenderComponentAsync(new AppendComponentLayout
+            return await _componentFactory.RenderComponentAsync(new HxSwapOob
             {
-                Components = new()
+                Content = new ViewRecipe
                 {
-                    new HxSwapOob
-                    {
-                        Content = new ViewRecipe
-                        {
-                            Recipe = updatedRecipe,
-                            RecipeId = recipeId
-                        },
-                        Target = "#page-container",
-                        ScrollToTop = true
-                    },
-                    new Toast
-                    {
-                        Message = $"Updated recipe \"{updatedRecipe.Title}\"",
-                        Severity = ToastSeverity.Success
-                    }
-                }
+                    Recipe = updatedRecipe,
+                    RecipeId = recipeId
+                },
+                Target = "#page-container",
+                ScrollToTop = true
             });
         }
 
