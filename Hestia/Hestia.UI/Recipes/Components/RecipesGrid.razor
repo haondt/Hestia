@@ -26,7 +26,7 @@
             @foreach (var (id, recipe) in Recipes)
             {
                 <div class="cell is-align-items-stretch">
-                    <div class="has-width-full is-clickable is-align-items-stretch " hx-get="/recipes/view/@id" hx-target="#page-container" hx-push-url="true">
+                    <a class="has-width-full is-clickable is-align-items-stretch " href="/recipes/view/@id" hx-boost="true" hx-target="#page-container">
 
                         <Card Classes="@("has-height-full")" ContentClasses="@("has-height-full")">
                             <Content>
@@ -34,7 +34,7 @@
                                 <div class="is-flex has-height-full">
                                     <div class="is-flex is-flex-direction-column gap-3 is-flex-grow-1 is-justify-content-space-between">
                                         <div class="content mb-0">
-                                            <strong>@recipe.Title</strong>
+                                            <p class="section-label mb-0">@recipe.Title</p>
                                             @if (recipe.Description.HasValue)
                                             {
                                                 <p class="has-text-grey text-clamp-2">
@@ -65,7 +65,7 @@
                             </Content>
                         </Card>
 
-                    </div>
+                    </a>
                 </div>
             }
             @if (NextPage.HasValue)

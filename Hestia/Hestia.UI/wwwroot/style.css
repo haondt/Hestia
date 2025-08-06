@@ -1,3 +1,5 @@
+@import 'css/meal-plans.css';
+
 :root {
     --hestia-content-width: 1300px;
     --bulma-card-content-padding: 1rem;
@@ -26,6 +28,8 @@
   --bulma-scheme-h: 14;
   --bulma-scheme-s: 5%;
   --color-protein: #b63032;
+
+  --panel-radius: 0.75rem;
 
 
 }
@@ -162,7 +166,7 @@
 
 .page-header p {
 /*    color:hsl(var(--bulma-primary-h), var(--bulma-primary-s), var(--bulma-primary-l)) ;
-*/    
+*/
     color: var(--bulma-text-strong);
     font-size: var(--bulma-size-large);
     text-align: center;
@@ -329,12 +333,12 @@ p > .icon {
 /* SortableJS styles */
 .sortable-ghost {
     opacity: 1;
-
 }
 
 .sortable-ghost .input {
     border-color: var(--bulma-link);
 }
+
 
 .sortable-ghost .has-text-danger {
     color: var(--bulma-text-weak) !important;
@@ -345,11 +349,23 @@ p > .icon {
     opacity: 0;
 }
 
+
 .drag-handle {
     cursor: grab;
     width: 12px;
     height: 12px;
     position: relative;
+}
+
+.drag-handle-wide {
+    cursor: grab;
+    width: 100%;
+    height: 20px;
+    position: relative;
+}
+
+.drag-container {
+    cursor: grab;
 }
 
 .drag-handle::before,
@@ -363,16 +379,31 @@ p > .icon {
     border-radius: 1px;
 }
 
-.drag-handle::before {
-    top: 3px;
+.drag-handle-wide::before,
+.drag-handle-wide::after {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    right: 0.5rem;
+    height: 1px;
+    background-color: var(--bulma-border-weak);
 }
 
-.drag-handle::after {
-    bottom: 3px;
+.drag-handle-wide:hover::before,
+.drag-handle-wide:hover::after {
+    background-color: var(--bulma-grey-dark);
+}
+
+.drag-handle::before, .drag-handle-wide::before {
+    top: 7px;
+}
+
+.drag-handle::after, .drag-handle-wide::after {
+    bottom: 7px;
 }
 
 
-.drag-handle:active {
+.drag-handle:active, .drag-handle-wide:active, .drag-container:active {
     cursor: grabbing;
 }
 
@@ -431,3 +462,6 @@ hr {
     transition-property: background-color, border-color, color;
 }
 
+.is-text-align-end {
+    text-align: end;
+}

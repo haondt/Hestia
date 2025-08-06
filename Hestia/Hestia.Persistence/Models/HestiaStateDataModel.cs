@@ -9,6 +9,7 @@ namespace Hestia.Persistence.Models
     {
         public int Id { get; set; }
         public bool HasSeededUnitConversions { get; set; } = false;
+        public int NextMealPlanNumber { get; set; } = 1;
 
         public static async Task<HestiaStateDataModel> GetOrCreateAsync(ApplicationDbContext dbContext)
         {

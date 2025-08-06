@@ -113,7 +113,7 @@ namespace Hestia.Domain.Services
                 //.Where(r => r.NormalizedTitle.Contains(query) ||
                 //           (r.Description != null && r.NormalizedDescription.Contains(query)))
                 .Where(r => r.NormalizedTitle.Contains(query))
-                .OrderBy(r => r.Title)
+                .OrderByDescending(r => r.Id)
                 .Skip(offset)
                 .Take(limit)
                 .ToListAsync();

@@ -173,5 +173,35 @@ namespace Hestia.Domain.Models
 
             return warning;
         }
+
+        public List<string> GetCompatibleUnits(NormalizedString fromUnit)
+        {
+            var compatibleUnits = new HashSet<NormalizedString>();
+            var queue = new Queue<NormalizedString>();
+            var visited = new HashSet<NormalizedString>();
+
+            queue.Enqueue(fromUnit);
+            visited.Add(fromUnit);
+
+            while (queue.Count > 0)
+            {
+                var currentUnit = queue.Dequeue();
+                compatibleUnits.Add(currentUnit);
+
+                if (_graph.TryGetValue(currentUnit, out var neighbors))
+                {
+                    foreach (var neighbor in neighbors.Keys)
+                    {
+                        if (!visited.Contains(neighbor))
+                        {
+                            visited.Add(neighbor);
+                            queue.Enqueue(neighbor);
+                        }
+                    }
+                }
+            }
+
+            return compatibleUnits.Select(u => u.Value.ToLower()).ToList();
+        }
     }
 }

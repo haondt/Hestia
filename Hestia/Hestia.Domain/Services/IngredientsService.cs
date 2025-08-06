@@ -62,7 +62,7 @@ namespace Hestia.Domain.Services
 
             var dataModels = await dbContext.Ingredients
                 .Where(i => i.NormalizedName.Contains(searchTerm))
-                .OrderBy(i => i.Id)
+                .OrderByDescending(r => r.Id)
                 .Skip(page * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

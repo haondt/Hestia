@@ -81,6 +81,10 @@ namespace Hestia.UI.Core.Extensions
             {
                 Uri = "/static/shared/vendored/sortablejs/Sortable.min.js"
             });
+            services.AddScoped<IHeadEntryDescriptor>(_ => new StyleSheetDescriptor
+            {
+                Uri = "/static/Hestia.styles.css",
+            });
             services.AddScoped<IHeadEntryDescriptor>(_ => new TitleDescriptor
             {
                 Title = "Hestia",

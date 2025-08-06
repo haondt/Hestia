@@ -27,6 +27,11 @@ public class UnitConversionsService(ApplicationDbContext dbContext) : IUnitConve
         var dataModels = await GetAllDataModelsAsync();
         return dataModels.Select(UnitConversionModel.FromDataModel).ToList();
     }
+    public async Task<List<string>> GetCompatibleUnitsAsync(NormalizedString fromUnit)
+    {
+        var graph = await GetCachedGraphAsync();
+        return graph.GetCompatibleUnits(fromUnit);
+    }
 
     public async Task<DetailedResult<decimal, string>> ConvertAsync(NormalizedString fromUnit, NormalizedString toUnit, decimal amount)
     {

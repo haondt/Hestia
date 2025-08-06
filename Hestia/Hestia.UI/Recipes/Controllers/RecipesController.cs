@@ -47,7 +47,7 @@ namespace Hestia.UI.Recipes.Controllers
             {
                 Response.AsResponseData()
                     .Status(404);
-                return await componentFactory.RenderComponentAsync(new Toast
+                return await _componentFactory.RenderComponentAsync(new Toast
                 {
                     Message = $"Recipe with id {recipeId} not found",
                     Severity = ToastSeverity.Error

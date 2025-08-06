@@ -1,0 +1,109 @@
+/* Layout containers */
+.meal-plan-search,
+.meal-plan-planner {
+    border: 1px solid var(--bulma-border);
+    border-radius: var(--panel-radius);
+    padding: 1rem;
+}
+
+#meal-plan-search-results {
+    height: 500px;
+}
+#meal-plan-search-panel {
+    margin-right: 1.5rem;
+}
+
+.meal-plan-content-view {
+    display: flex;
+
+    .meal-plan-search & {
+        display: none;
+    }
+
+}
+
+/* Base components */
+.meal-plan-item {
+    border: 1px solid var(--bulma-border-weak);
+    border-radius: var(--bulma-radius);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    * {
+        transition-duration: var(--bulma-duration);
+        transition-property: background-color, border-color, box-shadow, color;
+    }
+
+    .meal-plan-item-name {
+        padding: 7px 11px;
+        color: var(--bulma-text-strong);
+        border-top: 1px solid var(--bulma-border-weak);
+        border-left: 1px solid var(--bulma-border-weak);
+        border-start-start-radius: var(--bulma-radius);
+    }
+
+    .input {
+        border-start-start-radius: 0;
+    }
+
+    .meal-plan-content & {
+        margin-bottom: 0;
+        position: relative;
+        border: none;
+
+        .section-label {
+            font-weight: var(--bulma-text-weight);
+        }
+    }
+
+    &.sortable-ghost {
+        --bulma-border-weak: var(--bulma-link);
+        .select > select {
+
+            --bulma-input-border-color: var(--bulma-link);
+        }
+    }
+
+    .meal-plan-content-view {
+        .drag-container {
+            flex: 0 0 50px;
+            border: 1px solid var(--bulma-border-weak);
+            border-end-end-radius: var(--bulma-radius);
+            border-start-end-radius: var(--bulma-radius);
+        }
+
+    }
+}
+
+/* planner view */
+.meal-plan-content {
+    .is-hidden-meal-plan-content {
+        display: none !important;
+    }
+}
+
+.meal-plan-item-container {
+    padding-left: 1rem;
+    padding-bottom: 1rem;
+    border-left: 1px solid var(--bulma-border-weak);
+    min-height: 100px;
+}
+
+
+/* Mobile */
+@media screen and (max-width: 768px) {
+    .meal-plan-item-container {
+        padding-left: 0;
+        border-left: none;
+        min-height: 50px;
+    }
+
+    .meal-plan-search,
+    .meal-plan-planner {
+        border: none;
+        padding: 0.25rem;
+    }
+    #meal-plan-search-panel {
+        margin-right: 0;
+    }
+}

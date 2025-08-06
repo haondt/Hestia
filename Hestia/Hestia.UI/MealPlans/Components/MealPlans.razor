@@ -1,0 +1,26 @@
+@using Hestia.UI.Core.Components
+
+@attribute [RenderPage]
+<div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
+
+<div class="content-container mt-5">
+    <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-space-between is-align-items-center mb-5">
+        <h1 class="title is-3">Meal Plans</h1>
+        <a hx-get="/meal-plans/new"
+           hx-push-url="/meal-plans/new"
+           hx-swap="innerHTML"
+           hx-target="#page-container"
+           class="button is-primary">
+            <span class="icon">
+                <LucideIcon Name="plus" Size="20" />
+            </span>
+            <span>New meal plan</span>
+        </a>
+    </div>
+
+    <div class="content">
+        <p class="has-text-grey">
+            <em>Meal plans list will be implemented in the next phase. For now, you can create new meal plans using the button above.</em>
+        </p>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+@using Hestia.Domain.Models
+@using Hestia.Domain.Services
+@using Hestia.UI.Core.Components
+@inject IMealPlansService MealPlansService
+
+@code {
+    [Parameter]
+    public Optional<int> MealPlanId { get; set; }
+
+    [Parameter]
+    public MealPlanModel MealPlan { get; set; } = default!;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (MealPlan is null)
+        {
+            var defaultMealPlanNumber = await MealPlansService.GetNextMealPlanNumberAsync();
+            MealPlan = new()
+            {
+                LastModified = AbsoluteDateTime.Now,
+                Name = $"Meal Plan #{defaultMealPlanNumber}",
+                Sections = (await MealPlansService.GetDefaultSectionsAsync())
+                    .Select(s => new MealPlanSectionModel
+                    {
+                        Name = s
+                    }).ToList()
+            };
+        }
+        await base.OnInitializedAsync();
+    }
+}
+
+
+<div class="meal-plan-planner">
+    <!-- Basic meal plan info -->
+    <div class="field mb-5">
+        <input class="input" name="@nameof(MealPlanModel.Name)" type="text" placeholder="Name" value="@MealPlan.Name" required/>
+    </div>
+
+    <!-- Meal plan content -->
+    <div id="meal-plan-content" class="meal-plan-content">
+        @foreach (var mealPart in MealPlan.Sections)
+        {
+            <MealPlanSectionContainer Name="mealPart.Name" >
+                @foreach (var item in mealPart.Items)
+                {
+                    <MealPlanItem Entity="item" Id="item.RecipeOrIngredientId" />
+                }
+            </MealPlanSectionContainer>
+        }
+    </div>
+
+    <!-- Add meal part button -->
+    <div class="has-text-centered my-3">
+        <a
+            class="is-clickable has-text-grey"
+            hx-get="/meal-plans/fragments/section-container"
+            hx-target="#meal-plan-content"
+            hx-swap="beforeend">
+            Add Section
+        </a>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="mt-5">
+        <div class="is-flex is-justify-content-space-between">
+            @if(MealPlanId.HasValue) {
+                <button class="button is-primary">Save Changes</button>
+            }
+            else {
+                <button class="button is-primary">Save Meal Plan</button>
+            }
+            <button class="button is-danger">Cancel</button>
+        </div>
+    </div>
+</div>
