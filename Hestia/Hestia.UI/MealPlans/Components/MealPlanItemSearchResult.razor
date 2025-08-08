@@ -1,0 +1,54 @@
+@using Hestia.Domain.Models
+@using Hestia.Domain.Services
+@using Hestia.Persistence.Models
+@using Hestia.UI.Core.Components
+@inject IUnitConversionsService UnitConversionsService
+@code {
+    [Parameter, EditorRequired]
+    public required Union<RecipeModel, IngredientModel, MealPlanItemModel> Entity { get; set; }
+
+    [Parameter, EditorRequired]
+    public required int Id { get; set; }
+
+
+    private string _itemName = default!;
+    private Optional<string> _subtitle = new();
+    private MealItemType _mealItemType;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Entity.Is<RecipeModel>(out var recipe))
+        {
+            _itemName = recipe.Title;
+            _subtitle = recipe.Description;
+            _mealItemType = MealItemType.Recipe;
+        }
+        else if (Entity.Is<IngredientModel>(out var ingredient))
+        {
+            _itemName = ingredient.Name;
+            _subtitle = ingredient.Vendor;
+            _mealItemType = MealItemType.Ingredient;
+        }
+        else
+        {
+            var mealPlanItem = Entity.Cast<MealPlanItemModel>();
+            _itemName = mealPlanItem.ItemName;
+            _mealItemType = mealPlanItem.ItemType;
+        }
+
+        await base.OnInitializedAsync();
+    }
+}
+
+<div class="meal-plan-item-search-result is-bordered is-radiused is-flex is-flex-direction-row is-align-items-stretch is-flex-grow-1">
+    <div class="is-flex-grow-1 my-2 mx-4">
+        <p class="section-label">@_itemName</p>
+        <p class="has-text-grey text-clamp-2">@_subtitle.Unwrap()</p>
+    </div>
+    <p
+        data-item-name="@_itemName"
+        _="on click send mealPlanItemSelect(itemId: @Id, itemName: (my @@data-item-name), itemType: '@_mealItemType')"
+        class="is-clickable py-2 px-4 has-border-left-weak is-flex is-align-items-center is-justify-content-center is-whitespace-nowrap has-text-link">
+        Add
+    </p>
+</div>

@@ -1,0 +1,23 @@
+@using Hestia.Domain.Models
+@using Haondt.Core.Extensions
+@using Hestia.UI.Core.Components
+
+@attribute [RenderPage]
+<div _="on load send OnNavigate(value:'MealPlans') to #navbar then remove me"></div>
+
+@code {
+    [Parameter]
+    public Optional<MealPlanModel> MealPlanModel { get; set; }
+
+    [Parameter]
+    public Optional<int> MealPlanId { get; set; }
+}
+
+<div class="content-container mt-5">
+    <div id="meal-plan-editor-panel">
+        <div class="page-header mb-4">
+            <p>Meal Plan</p>
+        </div>
+        <MealPlanner MealPlan="MealPlanModel" MealPlanId="MealPlanId" />
+    </div>
+</div>

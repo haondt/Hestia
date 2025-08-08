@@ -3,6 +3,10 @@
     public required RenderFragment ChildContent { get; set; }
     [Parameter]
     public List<string> ResetListeners { get; set; } = [];
+    [Parameter]
+    public string ButtonText { get; set; } = "Actions";
+    [Parameter]
+    public string BeforeShow { get; set; } = "";
     private string _hyperscript = default!;
     protected override void OnInitialized()
     {
@@ -23,6 +27,8 @@ on click from elsewhere
 end
 on updateState
     if :active
+        {BeforeShow}
+        log 'SHOWTIME BOYS'
         add .is-active to :dd
         add .is-active to me
     else
@@ -38,8 +44,8 @@ end
 }
 <p 
     _="@_hyperscript"
-    class="px-3 py-2 has-border-bottom is-clickable tabs-action-button">
-    Actions
+    class="is-clickable">
+    @ButtonText
 </p>
 <div 
     class="dropdown tabs-action-dropdown is-right">

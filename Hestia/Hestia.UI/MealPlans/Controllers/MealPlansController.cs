@@ -1,18 +1,25 @@
 using Haondt.Core.Extensions;
 using Haondt.Web.BulmaCSS.Services;
+using Haondt.Web.Components;
 using Haondt.Web.Core.Extensions;
 using Haondt.Web.Core.Services;
+using Hestia.Domain.Models;
 using Hestia.Domain.Services;
+using Hestia.Persistence.Models;
 using Hestia.UI.Core.Components;
 using Hestia.UI.Core.Controllers;
+using Hestia.UI.Core.Extensions;
 using Hestia.UI.Library.Components.Element;
+using Hestia.UI.Library.Components.Htmx;
 using Hestia.UI.MealPlans.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hestia.UI.MealPlans.Controllers
 {
-    [Route("meal-plans")]
+    [Microsoft.AspNetCore.Mvc.Route("meal-plans")]
     public class MealPlansController(IComponentFactory componentFactory, IMealPlansService mealPlansService, IRecipesService recipesService, IIngredientsService ingredientsService) : UIController(componentFactory)
     {
         private readonly IComponentFactory _componentFactory = componentFactory;
@@ -29,7 +36,7 @@ namespace Hestia.UI.MealPlans.Controllers
         [HttpGet("new")]
         public Task<IResult> GetCreateMealPlan()
         {
-            return _componentFactory.RenderComponentAsync<MealPlans.Components.EditMealPlan>();
+            return _componentFactory.RenderComponentAsync<MealPlans.Components.MealPlan>();
         }
 
         //[HttpPost("new")]
@@ -85,9 +92,9 @@ namespace Hestia.UI.MealPlans.Controllers
                     StatusCode = StatusCodes.Status404NotFound,
                 });
 
-            return await _componentFactory.RenderComponentAsync(new EditMealPlan
+            return await _componentFactory.RenderComponentAsync(new MealPlan
             {
-                MealPlan = mealPlan.AsOptional(),
+                MealPlanModel = mealPlan.AsOptional(),
                 MealPlanId = mealPlanId.AsOptional()
             });
         }
@@ -127,11 +134,20 @@ namespace Hestia.UI.MealPlans.Controllers
                 ingredients = await ingredientsTask;
             }
 
-            return await _componentFactory.RenderComponentAsync(new MealPlanItemSearchResults
+            return await _componentFactory.RenderComponentAsync(new AppendComponentLayout
             {
-                Recipes = recipes,
-                Ingredients = ingredients,
-                CurrentSearch = search
+                Components = recipes.Select(r => new MealPlanItemSearchResult
+                {
+                    Entity = r.Recipe,
+                    Id = r.Id,
+                })
+                .Cast<IComponent>()
+                .Concat(ingredients.Select(i => new MealPlanItemSearchResult
+                {
+                    Entity = i.Ingredient,
+                    Id = i.Id
+                }))
+                .ToList()
             });
         }
 
@@ -160,5 +176,73 @@ namespace Hestia.UI.MealPlans.Controllers
         {
             return _componentFactory.RenderComponentAsync<MealPlanSectionContainer>();
         }
+        [HttpGet("fragments/item-picker")]
+        public Task<IResult> GetItemPickerFragment(
+            [FromQuery, Required] string targetSection)
+        {
+            return _componentFactory.RenderComponentAsync(new MealPlanItemPicker()
+            {
+                TargetSection = targetSection
+            });
+        }
+        [HttpGet("fragments/item-configurator")]
+        public Task<IResult> GetItemConfiguratorFragment(
+            [FromQuery] bool modal,
+            [FromQuery] int itemId,
+            [FromQuery] string itemName,
+            [FromQuery] MealItemType itemType,
+            [FromQuery] string targetSection
+            )
+
+        {
+            return _componentFactory.RenderComponentAsync(new MealPlanItemConfigurator()
+            {
+                Modal = modal,
+                ItemId = itemId,
+                ItemName = itemName,
+                ItemType = itemType,
+                TargetSection = targetSection
+            });
+        }
+
+        [HttpGet("fragments/add-item")]
+        public Task<IResult> GetAddItem(
+            [FromQuery] string? targetSection,
+            [FromQuery] string? targetItem,
+            [FromQuery] MealPlanItemModel mealPlanItem)
+        {
+            string target;
+            string strategy;
+            if (!string.IsNullOrEmpty(targetSection))
+            {
+                target = $"[data-meal-plan-section-id='{targetSection}'] .meal-plan-item-container";
+                strategy = "beforeend";
+            }
+            else if (!string.IsNullOrEmpty(targetItem))
+            {
+                target = $"#{targetItem}";
+                strategy = "outerHTML";
+            }
+            else
+            {
+                throw new InvalidOperationException("Neither target section or target item were provided");
+            }
+
+            Response.AsResponseData()
+                .HxTriggerAfterSettle("dirty")
+                .HxTriggerAfterSwap("closeModal");
+
+            return _componentFactory.RenderComponentAsync(new HxSwapOob
+            {
+                Content = new MealPlanItem
+                {
+                    Entity = mealPlanItem,
+                    Id = mealPlanItem.RecipeOrIngredientId
+                },
+                Target = target,
+                Strategy = strategy
+            });
+        }
+
     }
 }

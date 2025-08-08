@@ -1,0 +1,96 @@
+@using Hestia.Domain.Models
+@using Hestia.Domain.Services
+@using Hestia.UI.Core.Components
+@inject IMealPlansService MealPlansService
+
+@code {
+    [Parameter]
+    public Optional<int> MealPlanId { get; set; }
+
+    [Parameter]
+    public Optional<MealPlanModel> MealPlan { get; set; } = default!;
+    private MealPlanModel _mealPlan { get; set; } = default!;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!MealPlan.HasValue)
+        {
+            var defaultMealPlanNumber = await MealPlansService.GetNextMealPlanNumberAsync();
+            _mealPlan = new MealPlanModel()
+                {
+                    LastModified = AbsoluteDateTime.Now,
+                    Name = $"Meal Plan #{defaultMealPlanNumber}",
+                    Sections = (await MealPlansService.GetDefaultSectionsAsync())
+                        .Select(s => new MealPlanSectionModel
+                        {
+                            Name = s
+                        }).ToList()
+                };
+        }
+        else
+            _mealPlan = MealPlan.Value;
+        await base.OnInitializedAsync();
+    }
+}
+
+
+<div class="meal-planner">
+    <!-- Basic meal plan info -->
+    <div class="field mb-3">
+        <input class="input" name="@nameof(MealPlanModel.Name)" type="text" placeholder="Name" value="@_mealPlan.Name" required/>
+    </div>
+
+    <!-- Meal plan content -->
+    <div id="meal-plan-content" class="meal-plan-content"
+        _="
+            on load[event.target==me]
+                js(me)
+                    return new Sortable(me, {
+                        animation: 100,
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen',
+                        dragClass: 'sortable-drag',
+                        handle: '.drag-container'
+                    });
+                end
+                set :sortable to it
+            end
+
+            on destroy[event.target==me]
+                set sortable to :sortable
+                js(sortable)
+                    if (sortable) {
+                        sortable.destroy();
+                    }
+                end
+                remove me
+            end
+
+            on htmx:beforeCleanupElement[event.target==me]
+                send destroy to me
+            end
+        ">
+        @foreach (var mealPart in _mealPlan.Sections)
+        {
+            <MealPlanSectionContainer EmitDirtyOnLoad="false" Name="mealPart.Name" >
+                @foreach (var item in mealPart.Items)
+                {
+                    <MealPlanItem Entity="item" Id="item.RecipeOrIngredientId" />
+                }
+
+            </MealPlanSectionContainer>
+        }
+    </div>
+
+    <!-- Add meal part button -->
+    <div class="has-text-centered my-3">
+        <a
+            class="is-clickable has-text-grey"
+            hx-get="/meal-plans/fragments/section-container"
+            hx-target="#meal-plan-content"
+            hx-swap="beforeend">
+            Add Section
+        </a>
+    </div>
+</div>

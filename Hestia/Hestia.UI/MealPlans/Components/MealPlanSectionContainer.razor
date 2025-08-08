@@ -4,54 +4,90 @@
     [Parameter]
     public Optional<string> Name { get; set; }
     [Parameter]
-    public Optional<string> Id { get; set; }
+    public bool EmitDirtyOnLoad { get; set; } = true;
+    private string _id = Guid.NewGuid().ToString("N");
+
     private Dictionary<string, object> _containerAttributes = [];
+    
+    private static readonly string[] _mealNames = [
+        "Breakfast", "Lunch", "Dinner", "Snack", "Brunch", 
+        "Appetizer", "Dessert", "Side Dish", "Beverage", "Salad"
+    ];
+
+    private string _randomMealName = "";
 
     protected override void OnInitialized()
     {
-        if (Id.HasValue)
-            _containerAttributes["id"] = Id.Value;
+        if (EmitDirtyOnLoad)
+            _containerAttributes["_"] = "on load emit dirty";
+        
+        var random = new Random();
+        _randomMealName = _mealNames[random.Next(_mealNames.Length)];
+        
         base.OnInitialized();
     }
 }
 
-<div @attributes="_containerAttributes">
-    <div>
-        <input class="input mb-4 has-text-primary" type="text" placeholder="Snack" value="@Name.Unwrap()" required />
+<div class="meal-plan-section-container" data-meal-plan-section-id="@_id" @attributes="_containerAttributes">
+    <div class="field has-addons mb-3">
+        <div class="control is-expanded">
+            <input
+                _="on input send dirty"
+                class="input has-text-primary meal-plan-section-title-input" type="text" placeholder="@_randomMealName" value="@Name.Unwrap()" required />
+        </div>
+        <div class="control" style="flex: 0 0 50px;">
+            <div
+                class="drag-container is-flex is-align-items-center is-justify-content-center
+                    has-height-full has-border-top-weak has-border-right-weak has-border-bottom-weak is-radiused-right">
+                <span class="drag-handle">
+                </span>
+            </div>
+        </div>
     </div>
 
-    <div class="meal-plan-item-container mb-4 is-flex is-flex-direction-column gap-2"
-        _="
-            on load[event.target==me]
-                js(me)
-                    return new Sortable(me, {
-                        group: {
-                            name: 'shared',
-                        },
-                        animation: 100,
-                        ghostClass: 'sortable-ghost',
-                        chosenClass: 'sortable-chosen',
-                        dragClass: 'sortable-drag',
-                        handle: '.drag-container'
-                    });
+    <div class="meal-plan-item-container-container mb-4 is-flex is-flex-direction-column">
+        <div class="meal-plan-item-container is-flex is-flex-direction-column"
+            _="
+                on load[event.target==me]
+                    js(me)
+                        return new Sortable(me, {
+                            group: {
+                                name: 'meal-plan-sections',
+                            },
+                            animation: 100,
+                            ghostClass: 'sortable-ghost',
+                            chosenClass: 'sortable-chosen',
+                            dragClass: 'sortable-drag',
+                            handle: '.drag-container'
+                        });
+                    end
+                    set :sortable to it
                 end
-                set :sortable to it
-            end
 
-            on destroy[event.target==me]
-                set sortable to :sortable
-                js(sortable)
-                    if (sortable) {
-                        sortable.destroy();
-                    }
+                on destroy[event.target==me]
+                    set sortable to :sortable
+                    js(sortable)
+                        if (sortable) {
+                            sortable.destroy();
+                        }
+                    end
+                    remove me
                 end
-                remove me
-            end
 
-            on htmx:beforeCleanupElement[event.target==me]
-                send destroy to me
-            end
-        ">
-        @ChildContent
+                on htmx:beforeCleanupElement[event.target==me]
+                    send destroy to me
+                end
+            ">
+            @ChildContent
+        </div>
+        <div>
+            <a
+                class="is-clickable has-text-grey"
+                hx-get="/meal-plans/fragments/item-picker"
+                hx-swap="none"
+                hx-vals='{"targetSection":"@_id"}'>
+                Add Item
+            </a>
+        </div>
     </div>
 </div>

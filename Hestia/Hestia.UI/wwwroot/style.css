@@ -465,3 +465,20 @@ hr {
 .is-text-align-end {
     text-align: end;
 }
+
+.is-whitespace-nowrap {
+    white-space: nowrap;
+}
+
+.modal-close {
+    --bulma-delete-color: var(--bulma-primary);
+}
+
+.is-radiused-right {
+    border-bottom-right-radius: var(--bulma-radius);
+    border-top-right-radius: var(--bulma-radius);
+}
+
+.is-radiused {
+    border-radius: var(--bulma-radius)
+}

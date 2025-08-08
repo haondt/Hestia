@@ -1,11 +1,7 @@
 ﻿
 @code {
     [Parameter]
-    public RenderFragment? BodyContent { get; set; } 
-    [Parameter]
-    public RenderFragment? FooterContent { get; set; } 
-    [Parameter, EditorRequired]
-    public required string Title { get; set; } 
+    public RenderFragment? ChildContent { get; set; } 
 }
 
 
@@ -26,36 +22,10 @@
                 end
             end
         "></div>
-    <div class="card">
-        <style>
-            @@scope {
-                :scope {
-                    max-height: calc(100% - var(--bulma-modal-card-spacing));
-                    display: flex;
-                    flex-direction: column;
-                    width: 80rem;
-                }
-
-                .card-content {
-                    overflow: auto;
-                    /* overflow-y: scroll; */
-                }
-
-                .modal-card-head {
-                    box-shadow:none;
-                    border-bottom: 1px solid var(--bulma-border-weak);
-                }
-            }
-        </style>
-        <header class="modal-card-head card-header">
-            <p class="modal-card-title">@Title</p>
-            <button class="delete" _="on click send click to the previous .modal-background"></button>
-        </header>
-        <section class="card-content">
-            @BodyContent
-        </section>
-        <footer class="modal-card-foot">
-            @FooterContent
-        </footer>
+    <div class="modal-content" _="on closeModal send click to the previous .modal-background">
+        @ChildContent
     </div>
+    <button
+        _="on click send click to the previous .modal-background"
+        class="modal-close is-large is-primary"></button>
 </div>

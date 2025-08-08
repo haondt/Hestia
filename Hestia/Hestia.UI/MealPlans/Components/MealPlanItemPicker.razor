@@ -1,0 +1,51 @@
+@using Hestia.Domain.Models
+@using Hestia.Domain.Services
+@using Hestia.UI.Core.Components
+@using Hestia.UI.Library.Components.Element
+@inject IRecipesService RecipesService
+@inject IIngredientsService IngredientsService
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required string TargetSection { get; set; }
+}
+
+
+
+<Modal>
+    <div class="meal-plan-item-picker">
+        <div class="mb-4">
+            <form 
+                hx-get="/meal-plans/search-items" 
+                hx-target="#meal-plan-search-results" 
+                hx-swap="innerHTML">
+                <p class="control has-icons-left">
+                    <input
+                        _="
+                            on input debounced at 200ms
+                            send submit to the closest <form />
+                        "
+                        class="input is-fullwidth" 
+                        name="search" 
+                        placeholder="search recipes and ingredients" 
+                        type="search"
+                        value="" />
+                    <span class="icon is-small is-left"><LucideIcon Name="search" /></span>
+                </p>
+            </form>
+        </div>
+        
+        <div class="meal-plan-search-results-scroll-container"
+            hx-trigger="mealPlanItemSelect"
+            hx-get="/meal-plans/fragments/item-configurator"
+            hx-vals='js:{"itemId":event.detail.itemId, "itemName":event.detail.itemName, "itemType": event.detail.itemType, "targetSection":"@TargetSection", "modal":false}'
+            hx-target="closest .meal-plan-item-picker"
+            hx-swap="outerHTML">
+            <div 
+                id="meal-plan-search-results"
+                class="is-flex is-flex-direction-column">
+            </div>
+        </div>
+    </div>
+</Modal>

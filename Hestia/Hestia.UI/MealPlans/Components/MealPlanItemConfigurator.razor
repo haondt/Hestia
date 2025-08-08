@@ -1,0 +1,181 @@
+
+@using Hestia.Domain.Models
+@using Hestia.Domain.Services
+@using Hestia.UI.Core.Components
+@using Hestia.UI.Library.Components.Element
+@using Hestia.Persistence.Models
+@using System.Text.Json
+@inject IRecipesService RecipesService
+@inject IIngredientsService IngredientsService
+@inject IUnitConversionsService UnitConversionsService
+
+@code {
+    [Parameter]
+    public bool Modal { get; set; } = true;
+
+    [Parameter, EditorRequired]
+    public required int ItemId { get; set; }
+
+    [Parameter, EditorRequired]
+    public required string ItemName { get; set; }
+
+    [Parameter, EditorRequired]
+    public required MealItemType ItemType { get; set; }
+
+    [Parameter]
+    public Optional<string> TargetSection { get; set; }
+
+    [Parameter]
+    public Optional<string> TargetItem { get; set; }
+
+    private decimal _quantity = 1;
+    private List<string> _units = [""];
+    private string _selectedUnit = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ItemType == MealItemType.Recipe)
+        {
+            if (!(await RecipesService.GetRecipeAsync(ItemId)).TryGetValue(out var recipe))
+                throw new InvalidOperationException($"Recipe with id {ItemId} not found");
+            if (recipe.NumberOfServings.TryGetValue(out var numberOfServings))
+            {
+                if (recipe.YieldQuantity.TryGetValue(out var yieldQuantity))
+                {
+                    if (recipe.YieldUnit.TryGetValue(out var yieldUnit))
+                    {
+                        _quantity = yieldQuantity / numberOfServings;
+                        _units = await UnitConversionsService.GetCompatibleUnitsAsync(yieldUnit);
+                        _units.Add("");
+                        _selectedUnit = yieldUnit;
+                    }
+                    else
+                    {
+                        _quantity = yieldQuantity / numberOfServings;
+                    }
+                }
+                else
+                {
+                    _quantity = 1 / numberOfServings;
+                }
+            }
+            else
+            {
+                if (recipe.YieldQuantity.TryGetValue(out var yieldQuantity))
+                {
+                    if (recipe.YieldUnit.TryGetValue(out var yieldUnit))
+                    {
+                        _quantity = yieldQuantity;
+                        _units = await UnitConversionsService.GetCompatibleUnitsAsync(yieldUnit);
+                        _units.Add("");
+                        _selectedUnit = yieldUnit;
+                    }
+                    else
+                    {
+                        _quantity = yieldQuantity;
+                    }
+                }
+            }
+        }
+        else if (ItemType == MealItemType.Ingredient)
+        {
+            if (!(await IngredientsService.GetIngredientAsync(ItemId)).TryGetValue(out var ingredient))
+                throw new InvalidOperationException($"Ingredient with id {ItemId} not found");
+            if (ingredient.ServingSizeQuantity.HasValue)
+            {
+                _quantity = ingredient.ServingSizeQuantity.Value;
+                if (ingredient.ServingSizeUnit.HasValue)
+                    _selectedUnit = ingredient.ServingSizeUnit.Value;
+            }
+            else if (ingredient.AlternateServingSizeQuantity.HasValue)
+            {
+                _quantity = ingredient.AlternateServingSizeQuantity.Value;
+                if (ingredient.AlternateServingSizeUnit.HasValue)
+                    _selectedUnit = ingredient.AlternateServingSizeUnit.Value;
+            }
+
+            if (ingredient.ServingSizeUnit.HasValue)
+                _units.AddRange(await UnitConversionsService.GetCompatibleUnitsAsync(ingredient.ServingSizeUnit.Value));
+            if (ingredient.AlternateServingSizeUnit.HasValue)
+                _units.AddRange(await UnitConversionsService.GetCompatibleUnitsAsync(ingredient.AlternateServingSizeUnit.Value));
+            _units = _units.Distinct().ToList();
+            if (_units.Count > 1 && _selectedUnit == "")
+                _selectedUnit = _units.First(q => q != "");
+        }
+
+        await base.OnInitializedAsync();
+    }
+}
+
+
+@{
+    RenderFragment pickerContent = @<div class="meal-plan-item-configurator">
+            <p class="section-label">Add @ItemName</p>
+        
+    <form
+        class="mb-4"
+        hx-get="/meal-plans/fragments/add-item"
+        >
+            <input name="targetSection" value="@TargetSection.Unwrap()" type="hidden" />
+            <input name="targetItem" value="@TargetItem.Unwrap()" type="hidden" />
+            <input name="@nameof(MealPlanItemModel.ItemName)" value="@ItemName" type="hidden" />
+            <input name="@nameof(MealPlanItemModel.RecipeOrIngredientId)" value="@ItemId" type="hidden" />
+            <input name="@nameof(MealPlanItemModel.ItemType)" value="@ItemType" type="hidden" />
+            <div class="field">
+                <label class="label">Quantity</label>
+                <div class="field has-addons">
+                    <div class="control">
+                        <input
+                            name="@nameof(MealPlanItemModel.Quantity)"
+                            class="input"
+                            type="number"
+                            value="@_quantity.ToString("F2")"
+                            step="any"
+                            min="0">
+                    </div>
+                    <div class="control">
+                        <div class="select">
+                            <select name="@nameof(MealPlanItemModel.Unit)">
+                                @foreach(var unit in _units)
+                                {
+                                    if (unit == _selectedUnit)
+                                    {
+                                        <option value="@unit" selected>@unit</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@unit">@unit</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </form>
+
+        <div class="is-flex is-flex-direction-row is-justify-content-space-between">
+            <div class="control">
+                <button
+                    _="on click send submit to the previous <form/>"
+                    class="button is-primary">
+                    Add
+                </button>
+            </div>
+            <div class="control">
+                <button class="button" _="on click send closeModal">Cancel</button>
+            </div>
+        </div>
+    </div>;
+}
+
+@if (Modal)
+{
+    <Modal>
+        @pickerContent
+    </Modal>
+}
+else
+{
+    @pickerContent
+}

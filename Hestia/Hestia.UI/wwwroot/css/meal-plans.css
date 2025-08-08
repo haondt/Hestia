@@ -1,16 +1,47 @@
 /* Layout containers */
-.meal-plan-search,
-.meal-plan-planner {
+.meal-planner {
     border: 1px solid var(--bulma-border);
     border-radius: var(--panel-radius);
     padding: 1rem;
+    .sortable-ghost {
+        --bulma-border-weak: var(--bulma-link);
+        .select > select {
+            --bulma-input-border-color: var(--bulma-link);
+        }
+    }
+
+}
+#meal-plan-editor-panel {
+    margin:auto;
+    max-width: 800px;
+}
+.meal-plan-item-picker {
+    border: 1px solid var(--bulma-border);
+    background: var(--bulma-body-background-color);
+    border-radius: var(--panel-radius);
+    padding: 1rem;
+    height: 500px;
+    max-height: calc(100vh - calc(var(--bulma-modal-content-spacing-tablet) + 50px));
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+
 }
 
-#meal-plan-search-results {
-    height: 500px;
+.meal-plan-item-configurator {
+    border: 1px solid var(--bulma-border);
+    background: var(--bulma-body-background-color);
+    border-radius: var(--panel-radius);
+    padding: 1rem;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
 }
-#meal-plan-search-panel {
-    margin-right: 1.5rem;
+
+.meal-plan-search-results-scroll-container {
+    height: 100%;
+    overflow-y: scroll;
+    padding-right: 1rem;
 }
 
 .meal-plan-content-view {
@@ -20,6 +51,9 @@
         display: none;
     }
 
+}
+#meal-plan-search-results {
+    gap: 1rem;
 }
 
 /* Base components */
@@ -47,7 +81,6 @@
     }
 
     .meal-plan-content & {
-        margin-bottom: 0;
         position: relative;
         border: none;
 
@@ -56,13 +89,6 @@
         }
     }
 
-    &.sortable-ghost {
-        --bulma-border-weak: var(--bulma-link);
-        .select > select {
-
-            --bulma-input-border-color: var(--bulma-link);
-        }
-    }
 
     .meal-plan-content-view {
         .drag-container {
@@ -82,28 +108,30 @@
     }
 }
 
-.meal-plan-item-container {
+.meal-plan-item-container-container {
     padding-left: 1rem;
-    padding-bottom: 1rem;
     border-left: 1px solid var(--bulma-border-weak);
-    min-height: 100px;
 }
 
 
 /* Mobile */
 @media screen and (max-width: 768px) {
-    .meal-plan-item-container {
+    .meal-plan-item-container-container {
         padding-left: 0;
         border-left: none;
-        min-height: 50px;
     }
 
-    .meal-plan-search,
-    .meal-plan-planner {
+    .meal-planner {
         border: none;
         padding: 0.25rem;
     }
-    #meal-plan-search-panel {
-        margin-right: 0;
+
+    #meal-plan-editor-panel {
+        margin:auto;
+        max-width: initial;
+    }
+    .meal-plan-item-picker {
+        height: 500px;
+        max-height: 40vh;
     }
 }
