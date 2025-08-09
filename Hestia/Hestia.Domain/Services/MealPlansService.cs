@@ -53,18 +53,6 @@ namespace Hestia.Domain.Services
             await context.SaveChangesAsync();
 
 
-            // Set the MealPlanId for sections and MealSectionId for items
-            //foreach (var section in dataModel.Sections)
-            //{
-            //    section.MealPlanId = dataModel.Id;
-            //    foreach (var item in section.Items)
-            //    {
-            //        item.MealSectionId = section.Id;
-            //    }
-            //}
-
-            //await context.SaveChangesAsync();
-
             var createdMealPlan = await GetMealPlanAsync(dataModel.Id);
             return (dataModel.Id, createdMealPlan.Value
                 ?? throw new InvalidOperationException("Created meal plan not found after saving to database."));
@@ -92,17 +80,6 @@ namespace Hestia.Domain.Services
             await context.SaveChangesAsync();
 
 
-            // Set the MealPlanId for sections and MealSectionId for items
-            //foreach (var section in dataModel.Sections)
-            //{
-            //    section.MealPlanId = dataModel.Id;
-            //    foreach (var item in section.Items)
-            //    {
-            //        item.MealSectionId = section.Id;
-            //    }
-            //}
-
-            //await context.SaveChangesAsync();
 
             var createdMealPlan = await GetMealPlanAsync(dataModel.Id);
             return (dataModel.Id, createdMealPlan.Value
@@ -116,47 +93,11 @@ namespace Hestia.Domain.Services
                 .ThenInclude(s => s.Items)
                 .FirstAsync(mp => mp.Id == id);
 
-            // Remove existing sections and items
-            //context.MealItems.RemoveRange(existingMealPlan.Sections.SelectMany(s => s.Items));
-            //context.MealSections.RemoveRange(existingMealPlan.Sections);
 
             mealPlan.ApplyUpdate(existingMealPlan);
 
-            // Update meal plan properties
-            //existingMealPlan.Date = mealPlan.Date;
-            //existingMealPlan.Name = mealPlan.Name.Unwrap();
-            //existingMealPlan.LastModified = DateTime.UtcNow;
-
-            // Add new sections and items
-            //var newDataModel = mealPlan.AsDataModel();
-            //existingMealPlan.Sections = newDataModel.Sections.Select(s => new MealPlanSectionDataModel
-            //{
-            //    Name = s.Name,
-            //    Order = s.Order,
-            //    MealPlanId = id,
-            //    Items = s.Items.Select(i => new MealPlanItemDataModel
-            //    {
-            //        ItemType = i.ItemType,
-            //        RecipeId = i.RecipeId,
-            //        IngredientId = i.IngredientId,
-            //        Quantity = i.Quantity,
-            //        Unit = i.Unit,
-            //        MealSectionId = 0 // Will be set after saving
-            //    }).ToList()
-            //}).ToList();
-
             await context.SaveChangesAsync();
 
-            // Update MealSectionId for items
-            //foreach (var section in existingMealPlan.Sections)
-            //{
-            //    foreach (var item in section.Items)
-            //    {
-            //        item.MealSectionId = section.Id;
-            //    }
-            //}
-
-            //await context.SaveChangesAsync();
 
             var updatedMealPlan = await GetMealPlanAsync(id);
             return updatedMealPlan.Value
@@ -185,9 +126,10 @@ namespace Hestia.Domain.Services
             return state.NextMealPlanNumber;
         }
 
-        public async Task<List<string>> GetDefaultSectionsAsync()
+        public Task<List<string>> GetDefaultSectionsAsync()
         {
-            return ["Breakfast", "Lunch", "Dinner"];
+            //var state = await HestiaStateDataModel.GetOrCreateAsync(context);
+            return Task.FromResult<List<string>>(["Breakfast", "Lunch", "Dinner"]);
         }
     }
 }

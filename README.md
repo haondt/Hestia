@@ -1,5 +1,9 @@
 # hestia
 
+A Recipe book that includes costs and macronutrients.
+
+![](./docs/image.png)
+
 ## Scripts
 
 - make db migrations

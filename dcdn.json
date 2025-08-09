@@ -1,5 +1,5 @@
 {
-  "output": "Hestia\\Hestia.UI\\wwwroot\\vendored",
+  "output": "Hestia/Hestia.UI/wwwroot/vendored",
   "npm": {
     "htmx.org": [
       "dist/htmx.min.js"

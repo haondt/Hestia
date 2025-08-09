@@ -77,49 +77,6 @@ namespace Hestia.UI.MealPlans.Controllers
             });
         }
 
-        //[HttpPost("new")]
-        //public async Task<IResult> CreateMealPlan([FromForm] MealPlanModel mealPlan, [FromForm] bool createAnother)
-        //{
-        //    var (newMealPlanId, createdMealPlan) = await _mealPlansService.CreateMealPlanAsync(mealPlan);
-
-        //    if (createAnother)
-        //        return await _componentFactory.RenderComponentAsync(new HxSwapOob
-        //        {
-        //            Content = new EditMealPlan(),
-        //            Target = "#page-container",
-        //            ScrollToTop = true
-        //        });
-
-        //    Response.AsResponseData().HxPushUrl($"/meal-plans/view/{newMealPlanId}");
-        //    return await _componentFactory.RenderComponentAsync(new HxSwapOob
-        //    {
-        //        Content = new ViewMealPlan
-        //        {
-        //            MealPlan = createdMealPlan,
-        //            MealPlanId = newMealPlanId
-        //        },
-        //        Target = "#page-container",
-        //        ScrollToTop = true
-        //    });
-        //}
-
-        //[HttpGet("view/{mealPlanId}")]
-        //public async Task<IResult> GetMealPlan(int mealPlanId)
-        //{
-        //    var result = await _mealPlansService.GetMealPlanAsync(mealPlanId);
-        //    if (!result.TryGetValue(out var mealPlan))
-        //        return await _componentFactory.RenderComponentAsync(new Error
-        //        {
-        //            StatusCode = StatusCodes.Status404NotFound,
-        //        });
-
-        //    return await _componentFactory.RenderComponentAsync(new ViewMealPlan
-        //    {
-        //        MealPlan = mealPlan,
-        //        MealPlanId = mealPlanId
-        //    });
-        //}
-
         [HttpPut("meal-plan/{mealPlanId}")]
         public async Task<IResult> UpdateMealPlan(int mealPlanId, [FromForm] MealPlanModel mealPlan)
         {

@@ -6,18 +6,27 @@ USER $APP_UID
 WORKDIR /app
 EXPOSE 9080
 
+FROM oven/bun:1.2-debian AS deps
+WORKDIR /deps
+RUN apt update && apt install -y git && bun add -g https://gitlab.com/haondt/dcdn.git
+COPY package.json ./
+COPY bun.lock ./
+COPY dcdn.json ./
+RUN dcdn install
+RUN ls -la Hestia/Hestia.UI/wwwroot/vendored
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 #COPY ["Hestia/Hestia.csproj", "Hestia/"]
-COPY ["*/*.csproj", "."]
-COPY ["nuget.config", "."]
+COPY ["Hestia/*/*.csproj", "."]
+COPY ["Hestia/nuget.config", "."]
 RUN for file in $(ls *.csproj); do mkdir -p ./${file%.*}/ && mv $file ./${file%.*}/; done
 
 RUN dotnet restore "./Hestia/Hestia.csproj"
-COPY . .
+COPY ./Hestia .
+COPY --from=deps /deps/Hestia/Hestia.UI/wwwroot/vendored Hestia/Hestia.UI/wwwroot/vendored
 WORKDIR "/src/Hestia"
 RUN dotnet build "./Hestia.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
