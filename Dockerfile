@@ -13,7 +13,6 @@ COPY package.json ./
 COPY bun.lock ./
 COPY dcdn.json ./
 RUN dcdn install
-RUN ls -la Hestia/Hestia.UI/wwwroot/vendored
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
@@ -26,7 +25,7 @@ RUN for file in $(ls *.csproj); do mkdir -p ./${file%.*}/ && mv $file ./${file%.
 
 RUN dotnet restore "./Hestia/Hestia.csproj"
 COPY ./Hestia .
-COPY --from=deps /deps/Hestia/Hestia.UI/wwwroot/vendored Hestia/Hestia.UI/wwwroot/vendored
+COPY --from=deps /deps/Hestia/Hestia.UI/wwwroot/vendored Hestia.UI/wwwroot/vendored
 WORKDIR "/src/Hestia"
 RUN dotnet build "./Hestia.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
