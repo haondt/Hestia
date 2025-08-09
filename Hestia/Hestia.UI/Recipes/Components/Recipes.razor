@@ -27,7 +27,7 @@
                             on input debounced at 200ms
                             send submit to the closest <form />
                         "
-                        class="input is-fullwidth is-rounded" 
+                        class="input is-fullwidth" 
                         name="search" 
                         placeholder="search" 
                         type="search"
@@ -37,18 +37,14 @@
             </form>
         </div>
         <div class="control buttons">
-            <div class="dropdown is-right">
-                <div class="dropdown-trigger">
-                    <a 
-                        href="/recipes/new"
-                        class="button is-primary"
-                        hx-boost="true"
-                        hx-target="#page-container"
-                    >
-                        New recipe
-                    </a>
-                </div>
-            </div>
+            <a 
+                href="/recipes/new"
+                class="button is-primary"
+                hx-boost="true"
+                hx-target="#page-container"
+            >
+                New recipe
+            </a>
         </div>
     </div>
 

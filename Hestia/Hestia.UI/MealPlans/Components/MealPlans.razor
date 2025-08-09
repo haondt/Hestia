@@ -1,26 +1,112 @@
 @using Hestia.UI.Core.Components
+@using Hestia.Domain.Models
+@using Hestia.Domain.Services
+
+@inject IMealPlansService MealPlansService
+@inject IUnitConversionsService UnitConversionsService
+@inject IIngredientsService IngredientsService
+@inject IRecipesService RecipesService
 
 @attribute [RenderPage]
 <div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
 
-<div class="content-container mt-5">
-    <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-space-between is-align-items-center mb-5">
-        <h1 class="title is-3">Meal Plans</h1>
-        <button 
-           hx-post="/meal-plans/create"
-           hx-swap="innerHTML"
-           hx-target="#page-container"
-           class="button is-primary">
-            <span class="icon">
-                <LucideIcon Name="plus" Size="20" />
-            </span>
-            <span>New meal plan</span>
-        </button>
-    </div>
+@code {
+    private List<MealPlanRowModel> _mealPlans = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var mealPlans = await MealPlansService.GetMealPlansAsync();
+        var tasks = mealPlans.Select(async mp => 
+        {
+            var (insights, warnings) = await mp.MealPlan.GetInsightsAsync(UnitConversionsService, IngredientsService, RecipesService);
+            return new MealPlanRowModel 
+            {
+                Id = mp.Id,
+                Name = mp.MealPlan.Name,
+                LastModified = mp.MealPlan.LastModified.LocalTime.ToString("MMM d, yyyy"),
+                TotalCalories = insights.TotalCalories,
+                TotalProtein = insights.TotalProtein,
+                TotalCost = insights.TotalCost
+            };
+        });
+        
+        _mealPlans = (await Task.WhenAll(tasks)).ToList();
+    }
+    public class MealPlanRowModel
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+        public required string LastModified { get; set; }
+        public double TotalCalories { get; set; }
+        public double TotalProtein { get; set; }
+        public decimal TotalCost { get; set; }
+    }
+}
 
-    <div class="content">
-        <p class="has-text-grey">
-            <em>Meal plans list will be implemented in the next phase. For now, you can create new meal plans using the button above.</em>
+<div class="content-container mt-5">
+    <div class="field is-grouped">
+        <p class="control is-expanded has-icons-left">
+            <input
+                _="
+                    on input debounced at 150ms
+                    show <tr /> in #meal-plan-list when its @@data-meal-plan-name contains my value.toLowerCase()
+                    
+                "
+                class="input is-fullwidth" 
+                name="search" 
+                placeholder="search" 
+                type="search"
+                value="" />
+            <span class="icon is-small is-left"><LucideIcon Name="search" /></span>
         </p>
+        <div class="control buttons">
+            <button 
+                class="button is-primary"
+                hx-post="/meal-plans/create"
+                hx-swap="innerHTML"
+                hx-target="#page-container"
+            >
+                New meal plan
+            </button>
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <table class="table is-fullwidth is-hoverable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th class="is-hidden-mobile">Calories</th>
+                    <th class="is-hidden-mobile">Protein</th>
+                    <th class="is-hidden-mobile">Cost</th>
+                    <th>Last Edited</th>
+                </tr>
+            </thead>
+            <tbody id="meal-plan-list">
+                @foreach (var mealPlan in _mealPlans)
+                {
+                    <tr class="is-clickable"
+                        data-meal-plan-name="@mealPlan.Name.ToLower().Trim()"
+                        hx-get="/meal-plans/meal-plan/@mealPlan.Id"
+                        hx-target="#page-container"
+                        hx-push-url="/meal-plans/meal-plan/@mealPlan.Id">
+                        <td class="has-text-weight-semibold">@mealPlan.Name</td>
+                        <td class="is-hidden-mobile">@mealPlan.TotalCalories.ToString("F0")</td>
+                        <td class="is-hidden-mobile">@mealPlan.TotalProtein.ToString("F1")g</td>
+                        <td class="is-hidden-mobile">
+                            @if (mealPlan.TotalCost > 0)
+                            {
+                                <text>$@mealPlan.TotalCost.ToString("F2")</text>
+                            }
+                            else
+                            {
+                                <text>—</text>
+                            }
+                        </td>
+                        <td class="has-text-grey">@mealPlan.LastModified</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
