@@ -28,6 +28,15 @@
     [Parameter]
     public Optional<string> TargetItem { get; set; }
 
+    [Parameter]
+    public Optional<decimal> ItemQuantity { get; set; }
+
+    [Parameter]
+    public Optional<string> ItemUnit { get; set; }
+
+    [Parameter]
+    public bool AutoSelectUnit { get; set; } = true;
+
     private decimal _quantity = 1;
     private List<string> _units = [""];
     private string _selectedUnit = "";
@@ -47,7 +56,8 @@
                         _quantity = yieldQuantity / numberOfServings;
                         _units = await UnitConversionsService.GetCompatibleUnitsAsync(yieldUnit);
                         _units.Add("");
-                        _selectedUnit = yieldUnit;
+                        if (AutoSelectUnit)
+                            _selectedUnit = yieldUnit;
                     }
                     else
                     {
@@ -68,7 +78,8 @@
                         _quantity = yieldQuantity;
                         _units = await UnitConversionsService.GetCompatibleUnitsAsync(yieldUnit);
                         _units.Add("");
-                        _selectedUnit = yieldUnit;
+                        if (AutoSelectUnit)
+                            _selectedUnit = yieldUnit;
                     }
                     else
                     {
@@ -84,14 +95,16 @@
             if (ingredient.ServingSizeQuantity.HasValue)
             {
                 _quantity = ingredient.ServingSizeQuantity.Value;
-                if (ingredient.ServingSizeUnit.HasValue)
-                    _selectedUnit = ingredient.ServingSizeUnit.Value;
+                if (AutoSelectUnit)
+                    if (ingredient.ServingSizeUnit.HasValue)
+                        _selectedUnit = ingredient.ServingSizeUnit.Value;
             }
             else if (ingredient.AlternateServingSizeQuantity.HasValue)
             {
                 _quantity = ingredient.AlternateServingSizeQuantity.Value;
-                if (ingredient.AlternateServingSizeUnit.HasValue)
-                    _selectedUnit = ingredient.AlternateServingSizeUnit.Value;
+                if (AutoSelectUnit)
+                    if (ingredient.AlternateServingSizeUnit.HasValue)
+                        _selectedUnit = ingredient.AlternateServingSizeUnit.Value;
             }
 
             if (ingredient.ServingSizeUnit.HasValue)
@@ -99,8 +112,18 @@
             if (ingredient.AlternateServingSizeUnit.HasValue)
                 _units.AddRange(await UnitConversionsService.GetCompatibleUnitsAsync(ingredient.AlternateServingSizeUnit.Value));
             _units = _units.Distinct().ToList();
-            if (_units.Count > 1 && _selectedUnit == "")
-                _selectedUnit = _units.First(q => q != "");
+            if (AutoSelectUnit)
+                if (_units.Count > 1 && _selectedUnit == "")
+                    _selectedUnit = _units.First(q => q != "");
+        }
+
+        if (ItemQuantity.HasValue)
+            _quantity = ItemQuantity.Value;
+
+        if (ItemUnit.HasValue)
+        {
+            _units = _units.Append(ItemUnit.Value).Distinct().ToList();
+            _selectedUnit = ItemUnit.Value;
         }
 
         await base.OnInitializedAsync();
@@ -159,11 +182,11 @@
                 <button
                     _="on click send submit to the previous <form/>"
                     class="button is-primary">
-                    Add
+                    @TargetSection.Map(_ => "Add").Or("Save")
                 </button>
             </div>
             <div class="control">
-                <button class="button" _="on click send closeModal">Cancel</button>
+                <button class="button is-ghost has-text-danger" _="on click send closeModal">Cancel</button>
             </div>
         </div>
     </div>;

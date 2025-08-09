@@ -187,11 +187,15 @@ namespace Hestia.UI.MealPlans.Controllers
         }
         [HttpGet("fragments/item-configurator")]
         public Task<IResult> GetItemConfiguratorFragment(
-            [FromQuery] bool modal,
             [FromQuery] int itemId,
             [FromQuery] string itemName,
             [FromQuery] MealItemType itemType,
-            [FromQuery] string targetSection
+            [FromQuery] string? targetSection,
+            [FromQuery] string? targetItem,
+            [FromQuery] decimal? itemQuantity,
+            [FromQuery] string? itemUnit,
+            [FromQuery] bool modal = true,
+            [FromQuery] bool autoSelectUnit = true
             )
 
         {
@@ -201,7 +205,11 @@ namespace Hestia.UI.MealPlans.Controllers
                 ItemId = itemId,
                 ItemName = itemName,
                 ItemType = itemType,
-                TargetSection = targetSection
+                ItemUnit = itemUnit.AsOptional(),
+                AutoSelectUnit = autoSelectUnit,
+                ItemQuantity = itemQuantity.AsOptional(),
+                TargetSection = targetSection.AsOptional(),
+                TargetItem = targetItem.AsOptional()
             });
         }
 
@@ -220,7 +228,7 @@ namespace Hestia.UI.MealPlans.Controllers
             }
             else if (!string.IsNullOrEmpty(targetItem))
             {
-                target = $"#{targetItem}";
+                target = $"[data-meal-plan-item-id='{targetItem}']";
                 strategy = "outerHTML";
             }
             else

@@ -4,197 +4,86 @@
 @inject IUnitConversionsService UnitConversionsService
 @code {
     [Parameter, EditorRequired]
-    public required Union<RecipeModel, IngredientModel, MealPlanItemModel> Entity { get; set; }
+    public required MealPlanItemModel Entity { get; set; }
 
     [Parameter, EditorRequired]
     public required int Id { get; set; }
 
+    private string _id = Guid.NewGuid().ToString("N");
     private string _fieldPrefix = $"{nameof(MealPlanModel.Sections)}[#].{nameof(MealPlanSectionModel.Items)}[#]";
-
-    private string _itemName = default!;
-    private Optional<string> _subtitle = new();
-    private MealItemType _mealItemType;
-    private decimal _quantity = 1;
-    private List<string> _units = [""];
-    private string _selectedUnit = "";
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (Entity.Is<RecipeModel>(out var recipe))
-        {
-            _itemName = recipe.Title;
-            _subtitle = recipe.Description;
-            _mealItemType = MealItemType.Recipe;
-            if (recipe.NumberOfServings.TryGetValue(out var numberOfServings))
-            {
-                if (recipe.YieldQuantity.TryGetValue(out var yieldQuantity))
-                {
-                    if(recipe.YieldUnit.TryGetValue(out var yieldUnit))
-                    {
-                        _quantity = yieldQuantity / numberOfServings;
-                        _units = await UnitConversionsService.GetCompatibleUnitsAsync(yieldUnit);
-                        _units.Add("");
-                        _selectedUnit = yieldUnit;
-                    }
-                    else
-                    {
-                        _quantity = yieldQuantity / numberOfServings;
-                    }
-                }
-                else
-                {
-                    _quantity = 1 / numberOfServings;
-                }
-            }
-            else
-            {
-                if (recipe.YieldQuantity.TryGetValue(out var yieldQuantity))
-                {
-                    if(recipe.YieldUnit.TryGetValue(out var yieldUnit))
-                    {
-                        _quantity = yieldQuantity;
-                        _units = await UnitConversionsService.GetCompatibleUnitsAsync(yieldUnit);
-                        _units.Add("");
-                        _selectedUnit = yieldUnit;
-                    }
-                    else
-                    {
-                        _quantity = yieldQuantity;
-                    }
-                }
-                else
-                {
-                    _quantity = 1;
-                }
-            }
-        }
-        else if (Entity.Is<IngredientModel>(out var ingredient))
-        {
-            _itemName = ingredient.Name;
-            _subtitle = ingredient.Vendor;
-            _mealItemType = MealItemType.Ingredient;
-            if (ingredient.ServingSizeQuantity.HasValue)
-            {
-                _quantity = ingredient.ServingSizeQuantity.Value;
-                if (ingredient.ServingSizeUnit.HasValue)
-                    _selectedUnit = ingredient.ServingSizeUnit.Value;
-
-            }
-            else if (ingredient.AlternateServingSizeQuantity.HasValue)
-            {
-                _quantity = ingredient.AlternateServingSizeQuantity.Value;
-                if (ingredient.AlternateServingSizeUnit.HasValue)
-                    _selectedUnit = ingredient.AlternateServingSizeUnit.Value;
-            }
-
-            if (ingredient.ServingSizeUnit.HasValue)
-                _units.AddRange(await UnitConversionsService.GetCompatibleUnitsAsync(ingredient.ServingSizeUnit.Value));
-            if (ingredient.AlternateServingSizeUnit.HasValue)
-                _units.AddRange(await UnitConversionsService.GetCompatibleUnitsAsync(ingredient.AlternateServingSizeUnit.Value));
-            _units = _units.Distinct().ToList();
-            if (_units.Count > 1 && _selectedUnit == "")
-                _selectedUnit = _units.First(q => q != "");
-        }
-        else
-        {
-            var mealPlanItem = Entity.Cast<MealPlanItemModel>();
-            _itemName = mealPlanItem.ItemName;
-            _mealItemType = mealPlanItem.ItemType;
-            _quantity = mealPlanItem.Quantity;
-            if (mealPlanItem.Unit.TryGetValue(out var unit))
-            {
-                _selectedUnit = unit;
-                _units = await UnitConversionsService.GetCompatibleUnitsAsync(unit);
-                _units = _units.Append("").Distinct().ToList();
-            }
-        }
-
-        await base.OnInitializedAsync();
-    }
 }
 
-<div class="meal-plan-item">
+<div class="meal-plan-item" data-meal-plan-item-id="@_id">
+            <input
+                name="@_fieldPrefix.@(nameof(MealPlanItemModel.ItemType))"
+                type="hidden"
+                form="meal-planner-form"
+                value="@Entity.ItemType"/>
+            <input
+                name="@_fieldPrefix.@(nameof(MealPlanItemModel.RecipeOrIngredientId))"
+                type="hidden"
+                form="meal-planner-form"
+                value="@Id"/>
+            <input
+                name="@_fieldPrefix.@nameof(MealPlanItemModel.ItemName)"
+                type="hidden"
+                form="meal-planner-form"
+                value="@Entity.ItemName" />
+            <input
+                name="@_fieldPrefix.@nameof(MealPlanItemModel.Quantity)"
+                type="hidden"
+                form="meal-planner-form"
+                value="@Entity.Quantity" />
+            <input
+                name="@_fieldPrefix.@nameof(MealPlanItemModel.Unit)"
+                type="hidden"
+                form="meal-planner-form"
+                value="@Entity.Unit.Unwrap()" />
 
-    <div class="is-hidden-meal-plan-content is-flex is-flex-direction-row is-align-items-stretch is-flex-grow-1">
-        <div class="is-flex-grow-1 my-2 mx-4">
-            <p class="section-label">@_itemName</p>
-            <p class="has-text-grey text-clamp-2">@_subtitle.Unwrap()</p>
-        </div>
-        <div class="drag-container has-border-left-weak is-flex is-align-items-center is-justify-content-center" style="flex:0 0 50px;">
-            <span class="drag-handle">
-            </span>
-        </div>
-    </div>
-
-    <div class="meal-plan-content-view is-flex-direction-row is-flex-grow-1">
-        <input
-            name="@_fieldPrefix.@(nameof(MealPlanItemModel.ItemType))"
-            type="hidden"
-            value="@_mealItemType"/>
-        <input
-            name="@_fieldPrefix.@(nameof(MealPlanItemModel.RecipeOrIngredientId))"
-            type="hidden"
-            value="@Id"/>
-        <input
-            name="@_fieldPrefix.@nameof(MealPlanItemModel.ItemName)"
-            type="hidden"
-            value="@_itemName" />
-
-            <div class="is-flex-grow-1">
-                <div class="is-flex is-align-items-center">
-                    <div class="field has-addons is-flex-grow-1">
-                        <div class="control is-expanded">
-                            <p class="meal-plan-item-name">
-                                @_itemName
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="is-flex is-align-items-center">
-                    <div class="field has-addons is-flex-grow-1">
-                        <div class="control">
-                            <input
-                                name="@_fieldPrefix.@nameof(MealPlanItemModel.Quantity)"
-                                class="input unit-input"
-                                type="number"
-                                value="@_quantity.ToString("F2")"
-                                step="any"
-                                >
-                        </div>
-                        <div class="control">
-                            <div class="select">
-                                <select name="@_fieldPrefix.@nameof(MealPlanItemModel.Unit)">
-                                    @foreach(var unit in _units)
-                                    {
-                                        if (unit == _selectedUnit)
-                                        {
-                                            <option value="@unit" selected>@unit</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@unit">@unit</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                        <div class="control is-expanded is-text-align-end is-align-content-center has-border-top-weak has-border-bottom-weak">
-                            <a
-                                class="button has-text-danger is-ghost py-0"
-                                _="on click remove closest .meal-plan-item">
-                                Remove
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
+            <form>
+                <input
+                    name="itemType"
+                    type="hidden"
+                    value="@Entity.ItemType"/>
+                <input
+                    name="itemId"
+                    type="hidden"
+                    value="@Entity.RecipeOrIngredientId"/>
+                <input
+                    name="itemName"
+                    type="hidden"
+                    value="@Entity.ItemName" />
+                <input
+                    name="itemQuantity"
+                    type="hidden"
+                    value="@Entity.Quantity" />
+                <input
+                    name="itemUnit"
+                    type="hidden"
+                    value="@Entity.Unit.Unwrap()" />
+            </form>
+            <p
+                hx-get="/meal-plans/fragments/item-configurator"
+                hx-vals='js:{"targetItem":"@_id", "autoSelectUnit": false}'
+                hx-include="previous form"
+                hx-swap="none"
+                class="meal-plan-item-name">
+                <span class="mr-1">@Entity.ItemName</span>
+                <span>
+                    <span class="has-text-grey is-size-7 is-">@Entity.Quantity</span>
+                    <span class="has-text-grey is-size-7 is-">@Entity.Unit.Unwrap()</span>
+                </span>
+            </p>
+            <div class=" px-2 is-align-content-center has-border-top-weak has-border-bottom-weak has-border-right-weak has-text-danger is-clickable"
+                _="on click send removeme(target: (the closest .meal-plan-item))"
+            >
+                Delete
             </div>
             <div
                 class="drag-container is-flex is-align-items-center is-justify-content-center">
                 <span class="drag-handle">
                 </span>
             </div>
-    </div>
 </div>
 
 

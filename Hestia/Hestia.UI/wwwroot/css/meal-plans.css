@@ -9,6 +9,10 @@
             --bulma-input-border-color: var(--bulma-link);
         }
     }
+    * {
+        transition-duration: var(--bulma-duration);
+        transition-property: background-color, border-color, box-shadow, color;
+    }
 
 }
 #meal-plan-editor-panel {
@@ -44,40 +48,27 @@
     padding-right: 1rem;
 }
 
-.meal-plan-content-view {
-    display: flex;
-
-    .meal-plan-search & {
-        display: none;
-    }
-
-}
 #meal-plan-search-results {
     gap: 1rem;
 }
 
 /* Base components */
 .meal-plan-item {
-    border: 1px solid var(--bulma-border-weak);
-    border-radius: var(--bulma-radius);
     margin-bottom: 1rem;
     display: flex;
-    align-items: center;
-    * {
-        transition-duration: var(--bulma-duration);
-        transition-property: background-color, border-color, box-shadow, color;
-    }
+    align-items: stretch;
 
     .meal-plan-item-name {
         padding: 7px 11px;
         color: var(--bulma-text-strong);
-        border-top: 1px solid var(--bulma-border-weak);
-        border-left: 1px solid var(--bulma-border-weak);
-        border-start-start-radius: var(--bulma-radius);
+        border: 1px solid var(--bulma-border-weak);
+        border-bottom-left-radius: var(--bulma-radius);
+        border-top-left-radius: var(--bulma-radius);
+        flex-grow: 1;
     }
-
-    .input {
-        border-start-start-radius: 0;
+    .meal-plan-item-name:hover {
+        border: 1px solid var(--bulma-grey-dark);
+        cursor: pointer;
     }
 
     .meal-plan-content & {
@@ -89,16 +80,15 @@
         }
     }
 
-
-    .meal-plan-content-view {
-        .drag-container {
-            flex: 0 0 50px;
-            border: 1px solid var(--bulma-border-weak);
-            border-end-end-radius: var(--bulma-radius);
-            border-start-end-radius: var(--bulma-radius);
-        }
-
+    .drag-container {
+        flex: 0 0 50px;
+        border-top: 1px solid var(--bulma-border-weak);
+        border-bottom: 1px solid var(--bulma-border-weak);
+        border-right: 1px solid var(--bulma-border-weak);
+        border-end-end-radius: var(--bulma-radius);
+        border-start-end-radius: var(--bulma-radius);
     }
+
 }
 
 /* planner view */

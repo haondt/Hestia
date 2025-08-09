@@ -341,8 +341,7 @@ p > .icon {
 
 
 .sortable-ghost .has-text-danger {
-    color: var(--bulma-text-weak) !important;
-    opacity: 0.5;
+    color: var(--bulma-grey-dark) !important;
 }
 
 .sortable-drag {
@@ -477,6 +476,11 @@ hr {
 .is-radiused-right {
     border-bottom-right-radius: var(--bulma-radius);
     border-top-right-radius: var(--bulma-radius);
+}
+
+.is-radiused-left {
+    border-bottom-left-radius: var(--bulma-radius);
+    border-top-left-radius: var(--bulma-radius);
 }
 
 .is-radiused {

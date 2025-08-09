@@ -33,7 +33,13 @@
         <div class="control is-expanded">
             <input
                 _="on input send dirty"
+                form="meal-plan-form"
                 class="input has-text-primary meal-plan-section-title-input" type="text" placeholder="@_randomMealName" value="@Name.Unwrap()" required />
+        </div>
+        <div class="px-2 is-align-content-center has-border-top-weak has-border-bottom-weak has-border-right-weak has-text-danger is-clickable"
+            _="on click send removeme(target: (the closest .meal-plan-section-container))"
+        >
+            Delete
         </div>
         <div class="control" style="flex: 0 0 50px;">
             <div

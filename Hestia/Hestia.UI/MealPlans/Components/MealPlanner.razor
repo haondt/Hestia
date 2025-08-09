@@ -35,10 +35,24 @@
 }
 
 
-<div class="meal-planner">
+<div class="meal-planner"
+    _="
+        on dirty debounced at 150ms 
+            log 'dirty received!'
+        end
+        on removeme
+            remove the event's detail.target
+            send dirty to me
+        end
+    "
+>
+    <form id="meal-planner-form"></form>
     <!-- Basic meal plan info -->
     <div class="field mb-3">
-        <input class="input" name="@nameof(MealPlanModel.Name)" type="text" placeholder="Name" value="@_mealPlan.Name" required/>
+        <input
+            _="on input send dirty"
+            form="meal-planner-form"
+            class="input" name="@nameof(MealPlanModel.Name)" type="text" placeholder="Name" value="@_mealPlan.Name" required/>
     </div>
 
     <!-- Meal plan content -->
