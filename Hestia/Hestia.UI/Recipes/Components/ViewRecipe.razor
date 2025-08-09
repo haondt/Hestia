@@ -260,25 +260,25 @@
                     <p class="section-label">Per Serving (@(Recipe.NumberOfServings.Or(1)) servings)</p>
                     <div class="is-flex is-flex-direction-column gap-2">
                         <div class="is-flex is-justify-content-space-between">
-                            <span>Calories:</span>
+                            <span>Calories</span>
                             <span class="has-text-weight-semibold">@_insights.ServingInsights.Value.CaloriesPerServing.ToString("F0")</span>
                         </div>
                         <div class="is-flex is-justify-content-space-between">
-                            <span>Protein:</span>
+                            <span>Protein</span>
                             <span class="has-text-weight-semibold">@_insights.ServingInsights.Value.ProteinGramsPerServing.ToString("F1")g</span>
                         </div>
                         <div class="is-flex is-justify-content-space-between">
-                            <span>Fat:</span>
+                            <span>Fat</span>
                             <span class="has-text-weight-semibold">@_insights.ServingInsights.Value.FatGramsPerServing.ToString("F1")g</span>
                         </div>
                         <div class="is-flex is-justify-content-space-between">
-                            <span>Carbs:</span>
+                            <span>Carbs</span>
                             <span class="has-text-weight-semibold">@_insights.ServingInsights.Value.CarbGramsPerServing.ToString("F1")g</span>
                         </div>
                         @if (_insights.CostAnalysis.CostPerServing > 0)
                         {
                             <div class="is-flex is-justify-content-space-between">
-                                <span>Cost:</span>
+                                <span>Cost</span>
                                 <span class="has-text-weight-semibold">$@_insights.CostAnalysis.CostPerServing.ToString("F2")</span>
                             </div>
                         }
@@ -358,14 +358,14 @@
                         @if (_insights.CostAnalysis.CostPerServing > 0)
                         {
                             <div class="is-flex is-justify-content-space-between">
-                                <span>Cost per serving:</span>
+                                <span>Cost per serving</span>
                                 <span class="has-text-weight-semibold">$@_insights.CostAnalysis.CostPerServing.ToString("F2")</span>
                             </div>
                         }
                         @if (_insights.CostAnalysis.CaloriesPerDollar.TryGetValue(out var caloriesPerDollar))
                         {
                             <div class="is-flex is-justify-content-space-between">
-                                <span>Calories per dollar:</span>
+                                <span>Calories per dollar</span>
                                 <span class="has-text-weight-semibold">@caloriesPerDollar.ToString("F0")</span>
                             </div>
                         }

@@ -48,6 +48,22 @@ namespace Hestia.UI.MealPlans.Controllers
             });
         }
 
+        [HttpGet("insights/{id}")]
+        public async Task<IResult> GetMealPlanInsights(int id)
+        {
+            var mealPlan = await mealPlansService.GetMealPlanAsync(id);
+            if (!mealPlan.IsSuccessful)
+                return await _componentFactory.RenderComponentAsync(new Error
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                });
+            return await _componentFactory.RenderComponentAsync(new MealPlanInsights
+            {
+                MealPlanId = id,
+                MealPlan = mealPlan.Value
+            });
+        }
+
         [HttpPost("create")]
         public async Task<IResult> CreateMealPlan()
         {

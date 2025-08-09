@@ -10,6 +10,7 @@ namespace Hestia.Domain.Models
         public Optional<decimal> ProteinScore { get; set; }
 
         public Optional<RecipeServingInsightsModel> ServingInsights { get; set; }
+        public Optional<RecipeTotalInsightsModel> TotalInsights { get; set; }
     }
 
     public record RecipeCostAnalysisInsightsModel(
@@ -21,5 +22,11 @@ namespace Hestia.Domain.Models
         double ProteinGramsPerServing,
         double FatGramsPerServing,
         double CarbGramsPerServing);
+    public record RecipeTotalInsightsModel(
+        double Calories,
+        double ProteinGrams,
+        double FatGrams,
+        double CarbGrams,
+        decimal Cost);
 
 }

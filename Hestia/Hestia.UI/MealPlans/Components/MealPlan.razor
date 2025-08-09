@@ -14,7 +14,7 @@
 }
 
 <div class="content-container mt-5">
-    <div class="page-header mb-4">
+    <div class="page-header mb-2">
         <p>Meal Plan</p>
     </div>
     <div class="is-flex is-flex-direction-row is-fullwidth is-position-relative mb-5">
@@ -26,8 +26,8 @@
                         <a 
                             _="
                                 on click 
-                                    add .is-active to me
-                                    remove .is-active from the next <li a />
+                                    add .is-active to the closest <li/>
+                                    remove .is-active from the next <li />
                                     remove .is-hidden from #meal-plan-editor-panel
                                     set #meal-plan-insights-panel's innerHTML to ''
                                 end
@@ -41,8 +41,8 @@
                         <a
                             _="
                                 on click 
-                                    add .is-active to me
-                                    remove .is-active from the previous <li a />
+                                    add .is-active to the closest <li/>
+                                    remove .is-active from the previous <li />
                                     add .is-hidden to #meal-plan-editor-panel
                                     send loadData to #meal-plan-insights-panel
                                 end

@@ -239,6 +239,12 @@ namespace Hestia.Domain.Models
                 ProteinGramsPerServing: (double)totalProteinGrams / numberOfServings,
                 FatGramsPerServing: (double)totalFatGrams / numberOfServings,
                 CarbGramsPerServing: (double)totalCarbGrams / numberOfServings));
+            insights.TotalInsights = new RecipeTotalInsightsModel(
+                Calories: (double)totalCalories,
+                ProteinGrams: (double)totalProteinGrams,
+                FatGrams: (double)totalFatGrams,
+                CarbGrams: (double)totalCarbGrams,
+                Cost: totalCost);
 
             warnings = warnings
                 .Where(w => w.Warnings.Count > 0)

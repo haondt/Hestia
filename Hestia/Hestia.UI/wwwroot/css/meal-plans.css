@@ -15,7 +15,13 @@
     }
 
 }
-#meal-plan-editor-panel {
+.meal-plan-insights {
+    border: 1px solid var(--bulma-border);
+    border-radius: var(--panel-radius);
+    padding: 1rem;
+}
+
+#meal-plan-editor-panel, #meal-plan-insights-panel {
     margin:auto;
     max-width: 800px;
 }
@@ -115,8 +121,12 @@
         border: none;
         padding: 0.25rem;
     }
+    .meal-plan-insights {
+        border: none;
+        padding: 0.25rem;
+    }
 
-    #meal-plan-editor-panel {
+    #meal-plan-editor-panel, #meal-plan-insights-panel {
         margin:auto;
         max-width: initial;
     }
