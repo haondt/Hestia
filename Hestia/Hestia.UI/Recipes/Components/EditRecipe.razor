@@ -54,6 +54,20 @@
            ">
         <input id="group-id" name="groupId" type="hidden" value="@_groupId" />
     </form>
+    <form id="edit-recipe-add-ingredient-form-mobile" 
+        hx-get="/recipes/add-ingredient"
+        hx-target="#ingredients-list > .column"
+        hx-swap="afterbegin"
+        hx-rename="search:@(nameof(RecipeIngredientModel.Name))"
+        hx-include="#group-id"
+        _="
+            on htmx:afterRequest 
+                if the event's detail.successful is true then 
+                    reset() me
+                    increment the #group-id's value
+                end
+           ">
+    </form>
     <form
         hx-trigger="finalSubmit"
         id="edit-recipe-form" class="control" hx-swap="none" hx-encoding="multipart/form-data" @attributes="_formAttributes"
@@ -360,7 +374,7 @@
                                 <div class="field has-addons is-flex-grow-1 mb-0">
                                     <div class="control">
                                         <input 
-                                            form="edit-recipe-add-ingredient-form"
+                                            form="edit-recipe-add-ingredient-form-mobile"
                                             name="@nameof(RecipeIngredientModel.Quantity)"
                                             class="input unit-input" 
                                             type="number" 
@@ -370,7 +384,7 @@
                                     <div class="control is-expanded">
                                         <input 
                                             _="on change set <#ingredients-list-item-template input[name='unit'] />'s value to my value"
-                                            form="edit-recipe-add-ingredient-form"
+                                            form="edit-recipe-add-ingredient-form-mobile"
                                             class="input" 
                                             type="text" 
                                             placeholder="cup" 
@@ -412,7 +426,7 @@
                                     ">
                                     <Autocomplete 
                                         ValueName="@(nameof(RecipeIngredientModel.IngredientId))"
-                                        Form="@("edit-recipe-add-ingredient-form")"
+                                        Form="@("edit-recipe-add-ingredient-form-mobile")"
                                         Name="@("search")"
                                         Id="@("ingredient-search-mobile")"
                                         Placeholder="@("Flour")"
@@ -426,7 +440,7 @@
                                 <div class="control">
                                     <input 
                                         type="submit"
-                                        form="edit-recipe-add-ingredient-form"
+                                        form="edit-recipe-add-ingredient-form-mobile"
                                         class="button is-primary" 
                                          value="Add"/>
                                 </div>
