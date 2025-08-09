@@ -6,18 +6,101 @@
 <div _="on load send OnNavigate(value:'MealPlans') to #navbar then remove me"></div>
 
 @code {
-    [Parameter]
-    public Optional<MealPlanModel> MealPlanModel { get; set; }
+    [Parameter, EditorRequired]
+    public required MealPlanModel MealPlanModel { get; set; }
 
-    [Parameter]
-    public Optional<int> MealPlanId { get; set; }
+    [Parameter, EditorRequired]
+    public required int MealPlanId { get; set; }
 }
 
 <div class="content-container mt-5">
-    <div id="meal-plan-editor-panel">
-        <div class="page-header mb-4">
-            <p>Meal Plan</p>
+    <div class="page-header mb-4">
+        <p>Meal Plan</p>
+    </div>
+    <div class="is-flex is-flex-direction-row is-fullwidth is-position-relative mb-5">
+        <div class="is-fullwidth is-flex-grow-1">
+
+            <div class="tabs is-flex-grow-1">
+                <ul>
+                    <li class="is-active">
+                        <a 
+                            _="
+                                on click 
+                                    add .is-active to me
+                                    remove .is-active from the next <li a />
+                                    remove .is-hidden from #meal-plan-editor-panel
+                                    set #meal-plan-insights-panel's innerHTML to ''
+                                end
+                            "
+                            data-body-id="recipe-tab-body"
+                        >
+                            Meal Plan
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            _="
+                                on click 
+                                    add .is-active to me
+                                    remove .is-active from the previous <li a />
+                                    add .is-hidden to #meal-plan-editor-panel
+                                    send loadData to #meal-plan-insights-panel
+                                end
+                            "
+                            data-body-id="insights-tab-body"
+                        >
+                            Insights
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
+        <TabsActionsDropdown ResetListeners="@(["#recipe-delete-button"])">
+            <a 
+                id="recipe-delete-button"
+                class="dropdown-item"  
+                _="
+                    on click send delete to me end
+                    on actionsDropdownReset send cancelDelete to me end
+                    on cancelDelete
+                        remove .is-hidden from #recipe-delete-button
+                        add .is-hidden to #recipe-cancel-button
+                        add .is-hidden to #recipe-confirm-button
+                    end
+                    on delete
+                        add .is-hidden to #recipe-delete-button
+                        remove .is-hidden from #recipe-cancel-button
+                        remove .is-hidden from #recipe-confirm-button
+                    end
+                ">
+                Delete
+            </a>
+            <a 
+                id="recipe-cancel-button"
+                class="dropdown-item has-text-danger is-hidden"
+                _="
+                    on click send cancelDelete to #recipe-delete-button
+                ">
+                Cancel Delete
+            </a>
+            <a 
+                id="recipe-confirm-button"
+                class="dropdown-item has-text-danger is-hidden"
+                hx-delete="/meal-plans/meal-plan/@MealPlanId"
+                hx-swap="none">
+                Confirm Delete
+            </a>
+        </TabsActionsDropdown>
+    </div>
+
+    <div id="meal-plan-editor-panel">
         <MealPlanner MealPlan="MealPlanModel" MealPlanId="MealPlanId" />
+    </div>
+    <div 
+        id="meal-plan-insights-panel"
+        hx-trigger="loadData"
+        hx-get="/meal-plans/insights/@MealPlanId"
+        hx-swap="innerHTML"
+    >
     </div>
 </div>

@@ -69,6 +69,45 @@ namespace Hestia.Domain.Services
             return (dataModel.Id, createdMealPlan.Value
                 ?? throw new InvalidOperationException("Created meal plan not found after saving to database."));
         }
+        public async Task<(int Id, MealPlanModel MealPlan)> CreateDefaultMealPlanAsync()
+        {
+            var state = await HestiaStateDataModel.GetOrCreateAsync(context);
+            var mealPlan = new MealPlanModel
+            {
+                Name = $"Meal Plan #{state.NextMealPlanNumber}",
+                LastModified = AbsoluteDateTime.Now,
+                Sections = (await GetDefaultSectionsAsync())
+                    .Select(s => new MealPlanSectionModel
+                    {
+                        Name = s
+                    }).ToList()
+            };
+
+            var dataModel = mealPlan.AsDataModel();
+            context.MealPlans.Add(dataModel);
+
+            state.NextMealPlanNumber += 1;
+            context.Update(state);
+
+            await context.SaveChangesAsync();
+
+
+            // Set the MealPlanId for sections and MealSectionId for items
+            //foreach (var section in dataModel.Sections)
+            //{
+            //    section.MealPlanId = dataModel.Id;
+            //    foreach (var item in section.Items)
+            //    {
+            //        item.MealSectionId = section.Id;
+            //    }
+            //}
+
+            //await context.SaveChangesAsync();
+
+            var createdMealPlan = await GetMealPlanAsync(dataModel.Id);
+            return (dataModel.Id, createdMealPlan.Value
+                ?? throw new InvalidOperationException("Created meal plan not found after saving to database."));
+        }
 
         public async Task<MealPlanModel> UpdateMealPlanAsync(int id, MealPlanModel mealPlan)
         {

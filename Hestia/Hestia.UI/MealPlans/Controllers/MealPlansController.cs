@@ -23,7 +23,6 @@ namespace Hestia.UI.MealPlans.Controllers
     public class MealPlansController(IComponentFactory componentFactory, IMealPlansService mealPlansService, IRecipesService recipesService, IIngredientsService ingredientsService) : UIController(componentFactory)
     {
         private readonly IComponentFactory _componentFactory = componentFactory;
-        private readonly IMealPlansService _mealPlansService = mealPlansService;
         private readonly IRecipesService _recipesService = recipesService;
         private readonly IIngredientsService _ingredientsService = ingredientsService;
 
@@ -33,10 +32,33 @@ namespace Hestia.UI.MealPlans.Controllers
             return _componentFactory.RenderComponentAsync<MealPlans.Components.MealPlans>();
         }
 
-        [HttpGet("new")]
-        public Task<IResult> GetCreateMealPlan()
+        [HttpGet("meal-plan/{id}")]
+        public async Task<IResult> GetMealPlan(int id)
         {
-            return _componentFactory.RenderComponentAsync<MealPlans.Components.MealPlan>();
+            var mealPlan = await mealPlansService.GetMealPlanAsync(id);
+            if (!mealPlan.IsSuccessful)
+                return await _componentFactory.RenderComponentAsync(new Error
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                });
+            return await _componentFactory.RenderComponentAsync(new MealPlan
+            {
+                MealPlanId = id,
+                MealPlanModel = mealPlan.Value
+            });
+        }
+
+        [HttpPost("create")]
+        public async Task<IResult> CreateMealPlan()
+        {
+            var mealPlan = await mealPlansService.CreateDefaultMealPlanAsync();
+            Response.AsResponseData()
+                .HxPushUrl($"/meal-plans/meal-plan/{mealPlan.Id}");
+            return await _componentFactory.RenderComponentAsync(new MealPlan
+            {
+                MealPlanId = mealPlan.Id,
+                MealPlanModel = mealPlan.MealPlan
+            });
         }
 
         //[HttpPost("new")]
@@ -82,40 +104,12 @@ namespace Hestia.UI.MealPlans.Controllers
         //    });
         //}
 
-        [HttpGet("edit/{mealPlanId}")]
-        public async Task<IResult> EditMealPlan(int mealPlanId)
+        [HttpPut("meal-plan/{mealPlanId}")]
+        public async Task<IResult> UpdateMealPlan(int mealPlanId, [FromForm] MealPlanModel mealPlan)
         {
-            var result = await _mealPlansService.GetMealPlanAsync(mealPlanId);
-            if (!result.TryGetValue(out var mealPlan))
-                return await _componentFactory.RenderComponentAsync(new Error
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                });
-
-            return await _componentFactory.RenderComponentAsync(new MealPlan
-            {
-                MealPlanModel = mealPlan.AsOptional(),
-                MealPlanId = mealPlanId.AsOptional()
-            });
+            await mealPlansService.UpdateMealPlanAsync(mealPlanId, mealPlan);
+            return TypedResults.Ok();
         }
-
-        //[HttpPut("edit/{mealPlanId}")]
-        //public async Task<IResult> UpdateMealPlan(int mealPlanId, [FromForm] MealPlanModel mealPlan)
-        //{
-        //    var updatedMealPlan = await _mealPlansService.UpdateMealPlanAsync(mealPlanId, mealPlan);
-
-        //    Response.AsResponseData().HxPushUrl($"/meal-plans/view/{mealPlanId}");
-        //    return await _componentFactory.RenderComponentAsync(new HxSwapOob
-        //    {
-        //        Content = new ViewMealPlan
-        //        {
-        //            MealPlan = updatedMealPlan,
-        //            MealPlanId = mealPlanId
-        //        },
-        //        Target = "#page-container",
-        //        ScrollToTop = true
-        //    });
-        //}
 
         [HttpGet("search-items")]
         public async Task<IResult> SearchItems([FromQuery] string? search)
@@ -151,10 +145,10 @@ namespace Hestia.UI.MealPlans.Controllers
             });
         }
 
-        [HttpDelete("view/{mealPlanId}")]
+        [HttpDelete("meal-plan/{mealPlanId}")]
         public async Task<IResult> DeleteMealPlan(int mealPlanId)
         {
-            var result = await _mealPlansService.DeleteMealPlanAsync(mealPlanId);
+            var result = await mealPlansService.DeleteMealPlanAsync(mealPlanId);
             if (!result.IsSuccessful)
             {
                 Response.AsResponseData()
@@ -237,7 +231,6 @@ namespace Hestia.UI.MealPlans.Controllers
             }
 
             Response.AsResponseData()
-                .HxTriggerAfterSettle("dirty")
                 .HxTriggerAfterSwap("closeModal");
 
             return _componentFactory.RenderComponentAsync(new HxSwapOob
@@ -245,7 +238,8 @@ namespace Hestia.UI.MealPlans.Controllers
                 Content = new MealPlanItem
                 {
                     Entity = mealPlanItem,
-                    Id = mealPlanItem.RecipeOrIngredientId
+                    Id = mealPlanItem.RecipeOrIngredientId,
+                    EmitDirtyOnLoad = true
                 },
                 Target = target,
                 Strategy = strategy

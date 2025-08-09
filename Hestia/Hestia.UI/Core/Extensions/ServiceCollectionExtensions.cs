@@ -79,6 +79,14 @@ namespace Hestia.UI.Core.Extensions
             });
             services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
             {
+                Uri = "/static/shared/js/string-utils.js"
+            });
+            services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
+            {
+                Uri = "/static/shared/vendored/htmx-ext-loading-states/loading-states.js"
+            });
+            services.AddScoped<IHeadEntryDescriptor>(sp => new ScriptDescriptor
+            {
                 Uri = "/static/shared/vendored/sortablejs/Sortable.min.js"
             });
             services.AddScoped<IHeadEntryDescriptor>(_ => new StyleSheetDescriptor

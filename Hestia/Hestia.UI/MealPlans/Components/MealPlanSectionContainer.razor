@@ -1,3 +1,4 @@
+@using Hestia.Domain.Models
 @code {
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
@@ -19,7 +20,7 @@
     protected override void OnInitialized()
     {
         if (EmitDirtyOnLoad)
-            _containerAttributes["_"] = "on load emit dirty";
+            _containerAttributes["_"] = "on load send dirty";
         
         var random = new Random();
         _randomMealName = _mealNames[random.Next(_mealNames.Length)];
@@ -33,7 +34,8 @@
         <div class="control is-expanded">
             <input
                 _="on input send dirty"
-                form="meal-plan-form"
+                form="meal-planner-form"
+                name="@(nameof(MealPlanModel.Sections))[].@nameof(MealPlanSectionModel.Name)"
                 class="input has-text-primary meal-plan-section-title-input" type="text" placeholder="@_randomMealName" value="@Name.Unwrap()" required />
         </div>
         <div class="px-2 is-align-content-center has-border-top-weak has-border-bottom-weak has-border-right-weak has-text-danger is-clickable"
@@ -64,7 +66,10 @@
                             ghostClass: 'sortable-ghost',
                             chosenClass: 'sortable-chosen',
                             dragClass: 'sortable-drag',
-                            handle: '.drag-container'
+                            handle: '.drag-container',
+                            onEnd: e => {
+                                me.dispatchEvent(new Event('dirty', { bubbles: true }));
+                            }
                         });
                     end
                     set :sortable to it

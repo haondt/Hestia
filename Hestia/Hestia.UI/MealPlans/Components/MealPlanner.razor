@@ -4,41 +4,28 @@
 @inject IMealPlansService MealPlansService
 
 @code {
-    [Parameter]
-    public Optional<int> MealPlanId { get; set; }
+    [Parameter, EditorRequired]
+    public required int MealPlanId { get; set; }
 
-    [Parameter]
-    public Optional<MealPlanModel> MealPlan { get; set; } = default!;
-    private MealPlanModel _mealPlan { get; set; } = default!;
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!MealPlan.HasValue)
-        {
-            var defaultMealPlanNumber = await MealPlansService.GetNextMealPlanNumberAsync();
-            _mealPlan = new MealPlanModel()
-                {
-                    LastModified = AbsoluteDateTime.Now,
-                    Name = $"Meal Plan #{defaultMealPlanNumber}",
-                    Sections = (await MealPlansService.GetDefaultSectionsAsync())
-                        .Select(s => new MealPlanSectionModel
-                        {
-                            Name = s
-                        }).ToList()
-                };
-        }
-        else
-            _mealPlan = MealPlan.Value;
-        await base.OnInitializedAsync();
-    }
+    [Parameter, EditorRequired]
+    public required MealPlanModel MealPlan { get; set; }
 }
 
 
 <div class="meal-planner"
     _="
         on dirty debounced at 150ms 
-            log 'dirty received!'
+            repeat for section in <.meal-plan-section-container /> index sectionIdx
+                set sectionInput to the first <.meal-plan-section-title-input/> in section
+                set sectionInput.name to window.stringUtils.fillTemplate(sectionInput.name, [sectionIdx])
+                repeat for item in <.meal-plan-item/> in section index itemIdx
+                    set inputs to <input[form='meal-planner-form']/> in item
+                    repeat for input in inputs
+                        set input.name to window.stringUtils.fillTemplate(input.name, [sectionIdx, itemIdx])
+                    end
+                end
+            end
+            send submit to #meal-planner-form
         end
         on removeme
             remove the event's detail.target
@@ -46,13 +33,71 @@
         end
     "
 >
-    <form id="meal-planner-form"></form>
+    <form
+        id="meal-planner-form"
+        hx-put="/meal-plans/meal-plan/@MealPlanId"
+        _="
+            on load
+                set :title to the next <[name='Name']/>
+            end
+            on htmx:beforeRequest
+                add .is-hidden to #save-success-indicator
+                add .is-hidden to #save-fail-indicator
+                add .is-loading to :title's parentElement
+            end
+            on htmx:afterRequest
+                remove .is-loading from :title's parentElement
+                if event.detail.xhr.status is 200
+                    remove .is-hidden from #save-success-indicator
+                else
+                    remove .is-hidden from #save-fail-indicator
+                end
+            end
+        "
+    ></form>
     <!-- Basic meal plan info -->
-    <div class="field mb-3">
-        <input
-            _="on input send dirty"
-            form="meal-planner-form"
-            class="input" name="@nameof(MealPlanModel.Name)" type="text" placeholder="Name" value="@_mealPlan.Name" required/>
+    <div class="field mb-3 is-flex is-align-items-center">
+        <div class="control is-flex-grow-1 has-icons-right">
+            <input
+                _="on input send dirty"
+                form="meal-planner-form"
+                class="input"
+                name="@nameof(MealPlanModel.Name)"
+                type="text"
+                placeholder="Name"
+                value="@MealPlan.Name"
+                required
+                />
+            <span id="save-success-indicator" class="icon is-right has-text-success is-hidden">
+                <LucideIcon Name="check"/>
+            </span>
+            <span id="save-fail-indicator" class="icon is-right has-text-danger is-hidden">
+                <LucideIcon Name="cloud-alert" />
+            </span>
+        </div>
+        <div class="ml-2">
+            <Tooltip Position="Tooltip.TooltipPosition.TopEnd" >
+                <TriggerContent>
+                    <div class="is-flex is-align-items-center">
+                        <span class="icon">
+                            <LucideIcon CssClass="has-text-grey" Name="info"/>
+                        </span>
+                    </div>
+                </TriggerContent>
+                <TooltipContent>
+                    <div class="card p-3 content">
+                        <p>
+                            <span>Changes to this form will save automatically.</span>
+                            <span class="is-flex is-flex-wrap-wrap gap-2" >
+                                <span class="control is-loading just-spinner"></span> 
+                                <span>indicates a request is currently in flight.</span>
+                            </span>
+                        </p>
+                    </div>
+                </TooltipContent>
+            </Tooltip>
+        </div>
+
     </div>
 
     <!-- Meal plan content -->
@@ -65,7 +110,10 @@
                         ghostClass: 'sortable-ghost',
                         chosenClass: 'sortable-chosen',
                         dragClass: 'sortable-drag',
-                        handle: '.drag-container'
+                        handle: '.drag-container',
+                        onEnd: e => {
+                            me.dispatchEvent(new Event('dirty', { bubbles: true }));
+                        }
                     });
                 end
                 set :sortable to it
@@ -85,12 +133,12 @@
                 send destroy to me
             end
         ">
-        @foreach (var mealPart in _mealPlan.Sections)
+        @foreach (var mealPart in MealPlan.Sections)
         {
             <MealPlanSectionContainer EmitDirtyOnLoad="false" Name="mealPart.Name" >
                 @foreach (var item in mealPart.Items)
                 {
-                    <MealPlanItem Entity="item" Id="item.RecipeOrIngredientId" />
+                    <MealPlanItem EmitDirtyOnLoad="false" Entity="item" Id="item.RecipeOrIngredientId" />
                 }
 
             </MealPlanSectionContainer>

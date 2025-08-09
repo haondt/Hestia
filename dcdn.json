@@ -24,7 +24,9 @@
       "icons/info.svg",
       "icons/asterisk.svg",
       "icons/x.svg",
-      "icons/grip-vertical.svg"
+      "icons/grip-vertical.svg",
+      "icons/check.svg",
+      "icons/cloud-alert.svg"
     ],
     "@floating-ui/dom": [
       "./dist/floating-ui.dom.umd.js"
@@ -38,6 +40,9 @@
     "quill": [
       "dist/quill.js",
       "dist/quill.snow.css"
+    ],
+    "htmx-ext-loading-states": [
+      "loading-states.js"
     ]
   }
 }

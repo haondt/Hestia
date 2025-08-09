@@ -5,7 +5,7 @@
     [Parameter] public required string Name { get; set; } = string.Empty;
     [Parameter] public string? CssClass { get; set; }
     [Parameter] public string? Style { get; set; }
-    [Parameter] public int Size { get; set; } = 16;
+    [Parameter] public int Size { get; set; } = 20;
 }
 
 @((MarkupString)LucideIconService.RenderIcon(Name, Size, CssClass, Style))

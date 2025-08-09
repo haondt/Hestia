@@ -12,5 +12,6 @@ namespace Hestia.Domain.Services
         Task<Result> DeleteMealPlanAsync(int id);
         Task<int> GetNextMealPlanNumberAsync();
         Task<List<string>> GetDefaultSectionsAsync();
+        Task<(int Id, MealPlanModel MealPlan)> CreateDefaultMealPlanAsync();
     }
 }

@@ -9,11 +9,24 @@
     [Parameter, EditorRequired]
     public required int Id { get; set; }
 
+    [Parameter]
+    public bool EmitDirtyOnLoad { get; set; } = true;
+
     private string _id = Guid.NewGuid().ToString("N");
     private string _fieldPrefix = $"{nameof(MealPlanModel.Sections)}[#].{nameof(MealPlanSectionModel.Items)}[#]";
+
+
+    private Dictionary<string, object> _containerAttributes = [];
+    protected override void OnInitialized()
+    {
+        if (EmitDirtyOnLoad)
+            _containerAttributes["_"] = "on load send dirty";
+        
+        base.OnInitialized();
+    }
 }
 
-<div class="meal-plan-item" data-meal-plan-item-id="@_id">
+<div class="meal-plan-item" data-meal-plan-item-id="@_id" @attributes="_containerAttributes">
             <input
                 name="@_fieldPrefix.@(nameof(MealPlanItemModel.ItemType))"
                 type="hidden"

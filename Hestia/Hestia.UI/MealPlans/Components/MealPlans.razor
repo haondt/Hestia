@@ -6,8 +6,8 @@
 <div class="content-container mt-5">
     <div class="is-flex is-flex-direction-row is-fullwidth is-justify-content-space-between is-align-items-center mb-5">
         <h1 class="title is-3">Meal Plans</h1>
-        <a hx-get="/meal-plans/new"
-           hx-push-url="/meal-plans/new"
+        <button 
+           hx-post="/meal-plans/create"
            hx-swap="innerHTML"
            hx-target="#page-container"
            class="button is-primary">
@@ -15,7 +15,7 @@
                 <LucideIcon Name="plus" Size="20" />
             </span>
             <span>New meal plan</span>
-        </a>
+        </button>
     </div>
 
     <div class="content">
