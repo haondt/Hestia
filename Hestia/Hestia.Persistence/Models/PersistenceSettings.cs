@@ -6,6 +6,8 @@
         public bool DropDatabaseOnStartup { get; set; } = false;
 
         public SqliteSettings? Sqlite { get; set; }
+
+        public string FileDataPath { get; set; } = Directory.GetCurrentDirectory();
     }
 
 

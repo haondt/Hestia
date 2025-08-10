@@ -1,0 +1,13 @@
+@using Hestia.UI.Library.Components.Element
+@using Hestia.Domain.Models
+
+@code {
+    [Parameter]
+    public required Guid ProcessingId { get; set; }
+}
+
+<Modal>
+    <div id="scan-nutrition-label">
+        <ScanNutritionLabelUpdate ProcessingId="ProcessingId" />
+    </div>
+</Modal>

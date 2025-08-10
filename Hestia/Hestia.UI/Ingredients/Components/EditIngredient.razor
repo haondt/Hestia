@@ -61,6 +61,23 @@
     <div class="page-header">
         <p>@Ingredient.Map(_ => "Edit").Or("New") ingredient</p>
     </div>
+    
+    <div class="mb-5">
+        <form
+            id="scan-nutrition-form" enctype="multipart/form-data" hx-post="/ingredients/scan-nutrition-label" hx-swap="none"
+            _="
+                on innerSubmit
+                    send submit to me
+                    reset() me
+                end
+              ">
+            <input type="file" class="is-hidden" id="nutrition-image" name="image" accept="image/*" capture="environment" _="on change send innerSubmit to the closest <form />" />
+            <label for="nutrition-image" type="button" class="button is-success is-large is-fullwidth">
+                📷 Scan Nutrition Label
+            </label>
+        </form>
+    </div>
+
     <form id="edit-ingredient-form" class="control">
 
         <div class="field is-horizontal">

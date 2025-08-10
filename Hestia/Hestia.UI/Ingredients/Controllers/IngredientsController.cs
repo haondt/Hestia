@@ -20,7 +20,8 @@ namespace Hestia.UI.Ingredients.Controllers
     [Route("ingredients")]
     public class IngredientsController(IComponentFactory componentFactory,
         IIngredientsService ingredientsService,
-        IUnitConversionsService unitConversionsService) : UIController(componentFactory)
+        IUnitConversionsService unitConversionsService,
+        INutritionLabelScannerService labelScanner) : UIController(componentFactory)
     {
         private readonly IComponentFactory _componentFactory = componentFactory;
 
@@ -192,6 +193,33 @@ namespace Hestia.UI.Ingredients.Controllers
                 return true;
 
             return await unitConversionsService.CheckUnitCompatibilityAsync(unitA, unitB);
+        }
+
+        [HttpPost("scan-nutrition-label")]
+        public async Task<IResult> ScanNutritionLabel(IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+            {
+                return await _componentFactory.RenderComponentAsync(new Toast
+                {
+                    Message = "No image file provided",
+                    Severity = ToastSeverity.Error
+                });
+            }
+
+            using var stream = image.OpenReadStream();
+            var processingId = labelScanner.StartBackgroundProcessing(stream);
+
+            return await _componentFactory.RenderComponentAsync(new ScanNutritionLabel
+            {
+                ProcessingId = processingId
+            });
+        }
+
+        [HttpGet("scan-nutrition-label/status/{processingId}")]
+        public Task<IResult> GetScanStatus(Guid processingId)
+        {
+            return _componentFactory.RenderComponentAsync(new ScanNutritionLabelUpdate { ProcessingId = processingId });
         }
     }
 }
