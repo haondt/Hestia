@@ -18,31 +18,54 @@
     public Optional<decimal> CarbGrams { get; set; }
     [Parameter]
     public Optional<decimal> ProteinGrams { get; set; }
-}
-@if (ServingSizeQuantity.HasValue) {
-    <div hx-swap-oob="afterend:.control > input[name=@nameof(IngredientModel.ServingSizeQuantity)]">
-        <span
-            data-auto-value="@ServingSizeQuantity.Value"
-            _="
-                on load add .has-icons-right to the closest <.control /> set (the previous <.input/>)'s value to my @@data-auto-value end
-                on input 1 from the previous <.input /> remove .has-icons-right from the closest <.control/> then remove me end
-            "
-            
-            class="icon is-right has-text-primary">
-            <LucideIcon Name="zap" />
-        </span>
-    </div>
+
+    private readonly List<(string FieldName, object Value, bool IsUnitField)> _fieldsToPopulate = new();
+
+    protected override void OnParametersSet()
+    {
+        _fieldsToPopulate.Clear();
+
+        if (ServingSizeQuantity.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.ServingSizeQuantity), ServingSizeQuantity.Value, false));
+
+        if (ServingSizeUnit.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.ServingSizeUnit), ServingSizeUnit.Value, true));
+
+        if (AlternateServingSizeQuantity.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.AlternateServingSizeQuantity), AlternateServingSizeQuantity.Value, false));
+
+        if (AlternateServingSizeUnit.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.AlternateServingSizeUnit), AlternateServingSizeUnit.Value, true));
+
+        if (Calories.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.Calories), Calories.Value, false));
+
+        if (FatGrams.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.FatGrams), FatGrams.Value, false));
+
+        if (CarbGrams.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.CarbGrams), CarbGrams.Value, false));
+
+        if (ProteinGrams.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.ProteinGrams), ProteinGrams.Value, false));
+    }
+
+    private string GetHyperscriptForField(bool isUnitField)
+    {
+        var baseScript = "on load add .has-icons-right to the closest <.control /> set (the previous <.input/>)'s value to my @data-auto-value";
+        var unitScript = isUnitField ? " send checkUnits to #check-units-trigger" : "";
+        var endScript = " end on input 1 from the previous <.input /> remove .has-icons-right from the closest <.control/> then remove me end";
+
+        return baseScript + unitScript + endScript;
+    }
 }
 
-@if (ServingSizeUnit.HasValue) {
-    <div hx-swap-oob="afterend:.control > input[name=@nameof(IngredientModel.ServingSizeUnit)]">
+@foreach (var field in _fieldsToPopulate)
+{
+    <div hx-swap-oob="afterend:.control > input[name=@field.FieldName]">
         <span
-            data-auto-value="@ServingSizeUnit.Value"
-            _="
-                on load add .has-icons-right to the closest <.control /> set (the previous <.input/>)'s value to my @@data-auto-value send checkUnits to #check-units-trigger end
-                on input 1 from the previous <.input /> remove .has-icons-right from the closest <.control/> then remove me end
-            "
-            
+            data-auto-value="@field.Value"
+            _="@GetHyperscriptForField(field.IsUnitField)"
             class="icon is-right has-text-primary">
             <LucideIcon Name="zap" />
         </span>
