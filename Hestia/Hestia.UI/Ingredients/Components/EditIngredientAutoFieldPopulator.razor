@@ -1,0 +1,50 @@
+@using Hestia.Domain.Models
+@using Hestia.UI.Core.Components
+@using System.Text
+@code {
+    [Parameter]
+    public Optional<decimal> ServingSizeQuantity { get; set; }
+    [Parameter]
+    public Optional<string> ServingSizeUnit { get; set; }
+    [Parameter]
+    public Optional<decimal> AlternateServingSizeQuantity { get; set; }
+    [Parameter]
+    public Optional<string> AlternateServingSizeUnit { get; set; }
+    [Parameter]
+    public Optional<decimal> Calories { get; set; }
+    [Parameter]
+    public Optional<decimal> FatGrams { get; set; }
+    [Parameter]
+    public Optional<decimal> CarbGrams { get; set; }
+    [Parameter]
+    public Optional<decimal> ProteinGrams { get; set; }
+}
+@if (ServingSizeQuantity.HasValue) {
+    <div hx-swap-oob="afterend:.control > input[name=@nameof(IngredientModel.ServingSizeQuantity)]">
+        <span
+            data-auto-value="@ServingSizeQuantity.Value"
+            _="
+                on load add .has-icons-right to the closest <.control /> set (the previous <.input/>)'s value to my @@data-auto-value end
+                on input 1 from the previous <.input /> remove .has-icons-right from the closest <.control/> then remove me end
+            "
+            
+            class="icon is-right has-text-primary">
+            <LucideIcon Name="zap" />
+        </span>
+    </div>
+}
+
+@if (ServingSizeUnit.HasValue) {
+    <div hx-swap-oob="afterend:.control > input[name=@nameof(IngredientModel.ServingSizeUnit)]">
+        <span
+            data-auto-value="@ServingSizeUnit.Value"
+            _="
+                on load add .has-icons-right to the closest <.control /> set (the previous <.input/>)'s value to my @@data-auto-value send checkUnits to #check-units-trigger end
+                on input 1 from the previous <.input /> remove .has-icons-right from the closest <.control/> then remove me end
+            "
+            
+            class="icon is-right has-text-primary">
+            <LucideIcon Name="zap" />
+        </span>
+    </div>
+}

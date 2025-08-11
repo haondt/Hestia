@@ -26,7 +26,8 @@
       "icons/x.svg",
       "icons/grip-vertical.svg",
       "icons/check.svg",
-      "icons/cloud-alert.svg"
+      "icons/cloud-alert.svg",
+      "icons/zap.svg"
     ],
     "@floating-ui/dom": [
       "./dist/floating-ui.dom.umd.js"

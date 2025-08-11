@@ -1,5 +1,6 @@
 @using Hestia.Domain.Models
 @using Hestia.Domain.Services
+@using Hestia.UI.Library.Components.Element
 @inject INutritionLabelProcessingStateService StateService
 
 @code {
@@ -45,55 +46,12 @@
         {
             var scannedLabel = detailedResult.Value!;
 
-            <div class="notification is-success">
-                <p><strong>✅ Nutrition Label Scanned Successfully!</strong></p>
-                <p><small>Processing completed in @(scannedLabel.ProcessingDuration.TotalMilliseconds.ToString("N0"))ms</small></p>
+            <EditIngredientAutoFieldPopulator
+                ServingSizeQuantity="scannedLabel.ServingSizeQuantity"
+                ServingSizeUnit="scannedLabel.ServingSizeUnit"
                 
-                <div class="columns mt-4">
-                    <div class="column">
-                        @if (scannedLabel.ServingSizeQuantity.TryGetValue(out var servingSizeQuantity))
-                        {
-                            <input value="@servingSizeQuantity" type="hidden" name="@nameof(IngredientModel.ServingSizeQuantity)" />
-                            <p><strong>Serving Size:</strong> @servingSizeQuantity @(scannedLabel.ServingSizeUnit.Unwrap())</p>
-                        }
-                        @if (scannedLabel.AlternateServingSizeQuantity.TryGetValue(out var altServingSizeQuantity))
-                        {
-                            <input value="@altServingSizeQuantity" type="hidden" name="@nameof(IngredientModel.AlternateServingSizeQuantity)" />
-                            <p><strong>Alternate Serving:</strong> @altServingSizeQuantity @(scannedLabel.AlternateServingSizeUnit.Unwrap())</p>
-                        }
-                        @if (scannedLabel.Calories.TryGetValue(out var calories))
-                        {
-                            <input value="@calories" type="hidden" name="@nameof(IngredientModel.Calories)" />
-                            <p><strong>Calories:</strong> @calories</p>
-                        }
-                    </div>
-                    <div class="column">
-                        @if (scannedLabel.CarbohydrateGrams.TryGetValue(out var carbs))
-                        {
-                            <input value="@carbs" type="hidden" name="@nameof(IngredientModel.CarbGrams)" />
-                            <p><strong>Carbohydrates:</strong> @carbs g</p>
-                        }
-                        @if (scannedLabel.FatGrams.TryGetValue(out var fat))
-                        {
-                            <input value="@fat" type="hidden" name="@nameof(IngredientModel.FatGrams)" />
-                            <p><strong>Fat:</strong> @fat g</p>
-                        }
-                        @if (scannedLabel.ProteinGrams.TryGetValue(out var protein))
-                        {
-                            <input value="@protein" type="hidden" name="@nameof(IngredientModel.ProteinGrams)" />
-                            <p><strong>Protein:</strong> @protein g</p>
-                        }
-                        @if (scannedLabel.FibreGrams.TryGetValue(out var fibre))
-                        {
-                            <p><strong>Fibre:</strong> @fibre g</p>
-                        }
-                        @if (scannedLabel.SodiumGrams.TryGetValue(out var sodium))
-                        {
-                            <p><strong>Sodium:</strong> @sodium g</p>
-                        }
-                    </div>
-                </div>
-            </div>
+                />
+            <CloseModal />
         }
     }
 

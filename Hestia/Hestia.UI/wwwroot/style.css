@@ -175,6 +175,10 @@
 .unit-input {
     width: 5em;
 }
+.unit-input:has(+ .icon) {
+    width: 6em;
+
+}
 .unit-input-short {
     width: 2.5em;
 }
@@ -507,4 +511,17 @@ hr {
 }
 .control.is-loading.just-spinner {
     align-content: center;
+}
+
+#scan-nutrition-label {
+    background: var(--bulma-body-background-color);
+    border: 1px solid var(--bulma-border);
+    border-radius: var(--panel-radius);
+    padding: 2rem;
+}
+
+@media screen and (max-width: 768px) {
+    #scan-nutrition-label {
+        margin: 2rem;
+    }
 }

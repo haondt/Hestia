@@ -116,8 +116,9 @@
         <hr />
 
         <div class="is-hidden"
+            id="check-units-trigger"
             hx-swap="none"
-            hx-trigger="input from:.unit-input delay:200ms"
+            hx-trigger="checkUnits delay:200ms"
             hx-get="/utils/check-unit-compatibility"
             hx-sync="this:replace"
             hx-include=".unit-input"
@@ -128,6 +129,7 @@
                 message = UnitIncompatibilityMessage
             })'
             ></div>
+        <div class="is-hidden" _="on input from .unit-input send checkUnits to #check-units-trigger"></div>
 
         <div class="field is-horizontal">
             <div class="field-label is-normal">
