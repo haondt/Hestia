@@ -3,12 +3,17 @@
 @using Hestia.UI.Core.Components
 @using Hestia.UI.Core.Extensions
 @using System.Text.Json
+@using Microsoft.Extensions.Options
 
 @attribute [RenderPage]
 @inject IUnitConversionsService UnitConversionsService
+@inject IOptions<NutritionLabelScannerSettings> ScannerOptions
 <div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
 
 @code {
+
+
+
     public const string UnitIncompatibilityMessage = "Cannot convert between serving size and package size units.";
 
     [Parameter]
@@ -22,8 +27,12 @@
     private List<string> _warningTooltipIds = [];
     private bool _areUnitsCompatible = true;
 
+    private bool _scanNutritionLabelEnabled;
+
     protected override async Task OnInitializedAsync()
     {
+
+        _scanNutritionLabelEnabled = ScannerOptions.Value.Enabled;
         if (IngredientId.TryGetValue(out var id))
             _submitAttributes["hx-put"] =    $"/ingredients/edit/{id}";
         else
@@ -61,9 +70,11 @@
     <div class="page-header">
         <p>@Ingredient.Map(_ => "Edit").Or("New") ingredient</p>
     </div>
-    
-    <div class="mb-5">
-        <form
+
+    @if (_scanNutritionLabelEnabled)
+    {
+        <div class="mb-5">
+            <form
             id="scan-nutrition-form" enctype="multipart/form-data" hx-post="/ingredients/scan-nutrition-label" hx-swap="none"
             class="is-flex is-justify-content-center"
             _="
@@ -72,12 +83,13 @@
                     reset() me
                 end
               ">
-            <input type="file" class="is-hidden" id="nutrition-image" name="image" accept="image/*" capture="environment" _="on change send innerSubmit to the closest <form />" />
-            <label for="nutrition-image" type="button" class="button has-text-link px-5 py-4">
-                Scan Nutrition Label
-            </label>
-        </form>
-    </div>
+                <input type="file" class="is-hidden" id="nutrition-image" name="image" accept="image/*" capture="environment" _="on change send innerSubmit to the closest <form />" />
+                <label for="nutrition-image" type="button" class="button has-text-link px-5 py-4">
+                    Scan Nutrition Label
+                </label>
+            </form>
+        </div>
+    }
 
     <form id="edit-ingredient-form" class="control">
 
