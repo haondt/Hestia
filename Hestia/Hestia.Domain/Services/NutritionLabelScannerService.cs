@@ -1,144 +1,86 @@
-﻿using Google.Cloud.DocumentAI.V1;
-using Google.Protobuf;
-using Haondt.Core.Models;
 using Hestia.Domain.Models;
 using Hestia.Persistence.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
-using System.Reflection;
+using System.Diagnostics;
 
 namespace Hestia.Domain.Services
 {
-    public class NutritionLabelScannerService(IOptions<NutritionLabelScannerSettings> options,
+    public class NutritionLabelScannerService(
+        INutritionLabelTextExtractor textExtractor,
+        INutritionLabelTextTransformer textTransformer,
+        INutritionLabelProcessingStateService stateService,
         IOptions<PersistenceSettings> persistenceOptions,
-        DocumentProcessorServiceClient client,
-        INutritionLabelProcessingStateService stateService) : INutritionLabelScannerService
+        IOptions<NutritionLabelScannerSettings> scannerOptions,
+        ILogger<NutritionLabelScannerService> logger) : INutritionLabelScannerService
     {
-        NutritionLabelScannerSettings _settings = options.Value;
-        PersistenceSettings _persistenceSettings = persistenceOptions.Value;
-
-        private static readonly Dictionary<string, string> _fieldMappings = typeof(ScannedNutritionLabel)
-            .GetProperties()
-            .Where(p => p.GetCustomAttribute<DocumentAIFieldAttribute>() != null)
-            .ToDictionary(
-                p => p.Name,
-                p => p.GetCustomAttribute<DocumentAIFieldAttribute>()!.FieldName
-            );
-
-        private static readonly HashSet<string> _documentAIFields = new(_fieldMappings.Values);
-
+        private readonly PersistenceSettings _persistenceSettings = persistenceOptions.Value;
+        private readonly NutritionLabelScannerSettings _scannerSettings = scannerOptions.Value;
 
         public async Task ProcessLabelImageAsync(Stream imageStream, Guid processingId)
         {
-            stateService.UpdateProcessingStatus(processingId, "Resizing image...");
+            var stopwatch = Stopwatch.StartNew();
 
-            using var image = await Image.LoadAsync(imageStream);
-
-            // Resize image if it's too large (max 1024px on longest side)
-            var maxSize = 1024;
-            if (image.Width > maxSize || image.Height > maxSize)
+            try
             {
-                var ratio = Math.Min((double)maxSize / image.Width, (double)maxSize / image.Height);
-                var newWidth = (int)(image.Width * ratio);
-                var newHeight = (int)(image.Height * ratio);
+                // Step 1: Process and save the image
+                stateService.UpdateProcessingStatus(processingId, "Processing image...");
+                
+                using var image = await SixLabors.ImageSharp.Image.LoadAsync(imageStream);
 
-                image.Mutate(x => x.Resize(newWidth, newHeight));
-            }
-
-            stateService.UpdateProcessingStatus(processingId, "Compressing image...");
-            var encoder = new JpegEncoder
-            {
-                Quality = 85 // Good balance between quality and file size
-            };
-
-            using var memoryStream = new MemoryStream();
-            await image.SaveAsJpegAsync(memoryStream, encoder);
-            memoryStream.Position = 0;
-
-            var rawDocument = new RawDocument
-            {
-                Content = ByteString.FromStream(memoryStream),
-                MimeType = "image/jpeg"
-            };
-
-            var request = new ProcessRequest
-            {
-                Name = ProcessorName.FromProjectLocationProcessor(
-                    _settings.DocumentAI!.ProjectId,
-                    _settings.DocumentAI!.ProcessorLocationId,
-                    _settings.DocumentAI!.ProcessorId)
-                    .ToString(),
-                RawDocument = rawDocument
-            };
-
-            stateService.UpdateProcessingStatus(processingId, "Detecting labels...");
-            var response = await client.ProcessDocumentAsync(request);
-            var document = response.Document;
-
-            stateService.UpdateProcessingStatus(processingId, "Processing result...");
-            var scannedLabel = new ScannedNutritionLabel();
-            foreach (var entity in document.Entities)
-            {
-                if (!_documentAIFields.Contains(entity.Type)) continue;
-
-                switch (entity.Type)
+                // Resize if needed
+                var maxSize = 1024;
+                if (image.Width > maxSize || image.Height > maxSize)
                 {
-                    case var fieldName when fieldName == GetFieldName(nameof(ScannedNutritionLabel.ServingSizeQuantity)):
-                        var hasServingSizeUnit = document.Entities.Any(e => e.Type == GetFieldName(nameof(ScannedNutritionLabel.ServingSizeUnit)));
-                        scannedLabel.ServingSizeQuantity = ParseQuantityWithFractions(entity.MentionText, hasServingSizeUnit);
-                        break;
-
-                    case var fieldName when fieldName == GetFieldName(nameof(ScannedNutritionLabel.AlternateServingSizeQuantity)):
-                        var hasAlternateServingSizeUnit = document.Entities.Any(e => e.Type == GetFieldName(nameof(ScannedNutritionLabel.AlternateServingSizeUnit)));
-                        scannedLabel.AlternateServingSizeQuantity = ParseQuantityWithFractions(entity.MentionText, hasAlternateServingSizeUnit);
-                        break;
-
-                    case var fieldName when fieldName == GetFieldName(nameof(ScannedNutritionLabel.ServingSizeUnit)):
-                        var servingSizeUnitValue = entity.MentionText?.Trim();
-                        if (!string.IsNullOrEmpty(servingSizeUnitValue))
-                            scannedLabel.ServingSizeUnit = new Optional<string>(servingSizeUnitValue);
-                        break;
-
-                    case var fieldName when fieldName == GetFieldName(nameof(ScannedNutritionLabel.AlternateServingSizeUnit)):
-                        var alternateServingSizeUnitValue = entity.MentionText?.Trim();
-                        if (!string.IsNullOrEmpty(alternateServingSizeUnitValue))
-                            scannedLabel.AlternateServingSizeUnit = new Optional<string>(alternateServingSizeUnitValue);
-                        break;
-
-                    case var fieldName when fieldName == GetFieldName(nameof(ScannedNutritionLabel.Calories)):
-                        scannedLabel.Calories = ParseSimpleDecimal(entity.MentionText);
-                        break;
-
-                    case var fieldName when fieldName == GetFieldName(nameof(ScannedNutritionLabel.CarbohydrateGrams)):
-                        scannedLabel.CarbohydrateGrams = ParseSimpleDecimal(entity.MentionText);
-                        break;
-
-                    case var fieldName when fieldName == GetFieldName(nameof(ScannedNutritionLabel.FatGrams)):
-                        scannedLabel.FatGrams = ParseSimpleDecimal(entity.MentionText);
-                        break;
-
-                    case var fieldName when fieldName == GetFieldName(nameof(ScannedNutritionLabel.ProteinGrams)):
-                        scannedLabel.ProteinGrams = ParseSimpleDecimal(entity.MentionText);
-                        break;
-
-                    case var fieldName when fieldName == GetFieldName(nameof(ScannedNutritionLabel.FibreGrams)):
-                        scannedLabel.FibreGrams = ParseSimpleDecimal(entity.MentionText);
-                        break;
-
-                    case var fieldName when fieldName == GetFieldName(nameof(ScannedNutritionLabel.SodiumGrams)):
-                        scannedLabel.SodiumGrams = ParseSimpleDecimal(entity.MentionText);
-                        break;
+                    var ratio = Math.Min((double)maxSize / image.Width, (double)maxSize / image.Height);
+                    var newWidth = (int)(image.Width * ratio);
+                    var newHeight = (int)(image.Height * ratio);
+                    image.Mutate(x => x.Resize(newWidth, newHeight));
                 }
-            }
 
-            stateService.SetProcessingResult(processingId, scannedLabel);
+                var encoder = new JpegEncoder { Quality = 85 };
+                if (_scannerSettings.SaveTrainingData)
+                {
+                    var imagesDirectory = Path.Combine(_persistenceSettings.FileDataPath, "nutrition-labels");
+                    Directory.CreateDirectory(imagesDirectory);
+
+                    var timestamp = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
+                    var uniqueId = Guid.NewGuid().ToString("N")[..8];
+                    var fileName = $"nutrition-label-{timestamp}-{uniqueId}.jpg";
+                    var filePath = Path.Combine(imagesDirectory, fileName);
+
+                    await image.SaveAsJpegAsync(filePath, encoder);
+                }
+
+                // Step 2: Extract text using the configured OCR provider
+                using var memoryStream = new MemoryStream();
+                await image.SaveAsJpegAsync(memoryStream, encoder);
+                memoryStream.Position = 0;
+
+                var extractedText = await textExtractor.ExtractTextAsync(memoryStream, processingId);
+
+                // Step 3: Transform text to structured data using the configured LLM provider
+                var scannedLabel = await textTransformer.TransformText(extractedText, processingId);
+
+                stopwatch.Stop();
+                scannedLabel.ProcessingDuration = stopwatch.Elapsed;
+                stateService.SetProcessingResult(processingId, scannedLabel);
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                logger.LogError(ex, "Failed to process nutrition label for processing ID {ProcessingId}", processingId);
+                stateService.SetProcessingFailure(processingId, $"Error processing image: {ex.Message}");
+            }
         }
 
         public Guid StartBackgroundProcessing(Stream imageStream)
         {
             var processingId = stateService.StartProcessing();
+            stateService.UpdateProcessingStatus(processingId, "Processing image...");
 
             // Copy the stream since we need to process it in the background
             var memoryStream = new MemoryStream();
@@ -154,6 +96,7 @@ namespace Hestia.Domain.Services
                 }
                 catch (Exception ex)
                 {
+                    logger.LogError(ex, "Background processing failed for processing ID {ProcessingId}", processingId);
                     stateService.SetProcessingFailure(processingId, $"Error processing image: {ex.Message}");
                 }
                 finally
@@ -163,71 +106,6 @@ namespace Hestia.Domain.Services
             });
 
             return processingId;
-        }
-
-        private static Optional<decimal> ParseSimpleDecimal(string? mentionText)
-        {
-            var value = mentionText?.Trim();
-            if (!string.IsNullOrEmpty(value) && decimal.TryParse(value, out var parsed) && parsed >= 0)
-                return parsed;
-            return default;
-        }
-
-        private static Optional<decimal> ParseQuantityWithFractions(string? mentionText, bool hasCorrespondingUnit)
-        {
-            if (string.IsNullOrWhiteSpace(mentionText))
-            {
-                // Special case: if we have a unit but no quantity, assume quantity is 1
-                if (hasCorrespondingUnit)
-                    return 1m;
-
-                return default;
-            }
-
-            var components = mentionText.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (components.Length == 0)
-                return default;
-
-            var value = 0m;
-            var success = true;
-
-            foreach (var component in components)
-            {
-                var parts = component.Split('/');
-                if (parts.Length == 1)
-                {
-                    // Whole number or decimal
-                    if (decimal.TryParse(parts[0], out var parsedValue) && parsedValue >= 0)
-                    {
-                        value += parsedValue;
-                        continue;
-                    }
-                }
-                else if (parts.Length == 2)
-                {
-                    // Fraction like "1/4"
-                    if (decimal.TryParse(parts[0], out var numerator)
-                        && decimal.TryParse(parts[1], out var denominator)
-                        && denominator > 0 && numerator >= 0)
-                    {
-                        value += numerator / denominator;
-                        continue;
-                    }
-                }
-
-                success = false;
-                break;
-            }
-
-            return success && value >= 0 ? value : default;
-        }
-
-        private static string GetFieldName(string propertyName)
-        {
-            if (!_fieldMappings.TryGetValue(propertyName, out var fieldName))
-                throw new InvalidOperationException($"No DocumentAI field mapping found for property '{propertyName}'");
-
-            return fieldName;
         }
     }
 }

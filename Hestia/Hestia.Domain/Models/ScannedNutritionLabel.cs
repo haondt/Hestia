@@ -28,5 +28,7 @@ namespace Hestia.Domain.Models
         public Optional<decimal> FibreGrams { get; set; }
         [DocumentAIField("sodiumGrams")]
         public Optional<decimal> SodiumGrams { get; set; }
+        
+        public TimeSpan ProcessingDuration { get; set; }
     }
 }

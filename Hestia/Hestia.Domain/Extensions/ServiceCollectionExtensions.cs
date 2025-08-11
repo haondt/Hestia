@@ -21,14 +21,36 @@ namespace Hestia.Domain.Extensions
             if (scannerSettings.Enabled)
             {
                 services.Configure<NutritionLabelScannerSettings>(configuration.GetSection(nameof(NutritionLabelScannerSettings)));
-                if (scannerSettings.DocumentAI != null)
-                {
+                services.AddScoped<INutritionLabelScannerService, NutritionLabelScannerService>();
 
-                    services.AddScoped<INutritionLabelScannerService, NutritionLabelScannerService>();
+                if (scannerSettings.OcrProvider == OcrProvider.DocumentAI)
+                {
+                    if (scannerSettings.DocumentAI == null)
+                        throw new InvalidOperationException("DocumentAI settings are required when OcrProvider is DocumentAI");
+
+                    services.AddScoped<INutritionLabelTextExtractor, DocumentAINutritionLabelTextExtractor>();
+
                     services.AddDocumentProcessorServiceClient(b =>
                     {
                         b.Endpoint = $"{scannerSettings.DocumentAI.ProcessorLocationId}-documentai.googleapis.com";
                     });
+                }
+                else if (scannerSettings.OcrProvider == OcrProvider.CloudVision)
+                {
+                    services.AddScoped<INutritionLabelTextExtractor, CloudVisionNutritionLabelTextExtractor>();
+
+                    services.AddImageAnnotatorClient(b =>
+                    {
+
+                    });
+                }
+
+                if (scannerSettings.LlmProvider == LlmProvider.OpenRouter)
+                {
+                    if (scannerSettings.OpenRouter == null)
+                        throw new InvalidOperationException("OpenRouter settings are required when LlmProvider is OpenRouter");
+
+                    services.AddHttpClient<INutritionLabelTextTransformer, OpenRouterNutritionLabelTextTransformer>();
                 }
             }
             else

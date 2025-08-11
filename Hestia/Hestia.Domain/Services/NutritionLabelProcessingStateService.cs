@@ -12,7 +12,7 @@ namespace Hestia.Domain.Services
         public Guid StartProcessing()
         {
             var id = Guid.NewGuid();
-            cache.Set(id, "Processing...", _cacheTimeout);
+            UpdateProcessingStatus(id, "Processing...");
             return id;
         }
 
@@ -25,17 +25,17 @@ namespace Hestia.Domain.Services
 
         public void SetProcessingResult(Guid id, ScannedNutritionLabel result)
         {
-            cache.Set(id, new Union<string, DetailedResult<ScannedNutritionLabel, string>>(new DetailedResult<ScannedNutritionLabel, string>(result)));
+            cache.Set(id, new Union<string, DetailedResult<ScannedNutritionLabel, string>>(new DetailedResult<ScannedNutritionLabel, string>(result)), _cacheTimeout);
         }
 
         public void SetProcessingFailure(Guid id, string reason)
         {
-            cache.Set(id, new Union<string, DetailedResult<ScannedNutritionLabel, string>>(new DetailedResult<ScannedNutritionLabel, string>(reason)));
+            cache.Set(id, new Union<string, DetailedResult<ScannedNutritionLabel, string>>(new DetailedResult<ScannedNutritionLabel, string>(reason)), _cacheTimeout);
         }
 
         public void UpdateProcessingStatus(Guid id, string status)
         {
-            cache.Set(id, new Union<string, DetailedResult<ScannedNutritionLabel, string>>(status));
+            cache.Set(id, new Union<string, DetailedResult<ScannedNutritionLabel, string>>(status), _cacheTimeout);
         }
     }
 }
