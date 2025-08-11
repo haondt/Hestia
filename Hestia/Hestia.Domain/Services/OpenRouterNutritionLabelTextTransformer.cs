@@ -58,6 +58,8 @@ namespace Hestia.Domain.Services
                 - Extract numbers only, no units in numeric fields
                 - Sodium should be in grams (convert from mg if needed: mg ÷ 1000)
                 - Return ONLY the JSON, no explanation
+                - If two serving sizes are given, the first one is the serving size and the second is the alternate serving size. (e.g. 1 cup (250 mL) = 1 cup serving size, 250 mL alternate serving size).
+                - Normalize units to abbreviated, singular forms where appropriate. E.g. tablespoon -> tbsp, milliliters -> ml, lbs -> lb. If there is not a standard, well known conversion, leave it as-is (e.g. 1 egg -> 1 egg).
 
                 Text from nutrition label:
                 {{text}}

@@ -65,6 +65,7 @@
     <div class="mb-5">
         <form
             id="scan-nutrition-form" enctype="multipart/form-data" hx-post="/ingredients/scan-nutrition-label" hx-swap="none"
+            class="is-flex is-justify-content-center"
             _="
                 on innerSubmit
                     send submit to me
@@ -72,8 +73,8 @@
                 end
               ">
             <input type="file" class="is-hidden" id="nutrition-image" name="image" accept="image/*" capture="environment" _="on change send innerSubmit to the closest <form />" />
-            <label for="nutrition-image" type="button" class="button is-success is-large is-fullwidth">
-                📷 Scan Nutrition Label
+            <label for="nutrition-image" type="button" class="button has-text-link px-5 py-4">
+                Scan Nutrition Label
             </label>
         </form>
     </div>
