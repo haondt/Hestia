@@ -27,7 +27,7 @@ namespace Hestia.Persistence.Models
 
     }
 
-    public class HestiatStateEntityTypeConfiguration : IEntityTypeConfiguration<HestiaStateDataModel>
+    public class HestiaStateEntityTypeConfiguration : IEntityTypeConfiguration<HestiaStateDataModel>
     {
         public void Configure(EntityTypeBuilder<HestiaStateDataModel> builder)
         {

@@ -17,6 +17,13 @@ namespace Hestia.Domain.Models
                 .OrderBy(s => s.Order)
                 .Select(MealPlanItemModel.FromDataModel).ToList()
         };
+        public static MealPlanSectionModel FromDataModel(FoodLogSectionDataModel model) => new()
+        {
+            Name = model.Name,
+            Items = model.Items
+                .OrderBy(s => s.Order)
+                .Select(MealPlanItemModel.FromDataModel).ToList()
+        };
 
         public MealPlanSectionDataModel AsDataModel(int order) => new()
         {
@@ -24,6 +31,14 @@ namespace Hestia.Domain.Models
             Order = order,
             MealPlanId = 0,
             Items = Items.Select((item, i) => item.AsDataModel(i)).ToList()
+        };
+
+        public FoodLogSectionDataModel AsFoodLogDataModel(int order) => new()
+        {
+            Name = Name,
+            Order = order,
+            FoodLogId = 0,
+            Items = Items.Select((item, i) => item.AsFoodLogDataModel(i)).ToList()
         };
     }
 }

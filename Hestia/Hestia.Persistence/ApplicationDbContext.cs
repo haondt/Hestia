@@ -14,6 +14,7 @@ namespace Hestia.Persistence
         public DbSet<UnitConversionDataModel> UnitConversions { get; set; } = default!;
         public DbSet<HestiaStateDataModel> HestiaStates { get; set; } = default!;
         public DbSet<MealPlanDataModel> MealPlans { get; set; } = default!;
+        public DbSet<FoodLogDataModel> FoodLogs { get; set; } = default!;
 
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {

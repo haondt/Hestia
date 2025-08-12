@@ -27,7 +27,9 @@
       "icons/grip-vertical.svg",
       "icons/check.svg",
       "icons/cloud-alert.svg",
-      "icons/zap.svg"
+      "icons/zap.svg",
+      "icons/chevron-left.svg",
+      "icons/chevron-right.svg"
     ],
     "@floating-ui/dom": [
       "./dist/floating-ui.dom.umd.js"

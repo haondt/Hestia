@@ -14,6 +14,7 @@ namespace Hestia.Domain.Extensions
             services.AddScoped<IUnitConversionsService, UnitConversionsService>();
             services.AddScoped<IRecipesService, RecipesService>();
             services.AddScoped<IMealPlansService, MealPlansService>();
+            services.AddScoped<IFoodLogService, FoodLogService>();
             services.AddScoped<IDbSeeder, DbSeeder>();
             services.AddScoped<IDevDbSeeder, DevDbSeeder>();
 

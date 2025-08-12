@@ -129,6 +129,7 @@ namespace Hestia.Domain.Services
         public Task<List<string>> GetDefaultSectionsAsync()
         {
             //var state = await HestiaStateDataModel.GetOrCreateAsync(context);
+            // TODO:
             return Task.FromResult<List<string>>(["Breakfast", "Lunch", "Dinner"]);
         }
     }

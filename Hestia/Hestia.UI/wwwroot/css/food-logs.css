@@ -1,0 +1,24 @@
+
+.meal-plan-selector {
+    display: flex;
+    flex-direction: row;
+    > :first-child {
+        border-bottom-left-radius: var(--bulma-radius);
+        border-top-left-radius: var(--bulma-radius);
+        border-left: 1px solid var(--bulma-border-weak);
+    }
+    > * {
+        border-top: 1px solid var(--bulma-border-weak);
+        border-bottom: 1px solid var(--bulma-border-weak);
+        padding: 7px 11px;
+        border-right: 1px solid var(--bulma-border-weak);
+    }
+    > :last-child {
+        border-bottom-right-radius: var(--bulma-radius);
+        border-top-right-radius: var(--bulma-radius);
+    }
+}
+.meal-plan-label:hover {
+    border-color: var(--bulma-grey-dark);
+    cursor: pointer;
+}

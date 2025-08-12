@@ -1,0 +1,88 @@
+@using Hestia.Domain.Models
+@using Hestia.Domain.Services
+@using Hestia.UI.Core.Components
+@using Hestia.UI.FoodLog.Components
+@using System.Globalization
+@using Hestia.UI.MealPlans.Components
+
+@attribute [RenderPage]
+@inject IFoodLogService FoodLogService
+@inject IMealPlansService MealPlansService
+
+<div _="on load send OnNavigate(value:'FoodLog') to #navbar then remove me"></div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required string DateString { get; set; }
+
+    private FoodLogModel _foodLog = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _foodLog = await FoodLogService.GetOrCreateFoodLogAsync(DateString);
+    }
+
+}
+
+<div class="content-container mt-5">
+        <div class="page-header is-flex is-flex-direction-row is-justify-content-space-between is-align-items-center">
+            <div class="is-clickable">
+                <LucideIcon CssClass="has-text-primary" Name="chevron-left" Size="40" />
+            </div>
+            <div class="is-flex is-flex-direction-column">
+                <p class="px-6">Food Log</p>
+                <hr class="my-1" />
+                <p class="pl-6 has-text-grey is-size-6 is-text-align-start">@DateString</p>
+            </div>
+            <div class="is-clickable">
+                <LucideIcon CssClass="has-text-primary" Name="chevron-right" Size="40"/>
+            </div>
+        </div>
+    <div class="is-flex is-flex-direction-row is-fullwidth is-position-relative mb-5">
+        <div class="is-fullwidth is-flex-grow-1">
+            <div class="tabs is-flex-grow-1">
+                <ul>
+                    <li class="is-active">
+                        <a 
+                            _="
+                                on click 
+                                    add .is-active to the closest <li/>
+                                    remove .is-active from the first <li />
+                                    remove .is-hidden from #food-log-editor-panel
+                                    set #food-log-insights-panel's innerHTML to ''
+                                end
+                            "
+                        >
+                            Food Log
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            _="
+                                on click 
+                                    add .is-active to the closest <li/>
+                                    remove .is-active from the previous <li />
+                                    add .is-hidden to #food-log-editor-panel
+                                    send loadData to #food-log-insights-panel
+                                end
+                            "
+                        >
+                            Insights
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="food-log-editor-panel" class="meal-plan-editor-panel">
+        <FoodLogger FoodLog="_foodLog" DateString="DateString" />
+    </div>
+    <div 
+        id="food-log-insights-panel"
+        hx-trigger="loadData"
+        hx-get="/food-logs/insights/@DateString"
+        hx-swap="innerHTML"
+    >
+    </div>
+</div>

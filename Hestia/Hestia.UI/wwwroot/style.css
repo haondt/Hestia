@@ -1,4 +1,5 @@
 @import 'css/meal-plans.css';
+@import 'css/food-logs.css';
 
 :root {
     --hestia-content-width: 1300px;
@@ -467,6 +468,9 @@ hr {
 
 .is-text-align-end {
     text-align: end;
+}
+.is-text-align-start {
+    text-align: start !important;
 }
 
 .is-whitespace-nowrap {

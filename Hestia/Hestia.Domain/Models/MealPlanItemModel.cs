@@ -31,6 +31,16 @@ namespace Hestia.Domain.Models
                 ? model.Recipe!.Title
                 : model.Ingredient!.Name
         };
+        public static MealPlanItemModel FromDataModel(FoodLogItemDataModel model) => new()
+        {
+            ItemType = model.ItemType,
+            RecipeOrIngredientId = model.ItemType == MealItemType.Recipe ? model.RecipeId!.Value : model.IngredientId!.Value,
+            Quantity = model.Quantity,
+            Unit = model.Unit.AsOptional(),
+            ItemName = model.ItemType == MealItemType.Recipe
+                ? model.Recipe!.Title
+                : model.Ingredient!.Name
+        };
 
         public MealPlanItemDataModel AsDataModel(int order) => new()
         {
@@ -40,6 +50,16 @@ namespace Hestia.Domain.Models
             Quantity = Quantity,
             Unit = Unit.Unwrap(),
             MealSectionId = 0,
+            Order = order,
+        };
+        public FoodLogItemDataModel AsFoodLogDataModel(int order) => new()
+        {
+            ItemType = ItemType,
+            RecipeId = ItemType == MealItemType.Recipe ? RecipeOrIngredientId : null,
+            IngredientId = ItemType == MealItemType.Ingredient ? RecipeOrIngredientId : null,
+            Quantity = Quantity,
+            Unit = Unit.Unwrap(),
+            FoodLogSectionId = 0,
             Order = order,
         };
     }
