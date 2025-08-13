@@ -1,5 +1,7 @@
 using Haondt.Web.Core.Extensions;
 using Haondt.Web.Core.Services;
+using Hestia.Domain.Attributes;
+using Hestia.Domain.Models;
 using Hestia.Domain.Services;
 using Hestia.UI.Core.Controllers;
 using Microsoft.AspNetCore.Http;
@@ -16,6 +18,9 @@ namespace Hestia.UI.FoodLog.Controllers
         [HttpGet("food-log/{dateString?}")]
         public async Task<IResult> GetFoodLogAsync(string? dateString = null)
         {
+            if (!ValidDateStringAttribute.Validate(dateString))
+                dateString = null;
+
             if (dateString == null)
             {
                 if (Request.AsRequestData().IsHxRequest())
@@ -33,5 +38,15 @@ namespace Hestia.UI.FoodLog.Controllers
             });
         }
 
+        [HttpPut("food-log/{dateString?}")]
+        public async Task<IResult> UpdateFoodLogAsync([ValidDateString] string dateString, [FromForm] FoodLogModel foodLog)
+        {
+            if (!ModelState.IsValid)
+                return TypedResults.NotFound();
+
+            foodLog.DateString = dateString;
+            await foodLogService.UpdateFoodLogAsync(foodLog);
+            return TypedResults.Ok();
+        }
     }
 }

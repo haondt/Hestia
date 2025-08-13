@@ -36,6 +36,7 @@
     <form
         id="meal-planner-form"
         hx-put="/meal-plans/meal-plan/@MealPlanId"
+        hx-swap="none"
         _="
             on load
                 set :title to the next <[name='Name']/>

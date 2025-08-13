@@ -37,17 +37,15 @@
     <form
         id="meal-planner-form"
         hx-put="/food-logs/food-log/@DateString"
+        hx-swap="none"
         _="
-            on load
-                set :title to the next <[name='Name']/>
-            end
             on htmx:beforeRequest
                 add .is-hidden to #save-success-indicator
                 add .is-hidden to #save-fail-indicator
-                add .is-loading to :title's parentElement
+                remove .is-hidden from #in-flight-indicator
             end
             on htmx:afterRequest
-                remove .is-loading from :title's parentElement
+                add .is-hidden to #in-flight-indicator
                 if event.detail.xhr.status is 200
                     remove .is-hidden from #save-success-indicator
                 else
@@ -55,42 +53,44 @@
                 end
             end
         "
-    ></form>
+    >
+    <input type="hidden" name="@nameof(FoodLogModel.DateString)" value="@DateString"/>
+</form>
 
     <!-- Basic meal plan info -->
     <div class="field mb-3 is-flex is-align-items-center">
-        <div class="control is-flex-grow-1 has-icons-right">
-            <EmbeddedMealPlan MealPlan="@FoodLog.MealPlan" />
-            <span id="save-success-indicator" class="icon is-right has-text-success is-hidden">
-                <LucideIcon Name="check"/>
-            </span>
-            <span id="save-fail-indicator" class="icon is-right has-text-danger is-hidden">
-                <LucideIcon Name="cloud-alert" />
-            </span>
+        <div class="mr-2">
+            <EmbeddedMealPlan MealPlan="@FoodLog.MealPlan.AsOptional()" />
         </div>
-        <div class="control is-loading just-spinner ml-2 is-invisible"></div>
-        <div class="ml-2">
-            <Tooltip Position="Tooltip.TooltipPosition.TopEnd" >
-                <TriggerContent>
-                    <div class="is-flex is-align-items-center">
-                        <span class="icon">
-                            <LucideIcon CssClass="has-text-grey" Name="info"/>
+        <span class="is-flex-grow-1"></span>
+        <span id="save-success-indicator" class="icon mr-2 has-text-success is-hidden">
+            <LucideIcon Name="check"/>
+        </span>
+        <span id="save-fail-indicator" class="icon mr-2 has-text-danger is-hidden">
+            <LucideIcon Name="cloud-alert" />
+        </span>
+
+        <div id="in-flight-indicator" class="control is-hidden is-flex-shrink-0 is-loading just-spinner mr-2" style="width:24px;"></div>
+        <Tooltip Position="Tooltip.TooltipPosition.TopEnd" >
+            <TriggerContent>
+                <div class="is-flex is-align-items-center">
+                    <span class="icon">
+                        <LucideIcon CssClass="has-text-grey" Name="info"/>
+                    </span>
+                </div>
+            </TriggerContent>
+            <TooltipContent>
+                <div class="card p-3 content">
+                    <p>
+                        <span>Changes to this form will save automatically.</span>
+                        <span class="is-flex is-flex-wrap-wrap gap-2" >
+                            <span class="control is-loading just-spinner"></span> 
+                            <span>indicates a request is currently in flight.</span>
                         </span>
-                    </div>
-                </TriggerContent>
-                <TooltipContent>
-                    <div class="card p-3 content">
-                        <p>
-                            <span>Changes to this form will save automatically.</span>
-                            <span class="is-flex is-flex-wrap-wrap gap-2" >
-                                <span class="control is-loading just-spinner"></span> 
-                                <span>indicates a request is currently in flight.</span>
-                            </span>
-                        </p>
-                    </div>
-                </TooltipContent>
-            </Tooltip>
-        </div>
+                    </p>
+                </div>
+            </TooltipContent>
+        </Tooltip>
 
     </div>
 
