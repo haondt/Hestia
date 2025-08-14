@@ -23,25 +23,22 @@ namespace Hestia.UI.FoodLog.Controllers
 
         [HttpGet]
         [HttpGet("food-log/{dateString?}")]
-        public async Task<IResult> GetFoodLogAsync(string? dateString = null)
+        public async Task<IResult> GetFoodLogAsync(string? dateString = null, string? clientSideDateString = null)
         {
             if (!ValidDateStringAttribute.Validate(dateString))
                 dateString = null;
+            if (!ValidDateStringAttribute.Validate(clientSideDateString))
+                clientSideDateString = null;
 
-            if (dateString == null)
-            {
-                if (Request.AsRequestData().IsHxRequest())
-                {
-                    Response.AsResponseData()
-                        .HxLocation($"/food-logs/food-log/{DateTime.Today:yyyy-MM-dd}", target: "#page-container");
-                    return TypedResults.Ok();
-                }
-                return TypedResults.Redirect($"/food-logs/food-log/{DateTime.Today:yyyy-MM-dd}");
-            }
+            var finalDateString = clientSideDateString ?? dateString ?? DateTime.Today.ToString("yyyy-MM-dd");
 
+            if (!Request.AsRequestData().IsHxRequest() && string.IsNullOrEmpty(dateString))
+                return TypedResults.Redirect($"/food-logs/food-log/{finalDateString}");
+            Response.AsResponseData()
+                .HxPushUrl($"/food-logs/food-log/{finalDateString}");
             return await _componentFactory.RenderComponentAsync(new Components.FoodLog
             {
-                DateString = dateString,
+                DateString = finalDateString,
             });
         }
 
@@ -84,7 +81,7 @@ namespace Hestia.UI.FoodLog.Controllers
                 return await _componentFactory.RenderComponentAsync<EmbeddedMealPlan>();
             var mealPlan = await mealPlansService.GetMealPlanAsync(id.Value);
             if (!mealPlan.IsSuccessful)
-                return await componentFactory.RenderComponentAsync(new Toast
+                return await _componentFactory.RenderComponentAsync(new Toast
                 {
                     Message = $"Meal plan with id {id.Value} not found.",
                     Severity = ToastSeverity.Error

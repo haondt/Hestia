@@ -46,7 +46,9 @@
                 href="/food-logs"
                 hx-boost="true"
                 hx-target="#page-container"
-                class="navbar-item is-tab">Food Logs</a>
+                hx-vals='js:{clientSideDateString: new Date().toISOString().split("T")[0]}'
+                class="navbar-item is-tab"
+                >Food Logs</a>
         </div>
         <div class="navbar-end">
             <a

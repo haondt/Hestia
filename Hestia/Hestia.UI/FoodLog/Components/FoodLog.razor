@@ -16,27 +16,48 @@
     public required string DateString { get; set; }
 
     private FoodLogModel _foodLog = default!;
+    private DateOnly _date;
 
     protected override async Task OnInitializedAsync()
     {
         _foodLog = await FoodLogService.GetOrCreateFoodLogAsync(DateString);
+        _date = DateOnly.Parse(DateString);
     }
 
 }
 
 <div class="content-container mt-5">
         <div class="page-header is-flex is-flex-direction-row is-justify-content-space-between is-align-items-center">
-            <div class="is-clickable">
+            <a
+                href="/food-logs/food-log/@_date.AddDays(-1).ToString("yyyy-MM-dd")"
+                hx-boost="true"
+                hx-target="#page-container"
+            >
                 <LucideIcon CssClass="has-text-primary" Name="chevron-left" Size="40" />
-            </div>
+            </a>
             <div class="is-flex is-flex-direction-column">
                 <p class="px-6">Food Log</p>
                 <hr class="my-1" />
-                <p class="pl-6 has-text-grey is-size-6 is-text-align-start">@DateString</p>
+                <p class="pl-6 has-text-grey is-size-6 is-text-align-start is-clickable"
+                   _="on click set picker to #date-picker picker.showPicker()">@DateString</p>
+                <input 
+                    id="date-picker"
+                    type="date" 
+                    value="@DateString" 
+                    style="height:0;visibility:hidden;"
+                    hx-get="/food-logs"
+                    hx-vals='js:{clientSideDateString: this.value}'
+                    hx-target="#page-container"
+                    hx-trigger="change"
+                    />
             </div>
-            <div class="is-clickable">
-                <LucideIcon CssClass="has-text-primary" Name="chevron-right" Size="40"/>
-            </div>
+            <a
+                href="/food-logs/food-log/@_date.AddDays(1).ToString("yyyy-MM-dd")"
+                hx-boost="true"
+                hx-target="#page-container"
+            >
+                <LucideIcon CssClass="has-text-primary" Name="chevron-right" Size="40" />
+            </a>
         </div>
     <div class="is-flex is-flex-direction-row is-fullwidth is-position-relative mb-5">
         <div class="is-fullwidth is-flex-grow-1">
