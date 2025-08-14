@@ -16,6 +16,90 @@ namespace Hestia.Persistence.Migrations.Sqlite
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
 
+            modelBuilder.Entity("Hestia.Persistence.Models.FoodLogDataModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("DateString")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("MealPlanId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DateString")
+                        .IsUnique();
+
+                    b.HasIndex("MealPlanId");
+
+                    b.ToTable("FoodLogs");
+                });
+
+            modelBuilder.Entity("Hestia.Persistence.Models.FoodLogItemDataModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FoodLogSectionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("IngredientId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("RecipeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Unit")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FoodLogSectionId");
+
+                    b.HasIndex("IngredientId");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("FoodLogItemDataModel");
+                });
+
+            modelBuilder.Entity("Hestia.Persistence.Models.FoodLogSectionDataModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FoodLogId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FoodLogId");
+
+                    b.ToTable("FoodLogSectionDataModel");
+                });
+
             modelBuilder.Entity("Hestia.Persistence.Models.HestiaStateDataModel", b =>
                 {
                     b.Property<int>("Id")
@@ -104,6 +188,10 @@ namespace Hestia.Persistence.Migrations.Sqlite
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -277,6 +365,50 @@ namespace Hestia.Persistence.Migrations.Sqlite
                     b.ToTable("UnitConversions");
                 });
 
+            modelBuilder.Entity("Hestia.Persistence.Models.FoodLogDataModel", b =>
+                {
+                    b.HasOne("Hestia.Persistence.Models.MealPlanDataModel", "MealPlan")
+                        .WithMany("FoodLogs")
+                        .HasForeignKey("MealPlanId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("MealPlan");
+                });
+
+            modelBuilder.Entity("Hestia.Persistence.Models.FoodLogItemDataModel", b =>
+                {
+                    b.HasOne("Hestia.Persistence.Models.FoodLogSectionDataModel", "FoodLogSection")
+                        .WithMany("Items")
+                        .HasForeignKey("FoodLogSectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hestia.Persistence.Models.IngredientDataModel", "Ingredient")
+                        .WithMany()
+                        .HasForeignKey("IngredientId");
+
+                    b.HasOne("Hestia.Persistence.Models.RecipeDataModel", "Recipe")
+                        .WithMany()
+                        .HasForeignKey("RecipeId");
+
+                    b.Navigation("FoodLogSection");
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("Hestia.Persistence.Models.FoodLogSectionDataModel", b =>
+                {
+                    b.HasOne("Hestia.Persistence.Models.FoodLogDataModel", "FoodLog")
+                        .WithMany("Sections")
+                        .HasForeignKey("FoodLogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FoodLog");
+                });
+
             modelBuilder.Entity("Hestia.Persistence.Models.MealPlanItemDataModel", b =>
                 {
                     b.HasOne("Hestia.Persistence.Models.IngredientDataModel", "Ingredient")
@@ -329,6 +461,16 @@ namespace Hestia.Persistence.Migrations.Sqlite
                     b.Navigation("Recipe");
                 });
 
+            modelBuilder.Entity("Hestia.Persistence.Models.FoodLogDataModel", b =>
+                {
+                    b.Navigation("Sections");
+                });
+
+            modelBuilder.Entity("Hestia.Persistence.Models.FoodLogSectionDataModel", b =>
+                {
+                    b.Navigation("Items");
+                });
+
             modelBuilder.Entity("Hestia.Persistence.Models.IngredientDataModel", b =>
                 {
                     b.Navigation("Recipes");
@@ -336,6 +478,8 @@ namespace Hestia.Persistence.Migrations.Sqlite
 
             modelBuilder.Entity("Hestia.Persistence.Models.MealPlanDataModel", b =>
                 {
+                    b.Navigation("FoodLogs");
+
                     b.Navigation("Sections");
                 });
 

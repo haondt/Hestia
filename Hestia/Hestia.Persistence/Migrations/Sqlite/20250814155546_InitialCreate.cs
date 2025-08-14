@@ -5,7 +5,7 @@
 namespace Hestia.Persistence.Migrations.Sqlite
 {
     /// <inheritdoc />
-    public partial class Migration1 : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,6 +58,7 @@ namespace Hestia.Persistence.Migrations.Sqlite
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
+                    NormalizedName = table.Column<string>(type: "TEXT", nullable: false),
                     LastModified = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -102,6 +103,26 @@ namespace Hestia.Persistence.Migrations.Sqlite
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UnitConversions", x => new { x.NormalizedFromUnit, x.NormalizedToUnit });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FoodLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    DateString = table.Column<string>(type: "TEXT", nullable: false),
+                    MealPlanId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FoodLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FoodLogs_MealPlans_MealPlanId",
+                        column: x => x.MealPlanId,
+                        principalTable: "MealPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -155,6 +176,27 @@ namespace Hestia.Persistence.Migrations.Sqlite
                 });
 
             migrationBuilder.CreateTable(
+                name: "FoodLogSectionDataModel",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FoodLogId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Order = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FoodLogSectionDataModel", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FoodLogSectionDataModel_FoodLogs_FoodLogId",
+                        column: x => x.FoodLogId,
+                        principalTable: "FoodLogs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MealPlanItemDataModel",
                 columns: table => new
                 {
@@ -188,6 +230,72 @@ namespace Hestia.Persistence.Migrations.Sqlite
                         principalTable: "Recipes",
                         principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateTable(
+                name: "FoodLogItemDataModel",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Order = table.Column<int>(type: "INTEGER", nullable: false),
+                    ItemType = table.Column<int>(type: "INTEGER", nullable: false),
+                    RecipeId = table.Column<int>(type: "INTEGER", nullable: true),
+                    IngredientId = table.Column<int>(type: "INTEGER", nullable: true),
+                    Quantity = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Unit = table.Column<string>(type: "TEXT", nullable: true),
+                    FoodLogSectionId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FoodLogItemDataModel", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FoodLogItemDataModel_FoodLogSectionDataModel_FoodLogSectionId",
+                        column: x => x.FoodLogSectionId,
+                        principalTable: "FoodLogSectionDataModel",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FoodLogItemDataModel_Ingredients_IngredientId",
+                        column: x => x.IngredientId,
+                        principalTable: "Ingredients",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_FoodLogItemDataModel_Recipes_RecipeId",
+                        column: x => x.RecipeId,
+                        principalTable: "Recipes",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FoodLogItemDataModel_FoodLogSectionId",
+                table: "FoodLogItemDataModel",
+                column: "FoodLogSectionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FoodLogItemDataModel_IngredientId",
+                table: "FoodLogItemDataModel",
+                column: "IngredientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FoodLogItemDataModel_RecipeId",
+                table: "FoodLogItemDataModel",
+                column: "RecipeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FoodLogs_DateString",
+                table: "FoodLogs",
+                column: "DateString",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FoodLogs_MealPlanId",
+                table: "FoodLogs",
+                column: "MealPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FoodLogSectionDataModel_FoodLogId",
+                table: "FoodLogSectionDataModel",
+                column: "FoodLogId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MealPlanItemDataModel_IngredientId",
@@ -224,6 +332,9 @@ namespace Hestia.Persistence.Migrations.Sqlite
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "FoodLogItemDataModel");
+
+            migrationBuilder.DropTable(
                 name: "HestiaStates");
 
             migrationBuilder.DropTable(
@@ -236,6 +347,9 @@ namespace Hestia.Persistence.Migrations.Sqlite
                 name: "UnitConversions");
 
             migrationBuilder.DropTable(
+                name: "FoodLogSectionDataModel");
+
+            migrationBuilder.DropTable(
                 name: "MealPlanSectionDataModel");
 
             migrationBuilder.DropTable(
@@ -243,6 +357,9 @@ namespace Hestia.Persistence.Migrations.Sqlite
 
             migrationBuilder.DropTable(
                 name: "Recipes");
+
+            migrationBuilder.DropTable(
+                name: "FoodLogs");
 
             migrationBuilder.DropTable(
                 name: "MealPlans");
