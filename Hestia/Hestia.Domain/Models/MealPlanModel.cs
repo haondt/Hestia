@@ -1,5 +1,6 @@
 using Haondt.Core.Extensions;
 using Haondt.Core.Models;
+using Hestia.Core.Models;
 using Hestia.Domain.Services;
 using Hestia.Persistence.Models;
 using System.ComponentModel.DataAnnotations;
@@ -22,18 +23,20 @@ namespace Hestia.Domain.Models
             Sections = model.Sections
                 .OrderBy(s => s.Order)
                 .Select(MealPlanSectionModel.FromDataModel)
-                .ToList()
+                .ToList(),
         };
 
         public MealPlanDataModel AsDataModel() => new()
         {
             Name = Name,
+            NormalizedName = NormalizedString.Create(Name),
             LastModified = LastModified,
             Sections = Sections.Select((section, index) => section.AsDataModel(index)).ToList()
         };
         public void ApplyUpdate(MealPlanDataModel model)
         {
             model.Name = Name;
+            model.NormalizedName = NormalizedString.Create(Name);
             model.LastModified = AbsoluteDateTime.Now;
             model.Sections = Sections.Select((section, index) => section.AsDataModel(index)).ToList();
         }

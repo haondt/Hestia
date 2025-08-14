@@ -24,9 +24,9 @@ namespace Hestia.Persistence.Models
 
             builder
                 .HasOne(fl => fl.MealPlan)
-                .WithOne(mp => mp.FoodLog)
-                .HasForeignKey<FoodLogDataModel>(fl => fl.MealPlanId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .WithMany(mp => mp.FoodLogs)
+                .HasForeignKey(fl => fl.MealPlanId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

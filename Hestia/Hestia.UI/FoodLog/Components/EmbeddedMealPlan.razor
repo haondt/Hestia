@@ -1,14 +1,60 @@
 @using Hestia.Domain.Models
+@using Hestia.Domain.Services
 @using Hestia.UI.MealPlans.Components
+@inject IMealPlansService MealPlansService
 @code {
     [Parameter]
-    public Optional<MealPlanModel> MealPlan { get; set; }
+    public Optional<int> MealPlanId { get; set; }
+    [Parameter]
+    public bool EmitDirty { get; set; } = true;
+
+    private Optional<MealPlanModel> _mealPlan;
+    private Dictionary<string, object> _attributes = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (EmitDirty)
+            _attributes["_"] = "on load send dirty";
+
+        if (MealPlanId.TryGetValue(out var mealPlanId))
+        {
+            var result = await MealPlansService.GetMealPlanAsync(mealPlanId);
+            _mealPlan = result.AsOptional();
+        }
+        
+        await base.OnInitializedAsync();
+    }
+
 }
 
-<div class="is-flex is-flex-direction-row is-align-items-flex-end">
+<div 
+    @attributes="@_attributes"
+    id="embedded-meal-plan" class="is-flex is-flex-direction-row is-align-items-flex-end">
     <p class="section-label pb-2 mr-4">Meal plan</p>
-    <div class="meal-plan-selector mt-0">
-        <p class="meal-plan-label">Meal Plan #0</p>
-        <p class="has-text-danger is-clickable is-align-content-center">Clear</p>
-    </div>
+    @if (_mealPlan.TryGetValue(out var mealPlan))
+    {
+        <div class="is-hidden">
+            <input type="hidden" form="meal-planner-form" name="@nameof(FoodLogModel.MealPlanId)" value="@MealPlanId.Unwrap()" />
+        </div>
+        <div class="meal-plan-selector mt-0">
+            <p class="meal-plan-label"
+                hx-get="/food-logs/fragments/meal-plan-picker"
+                hx-swap="none"
+            >@mealPlan.Name</p>
+            <p
+                hx-get="/food-logs/fragments/embedded-meal-plan"
+                hx-target="#embedded-meal-plan"
+                class="has-text-danger is-clickable is-align-content-center">Clear</p>
+        </div>
+    }
+    else
+    {
+        <a
+            class="is-clickable has-text-grey mt-0 py-2"
+            hx-get="/food-logs/fragments/meal-plan-picker"
+            hx-swap="none">
+            Select Meal Plan
+        </a>
+        
+    }
 </div>

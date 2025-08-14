@@ -1,5 +1,6 @@
 using Haondt.Core.Extensions;
 using Haondt.Core.Models;
+using Hestia.Core.Models;
 using Hestia.Domain.Models;
 using Hestia.Persistence;
 using Hestia.Persistence.Models;
@@ -131,6 +132,27 @@ namespace Hestia.Domain.Services
             //var state = await HestiaStateDataModel.GetOrCreateAsync(context);
             // TODO:
             return Task.FromResult<List<string>>(["Breakfast", "Lunch", "Dinner"]);
+        }
+
+        public async Task<List<(int Id, MealPlanModel MealPlan)>> SearchMealPlansAsync(NormalizedString query, int page = 0, int pageSize = 50)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return await GetMealPlansAsync(page, pageSize);
+
+            var mealPlans = await context.MealPlans
+                .Include(mp => mp.Sections)
+                .ThenInclude(s => s.Items)
+                .ThenInclude(i => i.Recipe)
+                .Include(mp => mp.Sections)
+                .ThenInclude(s => s.Items)
+                .ThenInclude(i => i.Ingredient)
+                .Where(mp => mp.NormalizedName.Contains(query))
+                .OrderByDescending(mp => mp.LastModified)
+                .Skip(page * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return mealPlans.Select(mp => (mp.Id, MealPlanModel.FromDataModel(mp))).ToList();
         }
     }
 }

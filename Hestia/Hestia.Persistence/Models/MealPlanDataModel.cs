@@ -6,10 +6,10 @@ namespace Hestia.Persistence.Models
     {
         public int Id { get; set; }
         public required string Name { get; set; }
+        public required string NormalizedName { get; set; }
         public required AbsoluteDateTime LastModified { get; set; }
         public ICollection<MealPlanSectionDataModel> Sections { get; set; } = [];
-
-        public int? FoodLogId { get; set; }
-        public FoodLogDataModel? FoodLog { get; set; }
+        
+        public ICollection<FoodLogDataModel> FoodLogs { get; set; } = [];
     }
 }

@@ -9,7 +9,7 @@ namespace Hestia.Domain.Models
         [ValidDateString]
         public required string DateString { get; set; }
         public List<MealPlanSectionModel> Sections { get; set; } = [];
-        public MealPlanModel? MealPlan { get; set; }
+        public int? MealPlanId { get; set; }
 
         public static FoodLogModel FromDataModel(FoodLogDataModel model) => new()
         {
@@ -18,13 +18,13 @@ namespace Hestia.Domain.Models
                 .OrderBy(s => s.Order)
                 .Select(MealPlanSectionModel.FromDataModel)
                 .ToList(),
-            MealPlan = model.MealPlan.AsOptional().Map(MealPlanModel.FromDataModel).Unwrap()
+            MealPlanId = model.MealPlanId
         };
 
         public FoodLogDataModel AsDataModel() => new()
         {
             DateString = DateString,
-            MealPlan = MealPlan.AsOptional().Map(q => q.AsDataModel()).Unwrap(),
+            MealPlanId = MealPlanId,
             Sections = Sections.Select((section, index) => section.AsFoodLogDataModel(index)).ToList()
         };
 
@@ -32,7 +32,7 @@ namespace Hestia.Domain.Models
         {
             model.DateString = DateString;
             model.Sections = Sections.Select((section, index) => section.AsFoodLogDataModel(index)).ToList();
-            model.MealPlan = MealPlan.AsOptional().Map(q => q.AsDataModel()).Unwrap();
+            model.MealPlanId = MealPlanId;
         }
     }
 

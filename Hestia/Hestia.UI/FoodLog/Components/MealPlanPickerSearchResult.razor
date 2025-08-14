@@ -1,0 +1,26 @@
+@using Hestia.Domain.Models
+@using Hestia.Domain.Services
+@using Hestia.Persistence.Models
+@using Hestia.UI.Core.Components
+@inject IUnitConversionsService UnitConversionsService
+@code {
+    [Parameter, EditorRequired]
+    public required MealPlanModel MealPlan { get; set; }
+
+    [Parameter, EditorRequired]
+    public required int Id { get; set; }
+
+
+}
+
+<div class="meal-plan-item-search-result is-bordered is-radiused is-flex is-flex-direction-row is-align-items-stretch is-flex-grow-1">
+    <div class="is-flex-grow-1 my-2 mx-4">
+        <p class="section-label">@MealPlan.Name</p>
+        <p class="has-text-grey text-clamp-2">Last modified: @MealPlan.LastModified.LocalTime.ToString("G")</p>
+    </div>
+    <p
+        _="on click send mealPlanItemSelect(id: @Id)"
+        class="is-clickable py-2 px-4 has-border-left-weak is-flex is-align-items-center is-justify-content-center is-whitespace-nowrap has-text-weight-semibold has-text-light">
+        Select
+    </p>
+</div>
