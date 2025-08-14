@@ -22,14 +22,14 @@ namespace Hestia.Domain.Extensions
             if (scannerSettings.Enabled)
             {
                 services.Configure<NutritionLabelScannerSettings>(configuration.GetSection(nameof(NutritionLabelScannerSettings)));
-                services.AddScoped<INutritionLabelScannerService, NutritionLabelScannerService>();
+                services.AddScoped(typeof(IScannerService<>), typeof(ScannerService<>));
 
                 if (scannerSettings.OcrProvider == OcrProvider.DocumentAI)
                 {
                     if (scannerSettings.DocumentAI == null)
                         throw new InvalidOperationException("DocumentAI settings are required when OcrProvider is DocumentAI");
 
-                    services.AddScoped<INutritionLabelTextExtractor, DocumentAINutritionLabelTextExtractor>();
+                    services.AddScoped(typeof(IScanTextExtractor<>), typeof(DocumentAINutritionLabelTextExtractor<>));
 
                     services.AddDocumentProcessorServiceClient(b =>
                     {
@@ -38,7 +38,7 @@ namespace Hestia.Domain.Extensions
                 }
                 else if (scannerSettings.OcrProvider == OcrProvider.CloudVision)
                 {
-                    services.AddScoped<INutritionLabelTextExtractor, CloudVisionNutritionLabelTextExtractor>();
+                    services.AddScoped(typeof(IScanTextExtractor<>), typeof(CloudVisionScanTextExtractor<>));
 
                     services.AddImageAnnotatorClient(b =>
                     {
@@ -51,14 +51,15 @@ namespace Hestia.Domain.Extensions
                     if (scannerSettings.OpenRouter == null)
                         throw new InvalidOperationException("OpenRouter settings are required when LlmProvider is OpenRouter");
 
-                    services.AddHttpClient<INutritionLabelTextTransformer, OpenRouterNutritionLabelTextTransformer>();
+                    services.AddHttpClient<IScanTextTransformer<ScannedNutritionLabel>, OpenRouterNutritionLabelTextTransformer>();
+                    services.AddHttpClient<IScanTextTransformer<ScannedPackaging>, OpenRouterPackagingTextTransformer>();
                 }
             }
             else
             {
-                services.AddScoped<INutritionLabelScannerService, DisabledNutritionLabelScannerService>();
+                services.AddScoped(typeof(IScannerService<>), typeof(DisabledNutritionLabelScannerService<>));
             }
-            services.AddSingleton<INutritionLabelProcessingStateService, NutritionLabelProcessingStateService>();
+            services.AddSingleton(typeof(IScanProcessingStateService<>), typeof(ScanProcessingStateService<>));
 
             return services;
         }

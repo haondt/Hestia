@@ -21,7 +21,8 @@ namespace Hestia.UI.Ingredients.Controllers
     public class IngredientsController(IComponentFactory componentFactory,
         IIngredientsService ingredientsService,
         IUnitConversionsService unitConversionsService,
-        INutritionLabelScannerService labelScanner) : UIController(componentFactory)
+        IScannerService<ScannedNutritionLabel> labelScanner,
+        IScannerService<ScannedPackaging> packagingScanner) : UIController(componentFactory)
     {
         private readonly IComponentFactory _componentFactory = componentFactory;
 
@@ -210,7 +211,28 @@ namespace Hestia.UI.Ingredients.Controllers
             using var stream = image.OpenReadStream();
             var processingId = labelScanner.StartBackgroundProcessing(stream);
 
-            return await _componentFactory.RenderComponentAsync(new ScanNutritionLabel
+            return await _componentFactory.RenderComponentAsync(new Scan<ScannedNutritionLabel>
+            {
+                ProcessingId = processingId
+            });
+        }
+
+        [HttpPost("scan-packaging")]
+        public async Task<IResult> ScanPackaging(IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+            {
+                return await _componentFactory.RenderComponentAsync(new Toast
+                {
+                    Message = "No image file provided",
+                    Severity = ToastSeverity.Error
+                });
+            }
+
+            using var stream = image.OpenReadStream();
+            var processingId = packagingScanner.StartBackgroundProcessing(stream);
+
+            return await _componentFactory.RenderComponentAsync(new Scan<ScannedPackaging>
             {
                 ProcessingId = processingId
             });
@@ -219,7 +241,13 @@ namespace Hestia.UI.Ingredients.Controllers
         [HttpGet("scan-nutrition-label/status/{processingId}")]
         public Task<IResult> GetScanStatus(Guid processingId)
         {
-            return _componentFactory.RenderComponentAsync(new ScanNutritionLabelUpdate { ProcessingId = processingId });
+            return _componentFactory.RenderComponentAsync(new ScanUpdate<ScannedNutritionLabel> { ProcessingId = processingId });
+        }
+
+        [HttpGet("scan-packaging/status/{processingId}")]
+        public Task<IResult> GetPackagingScanStatus(Guid processingId)
+        {
+            return _componentFactory.RenderComponentAsync(new ScanUpdate<ScannedPackaging> { ProcessingId = processingId });
         }
     }
 }

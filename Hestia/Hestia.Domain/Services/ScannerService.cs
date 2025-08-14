@@ -9,13 +9,13 @@ using System.Diagnostics;
 
 namespace Hestia.Domain.Services
 {
-    public class NutritionLabelScannerService(
-        INutritionLabelTextExtractor textExtractor,
-        INutritionLabelTextTransformer textTransformer,
-        INutritionLabelProcessingStateService stateService,
+    public class ScannerService<T>(
+        IScanTextExtractor<T> textExtractor,
+        IScanTextTransformer<T> textTransformer,
+        IScanProcessingStateService<T> stateService,
         IOptions<PersistenceSettings> persistenceOptions,
         IOptions<NutritionLabelScannerSettings> scannerOptions,
-        ILogger<NutritionLabelScannerService> logger) : INutritionLabelScannerService
+        ILogger<ScannerService<T>> logger) : IScannerService<T> where T : IScannedData
     {
         private readonly PersistenceSettings _persistenceSettings = persistenceOptions.Value;
         private readonly NutritionLabelScannerSettings _scannerSettings = scannerOptions.Value;
@@ -28,7 +28,7 @@ namespace Hestia.Domain.Services
             {
                 // Step 1: Process and save the image
                 stateService.UpdateProcessingStatus(processingId, "Processing image...");
-                
+
                 using var image = await SixLabors.ImageSharp.Image.LoadAsync(imageStream);
 
                 // Resize if needed

@@ -1,6 +1,6 @@
 ﻿namespace Hestia.Domain.Services
 {
-    public interface INutritionLabelScannerService
+    public interface IScannerService<T>
     {
         Guid StartBackgroundProcessing(Stream imageStream);
     }

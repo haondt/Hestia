@@ -16,7 +16,7 @@ namespace Hestia.Domain.Models
         public string? Content { get; set; }
     }
 
-    // LLM response data model
+    // LLM response data models
     public class LLMNutritionData
     {
         public decimal? ServingSizeQuantity { get; set; }
@@ -29,5 +29,13 @@ namespace Hestia.Domain.Models
         public decimal? ProteinGrams { get; set; }
         public decimal? FibreGrams { get; set; }
         public decimal? SodiumGrams { get; set; }
+    }
+
+    public class LLMPackagingData
+    {
+        public string? Name { get; set; }
+        public string? Brand { get; set; }
+        public decimal? PackageSize { get; set; }
+        public string? PackageSizeUnit { get; set; }
     }
 }

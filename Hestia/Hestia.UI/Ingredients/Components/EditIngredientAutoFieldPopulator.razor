@@ -18,6 +18,15 @@
     public Optional<decimal> CarbGrams { get; set; }
     [Parameter]
     public Optional<decimal> ProteinGrams { get; set; }
+    
+    [Parameter]
+    public Optional<string> Name { get; set; }
+    [Parameter]
+    public Optional<string> Brand { get; set; }
+    [Parameter]
+    public Optional<decimal> PackageSize { get; set; }
+    [Parameter]
+    public Optional<string> PackageSizeUnit { get; set; }
 
     private readonly List<(string FieldName, object Value, bool IsUnitField)> _fieldsToPopulate = new();
 
@@ -48,6 +57,18 @@
 
         if (ProteinGrams.HasValue)
             _fieldsToPopulate.Add((nameof(IngredientModel.ProteinGrams), ProteinGrams.Value, false));
+
+        if (Name.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.Name), Name.Value, false));
+
+        if (Brand.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.Brand), Brand.Value, false));
+
+        if (PackageSize.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.PackageSizeQuantity), PackageSize.Value, false));
+
+        if (PackageSizeUnit.HasValue)
+            _fieldsToPopulate.Add((nameof(IngredientModel.PackageSizeUnit), PackageSizeUnit.Value, true));
     }
 
     private string GetHyperscriptForField(bool isUnitField)

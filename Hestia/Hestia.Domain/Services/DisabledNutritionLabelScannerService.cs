@@ -1,6 +1,6 @@
 ﻿namespace Hestia.Domain.Services
 {
-    public class DisabledNutritionLabelScannerService : INutritionLabelScannerService
+    public class DisabledNutritionLabelScannerService<T> : IScannerService<T>
     {
         public Guid StartBackgroundProcessing(Stream imageStream)
         {

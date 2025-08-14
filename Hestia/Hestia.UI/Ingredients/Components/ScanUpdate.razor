@@ -1,0 +1,79 @@
+@using Hestia.Domain.Models
+@using Hestia.Domain.Services
+@using Hestia.UI.Library.Components.Element
+@typeparam T where T : IScannedIngredientData 
+@inject IScanProcessingStateService<T> StateService
+
+@code {
+    [Parameter, EditorRequired]
+    public required Guid ProcessingId { get; set; }
+
+    private Result<Union<string, DetailedResult<T, string>>> _result = default!;
+    private Dictionary<string, object> _attributes = [];
+
+    protected override void OnInitialized()
+    {
+        _result = StateService.GetProcessingResult(ProcessingId);
+        if (_result.IsSuccessful && _result.Value.Is<string>(out _))
+            _attributes["hx-trigger"] = "load delay:500ms";
+        if (typeof(T) == typeof(ScannedNutritionLabel))
+            _attributes["hx-get"] = $"/ingredients/scan-nutrition-label/status/{ProcessingId}";
+        else if (typeof(T) == typeof(ScannedPackaging))
+            _attributes["hx-get"] = $"/ingredients/scan-packaging/status/{ProcessingId}";
+        base.OnInitialized();
+    }
+
+}
+
+<div 
+    id="scan-nutrition-label-state"
+    @attributes="_attributes"
+    hx-swap="outerHTML">
+    @if(!_result.TryGetValue(out var union))
+    {
+        <p>Processing session expired or not found. Please try again.</p>
+    }
+    else if (union.Is<string>(out var status))
+    {
+
+        <p>@status</p>
+    }
+    else 
+    {
+        var detailedResult = union.Cast<DetailedResult<T, string>>();
+
+        if (detailedResult.TryGetReason(out var reason))
+        {
+            <p class="has-text-danger">@reason</p>
+        }
+        else 
+        {
+            var scannedData = detailedResult.Value!;
+
+            if (scannedData is ScannedNutritionLabel scannedNutritionLabel)
+            {
+                <EditIngredientAutoFieldPopulator
+                    ServingSizeQuantity="scannedNutritionLabel.ServingSizeQuantity"
+                    ServingSizeUnit="scannedNutritionLabel.ServingSizeUnit"
+                    AlternateServingSizeQuantity="scannedNutritionLabel.AlternateServingSizeQuantity"
+                    AlternateServingSizeUnit="scannedNutritionLabel.AlternateServingSizeUnit"
+                    Calories="scannedNutritionLabel.Calories"
+                    FatGrams="scannedNutritionLabel.FatGrams"
+                    CarbGrams="scannedNutritionLabel.CarbohydrateGrams"
+                    ProteinGrams="scannedNutritionLabel.ProteinGrams"
+                    />
+            }
+            else if (scannedData is ScannedPackaging scannedPackaging)
+            {
+                <EditIngredientAutoFieldPopulator
+                    Name="scannedPackaging.Name"
+                    Brand="scannedPackaging.Brand"
+                    PackageSize="scannedPackaging.PackageSize"
+                    PackageSizeUnit="scannedPackaging.PackageSizeUnit"
+                    />
+            }
+            <CloseModal />
+        }
+    }
+
+</div>

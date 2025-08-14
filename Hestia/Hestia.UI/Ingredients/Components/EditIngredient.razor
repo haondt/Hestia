@@ -73,7 +73,21 @@
 
     @if (_scanNutritionLabelEnabled)
     {
-        <div class="mb-5">
+        <div class="mb-5 is-flex is-justify-content-center is-gap-2 mx-2">
+            <form
+            id="scan-packaging-form" enctype="multipart/form-data" hx-post="/ingredients/scan-packaging" hx-swap="none"
+            class="is-flex is-justify-content-center"
+            _="
+                on innerSubmit
+                    send submit to me
+                    reset() me
+                end
+              ">
+                <input type="file" class="is-hidden" id="packaging-image" name="image" accept="image/*" capture="environment" _="on change send innerSubmit to the closest <form />" />
+                <label for="packaging-image" type="button" class="button has-text-link px-5 py-4">
+                    Scan Packaging
+                </label>
+            </form>
             <form
             id="scan-nutrition-form" enctype="multipart/form-data" hx-post="/ingredients/scan-nutrition-label" hx-swap="none"
             class="is-flex is-justify-content-center"
@@ -99,7 +113,9 @@
             </div>
             <div class="field-body">
                 <div class="field">
-                    <input class="input" name="@nameof(IngredientModel.Name)" type="text" placeholder="3.25% Homogenized Milk" value="@Ingredient.Map(q => q.Name).Unwrap()" required/>
+                    <div class="control">
+                        <input class="input" name="@nameof(IngredientModel.Name)" type="text" placeholder="3.25% Homogenized Milk" value="@Ingredient.Map(q => q.Name).Unwrap()" required/>
+                    </div>
                 </div>
             </div>
         </div>
@@ -110,7 +126,9 @@
             </div>
             <div class="field-body">
                 <div class="field">
-                    <input class="input" name="@nameof(IngredientModel.Brand)" type="text" placeholder="Beatrice" value="@Ingredient.Bind(q => q.Brand).Unwrap()" />
+                    <div class="control">
+                        <input class="input" name="@nameof(IngredientModel.Brand)" type="text" placeholder="Beatrice" value="@Ingredient.Bind(q => q.Brand).Unwrap()" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -121,7 +139,9 @@
             </div>
             <div class="field-body">
                 <div class="field">
-                    <input class="input" name="@nameof(IngredientModel.Vendor)" type="text" placeholder="Superstore" value="@Ingredient.Bind(q => q.Vendor).Unwrap()" />
+                    <div class="control">
+                        <input class="input" name="@nameof(IngredientModel.Vendor)" type="text" placeholder="Superstore" value="@Ingredient.Bind(q => q.Vendor).Unwrap()" />
+                    </div>
                 </div>
             </div>
         </div>

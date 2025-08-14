@@ -5,16 +5,16 @@ using Microsoft.Extensions.Options;
 
 namespace Hestia.Domain.Services
 {
-    public class DocumentAINutritionLabelTextExtractor : INutritionLabelTextExtractor
+    public class DocumentAINutritionLabelTextExtractor<T> : IScanTextExtractor<T>
     {
         private readonly DocumentProcessorServiceClient _documentAiClient;
         private readonly DocumentAISettings _settings;
-        private readonly INutritionLabelProcessingStateService _stateService;
+        private readonly IScanProcessingStateService<T> _stateService;
 
         public DocumentAINutritionLabelTextExtractor(
             DocumentProcessorServiceClient documentAiClient,
             IOptions<NutritionLabelScannerSettings> options,
-            INutritionLabelProcessingStateService stateService)
+            IScanProcessingStateService<T> stateService)
         {
             _documentAiClient = documentAiClient;
             _settings = options.Value.DocumentAI ?? throw new InvalidOperationException("DocumentAI settings not configured");

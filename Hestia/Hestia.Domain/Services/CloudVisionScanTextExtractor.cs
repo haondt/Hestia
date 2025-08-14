@@ -2,14 +2,14 @@ using Google.Cloud.Vision.V1;
 
 namespace Hestia.Domain.Services
 {
-    public class CloudVisionNutritionLabelTextExtractor : INutritionLabelTextExtractor
+    public class CloudVisionScanTextExtractor<T> : IScanTextExtractor<T>
     {
         private readonly ImageAnnotatorClient _visionClient;
-        private readonly INutritionLabelProcessingStateService _stateService;
+        private readonly IScanProcessingStateService<T> _stateService;
 
-        public CloudVisionNutritionLabelTextExtractor(
+        public CloudVisionScanTextExtractor(
             ImageAnnotatorClient visionClient,
-            INutritionLabelProcessingStateService stateService)
+            IScanProcessingStateService<T> stateService)
         {
             _visionClient = visionClient;
             _stateService = stateService;

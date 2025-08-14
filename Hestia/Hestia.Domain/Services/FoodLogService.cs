@@ -20,7 +20,7 @@ namespace Hestia.Domain.Services
             if (existingFoodLog.IsSuccessful)
                 return FoodLogModel.FromDataModel(existingFoodLog.Value);
 
-            var state = await HestiaStateDataModel.GetOrCreateAsync(context);
+            var state = await HestiaStateDataModel.GetOrCreateAsync(_context);
             // TODO:
             var defaultSections = new List<string>(["Breakfast", "Lunch", "Dinner"]);
             return new FoodLogModel

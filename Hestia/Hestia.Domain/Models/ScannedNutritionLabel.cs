@@ -2,7 +2,7 @@
 
 namespace Hestia.Domain.Models
 {
-    public class ScannedNutritionLabel
+    public class ScannedNutritionLabel : IScannedIngredientData
     {
         [DocumentAIField("alternateServingSizeQuantity")]
         public Optional<decimal> AlternateServingSizeQuantity { get; set; }
@@ -28,7 +28,7 @@ namespace Hestia.Domain.Models
         public Optional<decimal> FibreGrams { get; set; }
         [DocumentAIField("sodiumGrams")]
         public Optional<decimal> SodiumGrams { get; set; }
-        
+
         public TimeSpan ProcessingDuration { get; set; }
     }
 }

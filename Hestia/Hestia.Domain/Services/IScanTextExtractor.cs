@@ -1,6 +1,6 @@
 ﻿namespace Hestia.Domain.Services
 {
-    public interface INutritionLabelTextExtractor
+    public interface IScanTextExtractor<T>
     {
         public Task<string> ExtractTextAsync(Stream imageData, Guid processingId);
     }
