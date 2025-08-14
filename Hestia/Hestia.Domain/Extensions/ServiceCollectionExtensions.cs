@@ -18,10 +18,10 @@ namespace Hestia.Domain.Extensions
             services.AddScoped<IDbSeeder, DbSeeder>();
             services.AddScoped<IDevDbSeeder, DevDbSeeder>();
 
-            var scannerSettings = configuration.GetRequiredSection<NutritionLabelScannerSettings>();
+            var scannerSettings = configuration.GetRequiredSection<ScannerSettings>();
             if (scannerSettings.Enabled)
             {
-                services.Configure<NutritionLabelScannerSettings>(configuration.GetSection(nameof(NutritionLabelScannerSettings)));
+                services.Configure<ScannerSettings>(configuration.GetSection(nameof(ScannerSettings)));
                 services.AddScoped(typeof(IScannerService<>), typeof(ScannerService<>));
 
                 if (scannerSettings.OcrProvider == OcrProvider.DocumentAI)

@@ -13,7 +13,7 @@ namespace Hestia.Domain.Services
 
         public DocumentAINutritionLabelTextExtractor(
             DocumentProcessorServiceClient documentAiClient,
-            IOptions<NutritionLabelScannerSettings> options,
+            IOptions<ScannerSettings> options,
             IScanProcessingStateService<T> stateService)
         {
             _documentAiClient = documentAiClient;

@@ -7,7 +7,7 @@ namespace Hestia.Domain.Services
 {
     public class OpenRouterNutritionLabelTextTransformer(
         HttpClient httpClient,
-        IOptions<NutritionLabelScannerSettings> options,
+        IOptions<ScannerSettings> options,
         IScanProcessingStateService<ScannedNutritionLabel> stateService) : OpenRouterScanTextTransformer<ScannedNutritionLabel>(httpClient, options, stateService)
     {
         private static readonly JsonSerializerOptions _jsonOptions = new()

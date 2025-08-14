@@ -18,7 +18,7 @@ namespace Hestia.Domain.Services
 
         public OpenRouterScanTextTransformer(
             HttpClient httpClient,
-            IOptions<NutritionLabelScannerSettings> options,
+            IOptions<ScannerSettings> options,
             IScanProcessingStateService<T> stateService)
         {
             _httpClient = httpClient;
@@ -36,7 +36,7 @@ namespace Hestia.Domain.Services
 
         public async Task<T> TransformText(string text, Guid processingId)
         {
-            _stateService.UpdateProcessingStatus(processingId, "Analyzing nutrition data with LLM...");
+            _stateService.UpdateProcessingStatus(processingId, "Analyzing data with LLM...");
 
 
             var requestBody = new

@@ -14,11 +14,11 @@ namespace Hestia.Domain.Services
         IScanTextTransformer<T> textTransformer,
         IScanProcessingStateService<T> stateService,
         IOptions<PersistenceSettings> persistenceOptions,
-        IOptions<NutritionLabelScannerSettings> scannerOptions,
+        IOptions<ScannerSettings> scannerOptions,
         ILogger<ScannerService<T>> logger) : IScannerService<T> where T : IScannedData
     {
         private readonly PersistenceSettings _persistenceSettings = persistenceOptions.Value;
-        private readonly NutritionLabelScannerSettings _scannerSettings = scannerOptions.Value;
+        private readonly ScannerSettings _scannerSettings = scannerOptions.Value;
 
         public async Task ProcessLabelImageAsync(Stream imageStream, Guid processingId)
         {

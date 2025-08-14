@@ -1,6 +1,6 @@
 ﻿namespace Hestia.Domain.Models
 {
-    public class NutritionLabelScannerSettings
+    public class ScannerSettings
     {
         public bool Enabled { get; set; } = false;
         public bool SaveTrainingData { get; set; } = false;

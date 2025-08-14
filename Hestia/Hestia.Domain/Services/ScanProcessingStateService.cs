@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace Hestia.Domain.Services
 {
-    public class ScanProcessingStateService<T>(IMemoryCache cache, IOptions<NutritionLabelScannerSettings> settings) : IScanProcessingStateService<T>
+    public class ScanProcessingStateService<T>(IMemoryCache cache, IOptions<ScannerSettings> settings) : IScanProcessingStateService<T>
     {
         private readonly TimeSpan _cacheTimeout = TimeSpan.FromMinutes(settings.Value.ProcessingCacheTimeoutMinutes);
 

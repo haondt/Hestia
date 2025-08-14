@@ -7,7 +7,7 @@
 
 @attribute [RenderPage]
 @inject IUnitConversionsService UnitConversionsService
-@inject IOptions<NutritionLabelScannerSettings> ScannerOptions
+@inject IOptions<ScannerSettings> ScannerOptions
 <div _="on load send OnNavigate(value:'NoNavigation') to #navbar then remove me"></div>
 
 @code {
