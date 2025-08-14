@@ -1,4 +1,5 @@
 using Haondt.Core.Extensions;
+using Haondt.Core.Models;
 using Hestia.Domain.Attributes;
 using Hestia.Persistence.Models;
 
@@ -9,7 +10,7 @@ namespace Hestia.Domain.Models
         [ValidDateString]
         public required string DateString { get; set; }
         public List<MealPlanSectionModel> Sections { get; set; } = [];
-        public int? MealPlanId { get; set; }
+        public Optional<int> MealPlanId { get; set; }
 
         public static FoodLogModel FromDataModel(FoodLogDataModel model) => new()
         {
@@ -18,13 +19,13 @@ namespace Hestia.Domain.Models
                 .OrderBy(s => s.Order)
                 .Select(MealPlanSectionModel.FromDataModel)
                 .ToList(),
-            MealPlanId = model.MealPlanId
+            MealPlanId = model.MealPlanId.AsOptional()
         };
 
         public FoodLogDataModel AsDataModel() => new()
         {
             DateString = DateString,
-            MealPlanId = MealPlanId,
+            MealPlanId = MealPlanId.Unwrap(),
             Sections = Sections.Select((section, index) => section.AsFoodLogDataModel(index)).ToList()
         };
 
@@ -32,42 +33,24 @@ namespace Hestia.Domain.Models
         {
             model.DateString = DateString;
             model.Sections = Sections.Select((section, index) => section.AsFoodLogDataModel(index)).ToList();
-            model.MealPlanId = MealPlanId;
+            model.MealPlanId = MealPlanId.Unwrap();
         }
 
-        public FoodLogDiffModel CalculateDiff(MealPlanModel? mealPlan)
+        public FoodLogDiffModel CalculateDiff(int mealPlanId, MealPlanModel mealPlan)
         {
             var diff = new FoodLogDiffModel
             {
                 DateString = DateString,
-                MealPlanId = MealPlanId,
-                MealPlanName = mealPlan?.Name
+                MealPlanId = mealPlanId,
+                MealPlanName = mealPlan.Name
             };
-
-            if (mealPlan == null)
-            {
-                // No meal plan to compare against - everything is "only in log"
-                diff.Sections = Sections.Select(section => new SectionDiffModel
-                {
-                    Name = section.Name,
-                    Items = section.Items.Select(item => new ItemDiffModel
-                    {
-                        ItemName = item.ItemName,
-                        RecipeOrIngredientId = item.RecipeOrIngredientId,
-                        DiffType = ItemDiffType.OnlyInLog,
-                        ActualQuantity = item.Quantity,
-                        ActualUnit = item.Unit.Unwrap()
-                    }).ToList()
-                }).ToList();
-                return diff;
-            }
 
             // Create a lookup for meal plan items by section and item identity
             var plannedItems = new Dictionary<string, Dictionary<(int id, string name), MealPlanItemModel>>();
             foreach (var section in mealPlan.Sections)
             {
                 plannedItems[section.Name] = section.Items.ToDictionary(
-                    item => (item.RecipeOrIngredientId, item.ItemName), 
+                    item => (item.RecipeOrIngredientId, item.ItemName),
                     item => item);
             }
 
@@ -85,11 +68,18 @@ namespace Hestia.Domain.Models
 
             foreach (var sectionName in allSectionNames)
             {
-                var sectionDiff = new SectionDiffModel { Name = sectionName };
-                
+                var sectionDiff = new SectionDiffModel { Name = sectionName, DiffType = ItemDiffType.Matched };
+
                 var plannedSectionItems = plannedItems.GetValueOrDefault(sectionName, new());
                 var loggedSectionItems = loggedItems.GetValueOrDefault(sectionName, new());
-                
+
+                if (plannedItems.ContainsKey(sectionName) && loggedItems.ContainsKey(sectionName))
+                    sectionDiff.DiffType = ItemDiffType.Matched;
+                else if (plannedItems.ContainsKey(sectionName))
+                    sectionDiff.DiffType = ItemDiffType.OnlyInPlan;
+                else
+                    sectionDiff.DiffType = ItemDiffType.OnlyInLog;
+
                 // Get all item keys from both sections
                 var allItemKeys = plannedSectionItems.Keys.Union(loggedSectionItems.Keys).ToList();
 
@@ -105,14 +95,18 @@ namespace Hestia.Domain.Models
                         var hasQuantityDiff = plannedItem.Quantity != loggedItem.Quantity;
                         var hasUnitDiff = plannedItem.Unit.Unwrap() != loggedItem.Unit.Unwrap();
                         diffType = hasQuantityDiff || hasUnitDiff ? ItemDiffType.Modified : ItemDiffType.Matched;
+                        if (diffType == ItemDiffType.Modified)
+                            sectionDiff.DiffType = ItemDiffType.Modified;
                     }
                     else if (plannedItem != null)
                     {
                         diffType = ItemDiffType.OnlyInPlan;
+                        sectionDiff.DiffType = ItemDiffType.Modified;
                     }
                     else
                     {
                         diffType = ItemDiffType.OnlyInLog;
+                        sectionDiff.DiffType = ItemDiffType.Modified;
                     }
 
                     sectionDiff.Items.Add(new ItemDiffModel
@@ -120,10 +114,10 @@ namespace Hestia.Domain.Models
                         ItemName = (plannedItem ?? loggedItem)!.ItemName,
                         RecipeOrIngredientId = itemKey.id,
                         DiffType = diffType,
-                        PlannedQuantity = plannedItem?.Quantity,
-                        PlannedUnit = plannedItem?.Unit.Unwrap(),
-                        ActualQuantity = loggedItem?.Quantity,
-                        ActualUnit = loggedItem?.Unit.Unwrap()
+                        PlannedQuantity = plannedItem?.Quantity ?? 0,
+                        PlannedUnit = plannedItem.AsOptional().Bind(q => q.Unit),
+                        ActualQuantity = loggedItem?.Quantity ?? 0,
+                        ActualUnit = loggedItem.AsOptional().Bind(q => q.Unit)
                     });
                 }
 

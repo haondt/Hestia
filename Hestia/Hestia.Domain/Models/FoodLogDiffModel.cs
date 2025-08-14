@@ -1,17 +1,18 @@
-using System.ComponentModel.DataAnnotations;
+using Haondt.Core.Models;
 
 namespace Hestia.Domain.Models
 {
     public record FoodLogDiffModel
     {
         public required string DateString { get; set; }
-        public int? MealPlanId { get; set; }
-        public string? MealPlanName { get; set; }
+        public required string MealPlanName { get; set; }
+        public required int MealPlanId { get; set; }
         public List<SectionDiffModel> Sections { get; set; } = [];
     }
 
     public record SectionDiffModel
     {
+        public required ItemDiffType DiffType { get; set; }
         public required string Name { get; set; }
         public List<ItemDiffModel> Items { get; set; } = [];
     }
@@ -20,20 +21,20 @@ namespace Hestia.Domain.Models
     {
         public required string ItemName { get; set; }
         public required int RecipeOrIngredientId { get; set; }
-        public ItemDiffType DiffType { get; set; }
-        
+        public required ItemDiffType DiffType { get; set; }
+
         // Planned values (from meal plan)
-        public decimal? PlannedQuantity { get; set; }
-        public string? PlannedUnit { get; set; }
-        
+        public required decimal PlannedQuantity { get; set; }
+        public Optional<string> PlannedUnit { get; set; }
+
         // Actual values (from food log)
-        public decimal? ActualQuantity { get; set; }
-        public string? ActualUnit { get; set; }
-        
+        public required decimal ActualQuantity { get; set; }
+        public Optional<string> ActualUnit { get; set; }
+
         // Calculated difference
-        public decimal? QuantityDifference => ActualQuantity - PlannedQuantity;
-        public bool HasQuantityDifference => PlannedQuantity.HasValue && ActualQuantity.HasValue && PlannedQuantity != ActualQuantity;
-        public bool HasUnitDifference => PlannedUnit != ActualUnit;
+        public decimal QuantityDifference => ActualQuantity - PlannedQuantity;
+        public bool HasQuantityDifference => QuantityDifference != 0;
+        public bool HasUnitDifference => !PlannedUnit.Equals(ActualUnit);
     }
 
     public enum ItemDiffType

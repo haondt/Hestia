@@ -62,33 +62,48 @@
     <div class="is-flex is-flex-direction-row is-fullwidth is-position-relative mb-5">
         <div class="is-fullwidth is-flex-grow-1">
             <div class="tabs is-flex-grow-1">
-                <ul>
-                    <li class="is-active">
+                <ul
+                    _="
+                        on setActive
+                            halt the event
+                            if :active is not null
+                                remove .is-active from the :active's parentElement
+                                add .is-hidden to :activeBody
+                            end
+
+                            set :active to the event's srcElement
+                            set :activeBody to #{:active's @@data-body-id}
+                            add .is-active to the :active's parentElement
+                            send loadData to :activeBody
+                            remove .is-hidden from :activeBody
+                        end
+                    "
+                    >
+                    <li>
                         <a 
                             _="
-                                on click 
-                                    add .is-active to the closest <li/>
-                                    remove .is-active from the first <li />
-                                    remove .is-hidden from #food-log-editor-panel
-                                    set #food-log-insights-panel's innerHTML to ''
-                                end
+                                on load send setActive end
+                                on click send setActive end
                             "
+                            data-body-id="food-log-editor-panel"
                         >
                             Food Log
                         </a>
                     </li>
                     <li>
                         <a
-                            _="
-                                on click 
-                                    add .is-active to the closest <li/>
-                                    remove .is-active from the previous <li />
-                                    add .is-hidden to #food-log-editor-panel
-                                    send loadData to #food-log-insights-panel
-                                end
-                            "
+                            _="on click send setActive end"
+                            data-body-id="food-log-insights-panel"
                         >
                             Insights
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            _="on click send setActive end"
+                            data-body-id="food-log-diff-panel"
+                        >
+                            Compare Meal Plan
                         </a>
                     </li>
                 </ul>
@@ -104,6 +119,15 @@
         hx-trigger="loadData"
         hx-get="/food-logs/insights/@DateString"
         hx-swap="innerHTML"
+        class="is-hidden"
+    >
+    </div>
+    <div 
+        id="food-log-diff-panel"
+        hx-trigger="loadData"
+        hx-get="/food-logs/diff/@DateString"
+        hx-swap="innerHTML"
+        class="is-hidden"
     >
     </div>
 </div>

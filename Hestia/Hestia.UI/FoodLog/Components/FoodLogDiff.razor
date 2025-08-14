@@ -1,0 +1,81 @@
+@using Hestia.Domain.Models
+@using Hestia.UI.Core.Components
+@using Hestia.UI.MealPlans.Components
+
+@code {
+    [Parameter]
+    public Optional<FoodLogDiffModel> Diff { get; set; }
+
+    private string GetDiffTextClass(ItemDiffType diffType) => diffType switch
+    {
+        ItemDiffType.OnlyInLog => "has-text-success",
+        ItemDiffType.OnlyInPlan => "has-text-danger",
+        ItemDiffType.Modified => "has-text-warning",
+        _ => ""
+    };
+
+    private string GetQuantityDisplay(ItemDiffModel item)
+    {
+        if (item.DiffType == ItemDiffType.Matched)
+            return $"{item.PlannedQuantity} {item.PlannedUnit.Unwrap()}".Trim();
+        var planned = $"{item.PlannedQuantity} {item.PlannedUnit.Unwrap()}";
+        var actual = $"{item.ActualQuantity} {item.ActualUnit.Unwrap()}";
+        return $"{planned} → {actual}";
+    }
+}
+
+<div>
+    @if (!Diff.TryGetValue(out var diff))
+    {
+        <p class="has-text-grey">No meal plan selected</p>
+    }
+    else
+    {
+        <div class="meal-plan-editor-panel">
+            <div class="meal-planner food-logger">
+                <div class="field mb-3 is-flex is-align-items-center">
+                    <div class="mr-2">
+                        <div class="is-flex is-flex-direction-row is-align-items-flex-end">
+                            <p class="section-label pb-2 mr-4">Meal plan</p>
+                            <div class="meal-plan-selector mt-0">
+                                <p class="meal-plan-label">@diff.MealPlanName</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="food-log-content" class="meal-plan-content">
+                    @foreach (var diffSection in diff.Sections)
+                    {
+                        <div class="meal-plan-section-container">
+                            <div class="field has-addons mb-3">
+                                <div class="control is-expanded">
+                                    <p class="input @GetDiffTextClass(diffSection.DiffType)  meal-plan-section-title-input">
+                                        @diffSection.Name
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="meal-plan-item-container-container mb-4 is-flex is-flex-direction-column">
+                                <div class="meal-plan-item-container is-flex is-flex-direction-column">
+                                    @foreach (var item in diffSection.Items)
+                                    {
+                                        <div class="meal-plan-item" >
+                                            <p class="meal-plan-item-name">
+                                                <span class="mr-1 @GetDiffTextClass(item.DiffType)">@item.ItemName</span>
+                                                <span>
+                                                    <span class="@GetDiffTextClass(item.DiffType) is-size-7 is-">@GetQuantityDisplay(item)</span>
+                                                </span>
+                                            </p>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+

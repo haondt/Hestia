@@ -93,5 +93,32 @@ namespace Hestia.UI.FoodLog.Controllers
                 MealPlanId = id.AsOptional()
             });
         }
+
+        [HttpGet("diff/{dateString}")]
+        public async Task<IResult> GetFoodLogDiffAsync([ValidDateString] string dateString)
+        {
+            if (!ModelState.IsValid)
+                return TypedResults.NotFound();
+
+            var foodLogResult = await foodLogService.GetOrCreateFoodLogAsync(dateString);
+
+            if (foodLogResult.MealPlanId.HasValue)
+            {
+                var mealPlan = await mealPlansService.GetMealPlanAsync(foodLogResult.MealPlanId.Value);
+                if (mealPlan.IsSuccessful)
+                {
+                    var diff = foodLogResult.CalculateDiff(foodLogResult.MealPlanId.Value, mealPlan.Value);
+                    return await _componentFactory.RenderComponentAsync(new Components.FoodLogDiff
+                    {
+                        Diff = diff
+                    });
+                }
+            }
+
+
+            return await _componentFactory.RenderComponentAsync(new Components.FoodLogDiff
+            {
+            });
+        }
     }
 }
