@@ -21,7 +21,7 @@
     padding: 1rem;
 }
 
-.meal-plan-editor-panel, #meal-plan-insights-panel {
+.meal-plan-editor-panel, .meal-plan-insights-panel {
     margin:auto;
     max-width: 800px;
 }
@@ -126,7 +126,7 @@
         padding: 0.25rem;
     }
 
-    .meal-plan-editor-panel, #meal-plan-insights-panel {
+    .meal-plan-editor-panel, .meal-plan-insights-panel {
         margin:auto;
         max-width: initial;
     }

@@ -120,5 +120,15 @@ namespace Hestia.UI.FoodLog.Controllers
             {
             });
         }
+
+        [HttpGet("insights/{dateString}")]
+        public async Task<IResult> GetFoodLogInsightsAsync([ValidDateString] string dateString)
+        {
+            var foodLog = await foodLogService.GetOrCreateFoodLogAsync(dateString);
+            return await _componentFactory.RenderComponentAsync(new FoodLogInsights
+            {
+                FoodLog = foodLog
+            });
+        }
     }
 }

@@ -1,0 +1,77 @@
+@using Hestia.Core.Models
+@using Hestia.Domain.Models
+@using Hestia.Domain.Services
+@using Hestia.UI.Core.Components
+@using Hestia.UI.Library.Components.Element
+@attribute [RenderPage]
+
+@inject IUnitConversionsService UnitConversionsService
+@inject IIngredientsService IngredientsService
+@inject IRecipesService RecipesService
+
+@code {
+    [Parameter, EditorRequired]
+    public required FoodLogModel FoodLog { get; set; }
+
+    private FoodLogInsightsModel _insights = default!;
+    private List<(string Title, List<string> Warnings)> _warnings = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        (_insights, _warnings) = await FoodLog.GetInsightsAsync(UnitConversionsService, IngredientsService, RecipesService);
+    }
+}
+
+<div class="meal-plan-insights">
+
+        @if (_warnings.Any())
+        {
+            <div class="notification py-3 px-4">
+                <details>
+                    <summary class="has-text-warning"><strong>Calculation Warnings (@_warnings.Sum(w => w.Warnings.Count))</strong></summary>
+                    @foreach (var (title, warnings) in _warnings)
+                    {
+                        <div class="mt-3">
+                            <p class="section-label">@title</p>
+                                @foreach (var warning in warnings)
+                                {
+                                    <p>@warning</p>
+                                }
+                        </div>
+                    }
+                </details>
+            </div>
+        }
+
+        <div>
+            <p class="section-label">Nutritional Totals</p>
+            
+            <table class="table is-fullwidth">
+                <tbody>
+                    <tr>
+                        <td>Total Calories</td>
+                        <td class="has-text-weight-semibold">@_insights.TotalCalories.ToString("F0")</td>
+                    </tr>
+                    <tr>
+                        <td>Total Protein</td>
+                        <td class="has-text-weight-semibold">@_insights.TotalProtein.ToString("F1")g</td>
+                    </tr>
+                    <tr>
+                        <td>Total Fat</td>
+                        <td class="has-text-weight-semibold">@_insights.TotalFat.ToString("F1")g</td>
+                    </tr>
+                    <tr>
+                        <td>Total Carbs</td>
+                        <td class="has-text-weight-semibold">@_insights.TotalCarbs.ToString("F1")g</td>
+                    </tr>
+                    @if (_insights.TotalCost > 0)
+                    {
+                        <tr>
+                            <td>Total Cost</td>
+                            <td class="has-text-weight-semibold">$@_insights.TotalCost.ToString("F2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+</div>
