@@ -108,6 +108,26 @@ namespace Hestia.UI.Core.Extensions
                     ""scrollIntoViewOnBoost"": false
                 }",
             });
+
+            // PWA Meta Tags
+            services.AddScoped<IHeadEntryDescriptor>(_ => new MetaDescriptor
+            {
+                Name = "theme-color",
+                Content = "#181616"
+            });
+            // PWA Manifest
+            services.AddScoped<IHeadEntryDescriptor>(_ => new LinkDescriptor
+            {
+                Uri = "/static/shared/manifest.json",
+                Relationship = "manifest"
+            });
+
+            // Service Worker Registration Script
+            services.AddScoped<IHeadEntryDescriptor>(_ => new ScriptDescriptor
+            {
+                Uri = "/static/shared/js/pwa-register.js"
+            });
+
             return services;
         }
     }

@@ -1,0 +1,28 @@
+{
+  "name": "Hestia",
+  "short_name": "Hestia",
+  "description": "A food tracking and meal planning application",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#181616",
+  "theme_color": "#e05f35",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/static/shared/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/static/shared/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["food", "health", "productivity"],
+  "lang": "en",
+  "dir": "ltr"
+}
