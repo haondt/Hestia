@@ -25,7 +25,7 @@ namespace Hestia.Persistence.Extensions
                 case StorageDrivers.Sqlite:
                     var sqliteConnection = new SqliteConnectionStringBuilder
                     {
-                        DataSource = persistenceSettings.Sqlite!.FilePath
+                        DataSource = Path.Join(persistenceSettings.FileDataPath, persistenceSettings.Sqlite!.FilePath)
                     }.ToString();
 
                     services.AddDbContext<SqliteApplicationDbContext>(o =>
